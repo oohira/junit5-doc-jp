@@ -1,0 +1,37 @@
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+junitPlatform {
+	filters {
+		engines {
+			include 'junit-jupiter'
+		}
+		includeClassNamePattern '.*Tests?'
+	}
+	logManager 'org.apache.logging.log4j.jul.LogManager'
+}
+
+dependencies {
+	api(project(':junit-platform-launcher'))
+	implementation('org.apache.maven.surefire:surefire-api:2.19.1')
+	implementation('org.apache.maven.surefire:common-java5:2.19.1')
+
+	testImplementation(project(':junit-jupiter-api'))
+	testImplementation(project(':junit-platform-runner'))
+	testImplementation(project(':junit-jupiter-engine'))
+	testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+	testImplementation("org.assertj:assertj-core:${assertJVersion}")
+
+	// Include junit-platform-console so that the JUnit Gradle plugin
+	// uses the local version of the ConsoleLauncher.
+	testRuntimeOnly(project(path: ':junit-platform-console', configuration: 'shadow'))
+	testRuntimeOnly("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+	testRuntimeOnly("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+}
+
+jar {
+	manifest {
+		attributes(
+			'Automatic-Module-Name': 'org.junit.platform.surefire.provider'
+		)
+	}
+}
