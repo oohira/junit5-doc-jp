@@ -39,18 +39,18 @@ test {
 dependencies {
 	asciidoctor('org.jruby:jruby-complete:9.1.15.0')
 
-	testImplementation(project(':junit-jupiter-api'))
-	testImplementation(project(path: ':junit-jupiter-params', configuration: 'shadow'))
-	testImplementation(project(':junit-platform-runner'))
-	testImplementation(project(':junit-platform-launcher'))
+	testImplementation("org.junit.jupiter:junit-jupiter-api:${version}")
+	testImplementation("org.junit.jupiter:junit-jupiter-params:${version}")
+	testImplementation("org.junit.platform:junit-platform-runner:${platformVersion}")
+	testImplementation("org.junit.platform:junit-platform-launcher:${platformVersion}")
 	if (gradle.ext.kotlinIsSupported) testImplementation("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
 
 	// Include junit-platform-console so that the JUnit Gradle plugin
 	// uses the local version of the ConsoleLauncher.
-	testRuntimeOnly(project(path: ':junit-platform-console', configuration: 'shadow'))
+	testRuntimeOnly("org.junit.platform:junit-platform-console:${platformVersion}")
 
-	testRuntimeOnly(project(':junit-vintage-engine'))
-	testRuntimeOnly(project(':junit-jupiter-engine'))
+	testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${vintageVersion}")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${version}")
 	testRuntimeOnly("org.apache.logging.log4j:log4j-core:${log4jVersion}")
 	testRuntimeOnly("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
 

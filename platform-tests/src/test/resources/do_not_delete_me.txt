@@ -1,3 +1,0 @@
-I am used by tests, so...
-
-Do NOT delete me!
