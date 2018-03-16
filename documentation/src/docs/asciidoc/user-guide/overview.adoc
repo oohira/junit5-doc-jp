@@ -1,11 +1,10 @@
 [[overview]]
-== Overview
+== 概要
 
-The goal of this document is to provide comprehensive reference documentation for
-programmers writing tests, extension authors, and engine authors as well as build tool
-and IDE vendors.
+この文書は、テストを書くプログラマーや拡張機能の作者、ビルドツールやIDEを含むテストエンジンの作者に対して、
+包括的なリファレンスを提供することを目的としています。
 
-ifdef::backend-html5[This document is also available as a link:index.pdf[PDF download].]
+//ifdef::backend-html5[This document is also available as a link:index.pdf[PDF download].]
 
 [TIP]
 .Translations
@@ -14,40 +13,40 @@ This document is also available in http://sjyuan.cc/junit5/user-guide-cn[Simplif
 ====
 
 [[overview-what-is-junit-5]]
-=== What is JUnit 5?
+=== JUnit 5とは
 
-Unlike previous versions of JUnit, JUnit 5 is composed of several different modules from
-three different sub-projects.
+これまでのバージョンのJUnitとは異なり、JUnit 5は
+3つのサブプロジェクトに含まれる複数のモジュールで構成されます。
 
 **JUnit 5 = _JUnit Platform_ + _JUnit Jupiter_ + _JUnit Vintage_**
 
-The **JUnit Platform** serves as a foundation for <<launcher-api,launching testing
-frameworks>> on the JVM. It also defines the `{TestEngine}` API for developing a testing
-framework that runs on the platform. Furthermore, the platform provides a
-<<running-tests-console-launcher,Console Launcher>> to launch the platform from the
-command line and build plugins for <<running-tests-build-gradle,Gradle>> and
-<<running-tests-build-maven,Maven>> as well as a
-<<running-tests-junit-platform-runner,JUnit 4 based Runner>> for running any `TestEngine`
-on the platform.
+**JUnit Platform** は、JVM上で <<launcher-api,テストフレームワークを起動する>>
+ための基盤となり、このプラットフォーム上で動作するテストフレームワークを開発するための
+`{TestEngine}` APIを定義しています。加えて、コマンドラインからプラットフォームを起動するための
+<<running-tests-console-launcher,Console Launcher>> や、
+<<running-tests-build-gradle,Gradle>> と <<running-tests-build-maven,Maven>>
+用のビルドプラグイン、 <<running-tests-junit-platform-runner,JUnit 4ベースのテストランナー>>
+などを提供し、あらゆる `TestEngine` を実行できるようになっています。
 
-**JUnit Jupiter** is the combination of the new <<writing-tests,programming model>> and
-<<extensions,extension model>> for writing tests and extensions in JUnit 5. The Jupiter
-sub-project provides a `TestEngine` for running Jupiter based tests on the platform.
+**JUnit Jupiter** は、JUnit 5でテストや拡張機能を書くための新しい
+<<writing-tests,プログラミングモデル>> と <<extensions,拡張モデル>> の組み合わせです。
+Jupiterサブプロジェクトは、プラットフォーム上でJupiterベースのテストを実行するための
+`TestEngine` を提供します。
 
-**JUnit Vintage** provides a `TestEngine` for running JUnit 3 and JUnit 4 based tests on
-the platform.
+**JUnit Vintage** は、プラットフォーム上でJUnit 3またはJUnit 4
+ベースのテストを実行するための `TestEngine` を提供します。
 
 [[overview-java-versions]]
-=== Supported Java Versions
+=== サポートされるJavaバージョン
 
-JUnit 5 requires Java 8 (or higher) at runtime. However, you can still test code that
-has been compiled with previous versions of the JDK.
+JUnit 5を実行するには、Java 8（またはそれ以上）が必要となります。
+ただし、それより古いバージョンのJDKでコンパイルされたコードをテストすることは可能です。
 
 
 [[overview-getting-help]]
-=== Getting Help
+=== 助けてもらうには
 
-Ask JUnit 5 related questions on {StackOverflow} or chat with us on {Gitter}.
+{StackOverflow} で質問するか、 {Gitter} で私たちにチャットしてください。
 
 [[installation]]
 == Installation
