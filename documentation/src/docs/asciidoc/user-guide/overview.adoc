@@ -1,11 +1,10 @@
 [[overview]]
-== Overview
+== 概要
 
-The goal of this document is to provide comprehensive reference documentation for
-programmers writing tests, extension authors, and engine authors as well as build tool
-and IDE vendors.
+この文書は、テストを書くプログラマーや拡張機能の作者、ビルドツールやIDEを含むテストエンジンの作者に対して、
+包括的なリファレンスを提供することを目的としています。
 
-ifdef::backend-html5[This document is also available as a link:index.pdf[PDF download].]
+//ifdef::backend-html5[This document is also available as a link:index.pdf[PDF download].]
 
 [TIP]
 .Translations
@@ -14,51 +13,51 @@ This document is also available in http://sjyuan.cc/junit5/user-guide-cn[Simplif
 ====
 
 [[overview-what-is-junit-5]]
-=== What is JUnit 5?
+=== JUnit 5とは
 
-Unlike previous versions of JUnit, JUnit 5 is composed of several different modules from
-three different sub-projects.
+これまでのバージョンのJUnitとは異なり、JUnit 5は
+3つのサブプロジェクトに含まれる複数のモジュールで構成されます。
 
 **JUnit 5 = _JUnit Platform_ + _JUnit Jupiter_ + _JUnit Vintage_**
 
-The **JUnit Platform** serves as a foundation for <<launcher-api,launching testing
-frameworks>> on the JVM. It also defines the `{TestEngine}` API for developing a testing
-framework that runs on the platform. Furthermore, the platform provides a
-<<running-tests-console-launcher,Console Launcher>> to launch the platform from the
-command line and build plugins for <<running-tests-build-gradle,Gradle>> and
-<<running-tests-build-maven,Maven>> as well as a
-<<running-tests-junit-platform-runner,JUnit 4 based Runner>> for running any `TestEngine`
-on the platform.
+**JUnit Platform** は、JVM上で <<launcher-api,テストフレームワークを起動する>>
+ための基盤となり、このプラットフォーム上で動作するテストフレームワークを開発するための
+`{TestEngine}` APIを定義しています。加えて、コマンドラインからプラットフォームを起動するための
+<<running-tests-console-launcher,Console Launcher>> や、
+<<running-tests-build-gradle,Gradle>> と <<running-tests-build-maven,Maven>>
+用のビルドプラグイン、 <<running-tests-junit-platform-runner,JUnit 4ベースのテストランナー>>
+などを提供し、あらゆる `TestEngine` を実行できるようになっています。
 
-**JUnit Jupiter** is the combination of the new <<writing-tests,programming model>> and
-<<extensions,extension model>> for writing tests and extensions in JUnit 5. The Jupiter
-sub-project provides a `TestEngine` for running Jupiter based tests on the platform.
+**JUnit Jupiter** は、JUnit 5でテストや拡張機能を書くための新しい
+<<writing-tests,プログラミングモデル>> と <<extensions,拡張モデル>> の組み合わせです。
+Jupiterサブプロジェクトは、プラットフォーム上でJupiterベースのテストを実行するための
+`TestEngine` を提供します。
 
-**JUnit Vintage** provides a `TestEngine` for running JUnit 3 and JUnit 4 based tests on
-the platform.
+**JUnit Vintage** は、プラットフォーム上でJUnit 3またはJUnit 4
+ベースのテストを実行するための `TestEngine` を提供します。
 
 [[overview-java-versions]]
-=== Supported Java Versions
+=== サポートされるJavaバージョン
 
-JUnit 5 requires Java 8 (or higher) at runtime. However, you can still test code that
-has been compiled with previous versions of the JDK.
+JUnit 5を実行するには、Java 8（またはそれ以上）が必要となります。
+ただし、それより古いバージョンのJDKでコンパイルされたコードをテストすることは可能です。
 
 
 [[overview-getting-help]]
-=== Getting Help
+=== 助けてもらうには
 
-Ask JUnit 5 related questions on {StackOverflow} or chat with us on {Gitter}.
+{StackOverflow} で質問するか、 {Gitter} で私たちにチャットしてください。
 
 [[installation]]
-== Installation
+== インストール
 
-Artifacts for final releases and milestones are deployed to Maven Central.
+最終リリースや各マイルストーンでの成果物は、Maven Centralリポジトリにデプロイされています。
 
-Snapshot artifacts are deployed to Sonatype's {snapshot-repo}[snapshots repository] under
-{snapshot-repo}/org/junit/[/org/junit].
+スナップショットは、Sonatype {snapshot-repo}[スナップショットリポジトリ] の
+{snapshot-repo}/org/junit/[/org/junit] 以下にデプロイされています。
 
 [[dependency-metadata]]
-=== Dependency Metadata
+=== 依存関係メタデータ
 
 [[dependency-metadata-junit-platform]]
 ==== JUnit Platform
@@ -67,34 +66,34 @@ Snapshot artifacts are deployed to Sonatype's {snapshot-repo}[snapshots reposito
 * *Version*: `{platform-version}`
 * *Artifact IDs*:
   `junit-platform-commons`::
-    Internal common library/utilities of JUnit. These utilities are intended solely for usage within
-    the JUnit framework itself. _Any usage by external parties is not supported._ Use at your own
-    risk!
+    JUnitの内部的な共通ライブラリ／ユーティリティです。これらのユーティリティは、
+    JUnitフレームワーク自身で使われることだけを想定しています。
+    _外部のプログラムからの利用はサポートされていません。_ 利用は自己責任で！
   `junit-platform-console`::
-    Support for discovering and executing tests on the JUnit Platform from the console. See
-    <<running-tests-console-launcher>> for details.
+    コンソールからJUnit Platform上でテストを見つけて実行する機能を提供します。
+    詳細は、 <<running-tests-console-launcher>> を参照してください。
   `junit-platform-console-standalone`::
-    An executable JAR with all dependencies included is provided at Maven Central under the
+    すべての依存関係を含む実行可能なJARは、Maven Centralリポジトリの
     https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone[junit-platform-console-standalone]
-    directory. See <<running-tests-console-launcher>> for details.
+    ディレクトリで提供されています。詳細は、 <<running-tests-console-launcher>> を参照してください。
   `junit-platform-engine`::
-    Public API for test engines. See <<launcher-api-engines-custom>> for details.
+    テストエンジンの公開APIです。詳細は、 <<launcher-api-engines-custom>> を参照してください。
   `junit-platform-gradle-plugin`::
-    Support for discovering and executing tests on the JUnit Platform using
-    <<running-tests-build-gradle,Gradle>>.
+    <<running-tests-build-gradle,Gradle>> を使って、
+    JUnit Platform上でテストを見つけて実行する機能を提供します。
   `junit-platform-launcher`::
-    Public API for configuring and launching test plans -- typically used by IDEs and build tools.
-    See <<launcher-api>> for details.
+    テストプランを構成して起動するための公開APIです。通常は、IDEやビルドツールに使われます。
+    詳細は、 <<launcher-api>> を参照してください。
   `junit-platform-runner`::
-    Runner for executing tests and test suites on the JUnit Platform in a JUnit 4
-    environment. See <<running-tests-junit-platform-runner>> for details.
+    JUnit Platform上のテストおよびテストスイートをJUnit 4環境で実行するテストランナーです。
+    詳細は、 <<running-tests-junit-platform-runner>> を参照してください。
   `junit-platform-suite-api`::
-    Annotations for configuring test suites on the JUnit Platform. Supported by the
-    <<running-tests-junit-platform-runner,JUnitPlatform runner>> and possibly by third-party
-    `TestEngine` implementations.
+    JUnit Platform上でテストスイートを構成するためのアノテーションです。
+    <<running-tests-junit-platform-runner,JUnitPlatformランナー>>
+    と（おそらく）サードパーティーの `TestEngine` 実装にもサポートされます。
   `junit-platform-surefire-provider`::
-    Support for discovering and executing tests on the JUnit Platform using
-    <<running-tests-build-maven,Maven Surefire>>.
+    <<running-tests-build-maven,Maven Surefire>> を使って、
+    JUnit Platform上でテストを見つけて実行する機能を提供します。
 
 [[dependency-metadata-junit-jupiter]]
 ==== JUnit Jupiter
@@ -103,14 +102,14 @@ Snapshot artifacts are deployed to Sonatype's {snapshot-repo}[snapshots reposito
 * *Version*: `{jupiter-version}`
 * *Artifact IDs*:
   `junit-jupiter-api`::
-    JUnit Jupiter API for <<writing-tests,writing tests>> and <<extensions,extensions>>.
+    JUnit Jupiterで <<writing-tests,テスト>> や <<extensions,拡張機能>> を書くためのAPIです。
   `junit-jupiter-engine`::
-    JUnit Jupiter test engine implementation, only required at runtime.
+    JUnit Jupiterのテストエンジン実装です。実行時だけ必要になります。
   `junit-jupiter-params`::
-    Support for <<writing-tests-parameterized-tests,parameterized tests>> in JUnit Jupiter.
+    JUnit Jupiterで <<writing-tests-parameterized-tests,パラメーター化テスト>> をサポートします。
   `junit-jupiter-migrationsupport`::
-    Migration support from JUnit 4 to JUnit Jupiter,
-    only required for running selected JUnit 4 rules.
+    JUnit 4からJUnit Jupiterへの移行をサポートします。
+    JUnit Jupiter上で、JUnit 4ルールを実行したいときだけ必要になります。
 
 [[dependency-metadata-junit-vintage]]
 ==== JUnit Vintage
@@ -119,28 +118,26 @@ Snapshot artifacts are deployed to Sonatype's {snapshot-repo}[snapshots reposito
 * *Version*: `{vintage-version}`
 * *Artifact ID*:
   `junit-vintage-engine`::
-    JUnit Vintage test engine implementation that allows to run vintage JUnit tests, i.e. tests
-    written in the JUnit 3 or JUnit 4 style, on the new JUnit Platform.
+    JUnit Vintageのテストエンジン実装です。JUnit 3またはJUnit 4で書かれた昔のテストを
+    新しいJUnit Platform上で実行できるようにします。
 
 [[dependency-metadata-dependencies]]
-==== Dependencies
+==== 依存関係
 
-All of the above artifacts have a dependency in their published Maven POMs on
-the following _@API Guardian_ JAR.
+前述のすべてのJARが次の _@API Guardian_ JARに依存しています。
 
 * *Group ID*: `org.apiguardian`
 * *Artifact ID*: `apiguardian-api`
 * *Version*: `{apiguardian-version}`
 
-In addition, most of the above artifacts have a direct or transitive dependency to the
-following _OpenTest4J_ JAR.
+加えて、ほとんどのJARが次の _OpenTest4J_ JARに直接または間接的に依存しています。
 
 * *Group ID*: `org.opentest4j`
 * *Artifact ID*: `opentest4j`
 * *Version*: `{ota4j-version}`
 
 [[dependency-diagram]]
-=== Dependency Diagram
+=== 依存関係図
 
 [plantuml, component-diagram, svg]
 ----
@@ -220,11 +217,11 @@ vintage_engine ..> junit4
 ----
 
 [[dependency-metadata-junit-jupiter-samples]]
-=== JUnit Jupiter Sample Projects
+=== JUnit Jupiterサンプルプロジェクト
 
-The {junit5-samples-repo}[`junit5-samples`] repository hosts a collection of sample
-projects based on JUnit Jupiter and JUnit Vintage. You'll find the respective
-`build.gradle` and `pom.xml` in the projects below.
+{junit5-samples-repo}[`junit5-samples`] リポジトリは、
+JUnit JupiterベースとJUnit Vintageベースのプロジェクトの様々なサンプルを提供します。
+次のプロジェクトで `build.gradle` と `pom.xml` を見つけられるでしょう。
 
-* For Gradle, check out the `{junit5-gradle-consumer}` project.
-* For Maven, check out the `{junit5-maven-consumer}` project.
+* Gradleの場合は、`{junit5-gradle-consumer}` プロジェクトを参照してください
+* Mavenの場合は、`{junit5-maven-consumer}` プロジェクトを参照してください
