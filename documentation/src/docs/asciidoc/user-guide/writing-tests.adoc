@@ -61,21 +61,21 @@ include::{testDir}/example/Fast.java[tags=user_guide]
 ----
 
 [[writing-tests-standard]]
-=== Standard Test Class
+=== 標準的なテストクラス
 
 [source,java,indent=0]
-.A standard test case
+.標準的なテストケース
 ----
 include::{testDir}/example/StandardTests.java[tags=user_guide]
 ----
 
-NOTE: Neither test classes nor test methods need to be `public`.
+NOTE: テストクラスやテストメソッドは、 `public` である必要がありません。
 
 [[writing-tests-display-names]]
-=== Display Names
+=== 表示名
 
-Test classes and test methods can declare custom display names -- with spaces, special
-characters, and even emojis -- that will be displayed by test runners and test reporting.
+テストクラスやテストメソッドは、カスタムの表示名を宣言できます。
+空白や特殊文字だけでなく絵文字も含めることができ、テストランナーやテストレポートに表示されます。
 
 [source,java,indent=0]
 ----
