@@ -83,20 +83,20 @@ include::{testDir}/example/DisplayNameDemo.java[tags=user_guide]
 ----
 
 [[writing-tests-assertions]]
-=== Assertions
+=== アサーション
 
-JUnit Jupiter comes with many of the assertion methods that JUnit 4 has and adds a few
-that lend themselves well to being used with Java 8 lambdas. All JUnit Jupiter assertions
-are `static` methods in the `{Assertions}` class.
+JUnit Jupiterは、JUnit 4にあった多くのアサーションメソッドをもち、
+Java 8のラムダ式と一緒に使いやすいものもいくつか追加しています。
+すべてのJUnit Jupiterアサーションは、 `{Assertions}` クラスの `static` メソッドです。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/AssertionsDemo.java[tags=user_guide]
 ----
 
-JUnit Jupiter also comes with a few assertion methods that lend themselves well to being
-used in https://kotlinlang.org/[Kotlin]. All JUnit Jupiter Kotlin assertions are top-level
-functions in the `org.junit.jupiter.api` package.
+JUnit Jupiterは、 https://kotlinlang.org/[Kotlin]
+と一緒に使いやすいアサーションもいくつか含んでいます。すべてのJUnit Jupiter Kotlinアサーションは、
+`org.junit.jupiter.api` パッケージのトップレベル関数です。
 
 // TODO: Change to using kotlin language highlighting after switch to rouge syntax highlighter
 [source,groovy,indent=0]

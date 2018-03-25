@@ -33,15 +33,15 @@ class AssertionsDemo {
 	@Test
 	void standardAssertions() {
 		assertEquals(2, 2);
-		assertEquals(4, 4, "The optional assertion message is now the last parameter.");
-		assertTrue('a' < 'b', () -> "Assertion messages can be lazily evaluated -- "
-				+ "to avoid constructing complex messages unnecessarily.");
+		assertEquals(4, 4, "省略可能なアサーションメッセージは最後のパラメーター");
+		assertTrue('a' < 'b', () -> "アサーションメッセージは遅延評価できる -- "
+				+ "不必要に複雑なメッセージを構築するコストを割けるために");
 	}
 
 	@Test
 	void groupedAssertions() {
-		// In a grouped assertion all assertions are executed, and any
-		// failures will be reported together.
+		// アサーションをグループ化すると、すべてのアサーションが一度に実行され、
+		// すべての失敗がまとめて報告される。
 		assertAll("person",
 			() -> assertEquals("John", person.getFirstName()),
 			() -> assertEquals("Doe", person.getLastName())
@@ -50,26 +50,24 @@ class AssertionsDemo {
 
 	@Test
 	void dependentAssertions() {
-		// Within a code block, if an assertion fails the
-		// subsequent code in the same block will be skipped.
+		// コードブロック内でアサーションが失敗すると、同じブロック内の後続のコードはスキップされる。
 		assertAll("properties",
 			() -> {
 				String firstName = person.getFirstName();
 				assertNotNull(firstName);
 
-				// Executed only if the previous assertion is valid.
+				// 上のアサーションが成功した場合のみ実行される。
 				assertAll("first name",
 					() -> assertTrue(firstName.startsWith("J")),
 					() -> assertTrue(firstName.endsWith("n"))
 				);
 			},
 			() -> {
-				// Grouped assertion, so processed independently
-				// of results of first name assertions.
+				// グループ化されたアサーションは、first name のアサーションとは独立して実行される。
 				String lastName = person.getLastName();
 				assertNotNull(lastName);
 
-				// Executed only if the previous assertion is valid.
+				// 上のアサーションが成功した場合のみ実行される。
 				assertAll("last name",
 					() -> assertTrue(lastName.startsWith("D")),
 					() -> assertTrue(lastName.endsWith("e"))
@@ -88,15 +86,15 @@ class AssertionsDemo {
 
 	@Test
 	void timeoutNotExceeded() {
-		// The following assertion succeeds.
+		// 次のアサーションは成功する。
 		assertTimeout(ofMinutes(2), () -> {
-			// Perform task that takes less than 2 minutes.
+			// 2分未満で終わるタスクを実行する。
 		});
 	}
 
 	@Test
 	void timeoutNotExceededWithResult() {
-		// The following assertion succeeds, and returns the supplied object.
+		// 次のアサーションは成功し、指定されたオブジェクトを返す。
 		String actualResult = assertTimeout(ofMinutes(2), () -> {
 			return "a result";
 		});
@@ -105,7 +103,7 @@ class AssertionsDemo {
 
 	@Test
 	void timeoutNotExceededWithMethod() {
-		// The following assertion invokes a method reference and returns an object.
+		// 次のアサーションは、メソッド参照を実行してオブジェクトを返す。
 		String actualGreeting = assertTimeout(ofMinutes(2), AssertionsDemo::greeting);
 		assertEquals("Hello, World!", actualGreeting);
 	}
@@ -115,10 +113,10 @@ class AssertionsDemo {
 	// tag::user_guide[]
 	@Test
 	void timeoutExceeded() {
-		// The following assertion fails with an error message similar to:
+		// 次のアサーションは、以下のようなエラーメッセージを出して失敗する:
 		// execution exceeded timeout of 10 ms by 91 ms
 		assertTimeout(ofMillis(10), () -> {
-			// Simulate task that takes more than 10 ms.
+			// 10ミリ秒より時間のかかるタスクをシミュレートする。
 			Thread.sleep(100);
 		});
 	}
@@ -128,10 +126,10 @@ class AssertionsDemo {
 	// tag::user_guide[]
 	@Test
 	void timeoutExceededWithPreemptiveTermination() {
-		// The following assertion fails with an error message similar to:
+		// 次のアサーションは、以下のようなエラーメッセージを出して失敗する:
 		// execution timed out after 10 ms
 		assertTimeoutPreemptively(ofMillis(10), () -> {
-			// Simulate task that takes more than 10 ms.
+			// 10ミリ秒より時間のかかるタスクをシミュレートする。
 			Thread.sleep(100);
 		});
 	}
