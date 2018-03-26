@@ -105,35 +105,35 @@ include::{kotlinTestDir}/example/AssertionsDemoKotlin.kt[tags=user_guide]
 ----
 
 [[writing-tests-assertions-third-party]]
-==== Third-party Assertion Libraries
+==== サードパーティーのアサーションライブラリ
 
-Even though the assertion facilities provided by JUnit Jupiter are sufficient for many
-testing scenarios, there are times when more power and additional functionality such as
-_matchers_ are desired or required. In such cases, the JUnit team recommends the use of
-third-party assertion libraries such as {AssertJ}, {Hamcrest}, {Truth}, etc. Developers
-are therefore free to use the assertion library of their choice.
+多くのテストシナリオではJUnit Jupiterが提供するアサーション機能だけで十分ですが、
+時にはさらなるパワーや _マッチャー_ のような追加機能が必要になることもあります。
+そのような場合には、 {AssertJ} や {Hamcrest}、 {Truth} のようなサードパーティーの
+アサーションライブラリを使うことをJUnitチームはお勧めします。
+開発者は、好みに応じてアサーションライブラリを自由に選択することができます。
 
-For example, the combination of _matchers_ and a fluent API can be used to make
-assertions more descriptive and readable. However, JUnit Jupiter's `{Assertions}` class
-does not provide an
+例えば、 _マッチャー_ と流れるようなAPIを組み合わせれば、アサーションをもっと説明的で
+読みやすくすることができます。しかし、JUnit Jupiterの `{Assertions}` クラスは、
+JUnit 4の `org.junit.Assert` クラスのようにHamcrestの
+http://junit.org/junit4/javadoc/latest/org/hamcrest/Matcher.html[`Matcher`]
+を受け付ける
 http://junit.org/junit4/javadoc/latest/org/junit/Assert.html#assertThat[`assertThat()`]
-method like the one found in JUnit 4's `org.junit.Assert` class which accepts a Hamcrest
-http://junit.org/junit4/javadoc/latest/org/hamcrest/Matcher.html[`Matcher`]. Instead,
-developers are encouraged to use the built-in support for matchers provided by third-party
-assertion libraries.
+メソッドを提供していません。代わりに、開発者はサードパーティーのアサーションライブラリが
+提供するマッチャーを利用することが推奨されます。
 
-The following example demonstrates how to use the `assertThat()` support from Hamcrest in
-a JUnit Jupiter test. As long as the Hamcrest library has been added to the classpath,
-you can statically import methods such as `assertThat()`, `is()`, and `equalTo()` and
-then use them in tests like in the `assertWithHamcrestMatcher()` method below.
+次の例は、JUnit JupiterテストでHamcrestの `assertThat()` を使う方法を示しています。
+Hamcrestライブラリをクラスパスに追加しさえすれば、 `assertThat()` や `is()`、 `equalTo()`
+のようなメソッドをstatic importして、下の `assertWithHamcrestMatcher()` メソッドのように
+テストの中で使うことができます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/HamcrestAssertionDemo.java[tags=user_guide]
 ----
 
-Naturally, legacy tests based on the JUnit 4 programming model can continue using
-`org.junit.Assert#assertThat`.
+当然ながら、JUnit 4のプログラミングモデルに基づくレガシーなテストでは、引き続き
+`org.junit.Assert#assertThat` を使い続けることができます。
 
 [[writing-tests-assumptions]]
 === Assumptions
