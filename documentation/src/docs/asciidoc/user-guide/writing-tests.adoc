@@ -136,11 +136,11 @@ include::{testDir}/example/HamcrestAssertionDemo.java[tags=user_guide]
 `org.junit.Assert#assertThat` を使い続けることができます。
 
 [[writing-tests-assumptions]]
-=== Assumptions
+=== 前提条件
 
-JUnit Jupiter comes with a subset of the assumption methods that JUnit 4 provides and
-adds a few that lend themselves well to being used with Java 8 lambdas. All JUnit Jupiter
-assumptions are static methods in the `{Assumptions}` class.
+JUnit Jupiterは、JUnit 4が提供する前提条件用メソッドの一部を備え、
+Java 8のラムダ式と一緒に使いやすいものをいくつか追加しています。
+JUnit Jupiterの前提条件メソッドは、すべて `{Assumptions}` クラスのstaticメソッドです。
 
 [source,java,indent=0]
 ----
