@@ -148,21 +148,21 @@ include::{testDir}/example/AssumptionsDemo.java[tags=user_guide]
 ----
 
 [[writing-tests-disabling]]
-=== Disabling Tests
+=== テストの無効化
 
-Entire test classes or individual test methods may be _disabled_ via the `{Disabled}`
-annotation, via one of the annotations discussed in
-<<writing-tests-conditional-execution>>, or via a custom <<extensions-conditions,
-`ExecutionCondition`>>.
+テストクラス全体または個々のテストメソッドは、 `{Disabled}` アノテーションや
+<<writing-tests-conditional-execution>> で説明するアノテーション、
+あるいはカスタムの <<extensions-conditions, `ExecutionCondition`>>
+によって _無効化_ することができます。
 
-Here's a `@Disabled` test class.
+次の例は、`@Disabled` されたテストクラスです。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/DisabledClassDemo.java[tags=user_guide]
 ----
 
-And here's a test class that contains a `@Disabled` test method.
+そして次の例は、`@Disabled` されたテストメソッドをもつテストクラスです。
 
 [source,java,indent=0]
 ----
