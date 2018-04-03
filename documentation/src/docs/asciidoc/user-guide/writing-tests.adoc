@@ -227,12 +227,11 @@ include::{testDir}/example/ConditionalTestExecutionDemo.java[tags=user_guide_jre
 ----
 
 [[writing-tests-conditional-execution-system-properties]]
-==== System Property Conditions
+==== システムプロパティ条件
 
-A container or test may be enabled or disabled based on the value of the `named` JVM
-system property via the `{EnabledIfSystemProperty}` and `{DisabledIfSystemProperty}`
-annotations. The value supplied via the `matches` attribute will be interpreted as a
-regular expression.
+`{EnabledIfSystemProperty}` および `{DisabledIfSystemProperty}` アノテーションを使うと、
+指定した名前をもつJVMシステムプロパティの値に応じて、コンテナやテストを有効にしたり
+無効にしたりできます。 `matches` 属性で指定する値は、正規表現として解釈されます。
 
 [source,java,indent=0]
 ----
@@ -240,12 +239,11 @@ include::{testDir}/example/ConditionalTestExecutionDemo.java[tags=user_guide_sys
 ----
 
 [[writing-tests-conditional-execution-environment-variables]]
-==== Environment Variable Conditions
+==== 環境変数条件
 
-A container or test may be enabled or disabled based on the value of the `named`
-environment variable from the underlying operating system via the
-`{EnabledIfEnvironmentVariable}` and `{DisabledIfEnvironmentVariable}` annotations. The
-value supplied via the `matches` attribute will be interpreted as a regular expression.
+`{EnabledIfEnvironmentVariable}` および `{DisabledIfEnvironmentVariable}`
+アノテーションを使うと、指定した名前をもつ環境変数の値に応じて、コンテナやテストを
+有効にしたり無効にしたりできます。`matches` 属性で指定する値は、正規表現として解釈されます。
 
 [source,java,indent=0]
 ----
@@ -253,27 +251,24 @@ include::{testDir}/example/ConditionalTestExecutionDemo.java[tags=user_guide_env
 ----
 
 [[writing-tests-conditional-execution-scripts]]
-==== Script-based Conditions
+==== スクリプトベースの条件
 
-JUnit Jupiter provides the ability to either _enable_ or _disable_ a container or test
-depending on the evaluation of a script configured via the `{EnabledIf}` or
-`{DisabledIf}` annotation. Scripts can be written in JavaScript, Groovy, or any other
-scripting language for which there is support for the Java Scripting API, defined by JSR
-223.
+JUnit Jupiterは、`{EnabledIf}` または `{DisabledIf}` アノテーションで設定された
+スクリプトの実行結果に応じて、コンテナやテストを有効にしたり無効にしたりする機能を提供します。
+スクリプトは、JavaScript、Groovy、あるいはJSR 223で定義されたJava Scripting API
+をサポートする任意の言語で記述することができます。
 
-WARNING: Conditional test execution via `{EnabledIf}` and `{DisabledIf}` is currently an
-_experimental_ feature. Consult the table in <<api-evolution-experimental-apis>> for
-details.
+WARNING: `{EnabledIf}` および `{DisabledIf}` を使った条件付きテスト実行は、
+現在 _試験的な_ 機能です。詳細は、<<api-evolution-experimental-apis>>
+のテーブルを参考にしてください。
 
-TIP: If the logic of your script depends only on the current operating system, the
-current Java Runtime Environment version, a particular JVM system property, or a
-particular environment variable, you should consider using one of the built-in
-annotations dedicated to that purpose. See the previous sections of this chapter for
-further details.
+TIP: もしスクリプトのロジックが現在のオペレーティングシステムやJavaランタイム環境の
+バージョン、特定のJVMシステムプロパティや環境変数だけに依存するなら、その目的専用の
+組み込みアノテーションの使用を検討すべきです。詳細は、この章の前の節を参照してください。
 
-NOTE: If you find yourself using the same script-based condition many times, consider
-writing a dedicated <<extensions-conditions, ExecutionCondition>> extension in order to
-implement the condition in a faster, type-safe, and more maintainable manner.
+NOTE: もし同じようなスクリプトベースの条件を何回も使っていると感じたら、
+高速かつタイプセーフで、よりメンテナンスしやすい方法で実装するために、専用の
+<<extensions-conditions, ExecutionCondition>> 拡張を書くことを検討してください。
 
 [source,java,indent=0]
 ----
