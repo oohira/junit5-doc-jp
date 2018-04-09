@@ -1,59 +1,56 @@
 [[writing-tests]]
-== Writing Tests
+== テストを書く
 
 [source,java,indent=0]
-.A first test case
+.最初のテストケース
 ----
 include::{testDir}/example/FirstJUnit5Tests.java[tags=user_guide]
 ----
 
 [[writing-tests-annotations]]
-=== Annotations
+=== アノテーション
 
-JUnit Jupiter supports the following annotations for configuring tests and extending the
-framework.
+JUnit Jupiterは、テストを構成し、フレームワークを拡張するために、次のアノテーションをサポートします。
 
-All core annotations are located in the `{api-package}` package in the `junit-jupiter-api`
-module.
+中心となるすべてのアノテーションは、 `junit-jupiter-api` モジュールの `{api-package}` パッケージに含まれます。
 
 [cols="20,80"]
 |===
-| Annotation           | Description
+| アノテーション         | 説明
 
-| `@Test`              | Denotes that a method is a test method. Unlike JUnit 4's `@Test` annotation, this annotation does not declare any attributes, since test extensions in JUnit Jupiter operate based on their own dedicated annotations. Such methods are _inherited_ unless they are _overridden_.
-| `@ParameterizedTest` | Denotes that a method is a <<writing-tests-parameterized-tests, parameterized test>>. Such methods are _inherited_ unless they are _overridden_.
-| `@RepeatedTest`      | Denotes that a method is a test template for a <<writing-tests-repeated-tests, repeated test>>. Such methods are _inherited_ unless they are _overridden_.
-| `@TestFactory`       | Denotes that a method is a test factory for <<writing-tests-dynamic-tests, dynamic tests>>. Such methods are _inherited_ unless they are _overridden_.
-| `@TestInstance`      | Used to configure the <<writing-tests-test-instance-lifecycle, test instance lifecycle>> for the annotated test class. Such annotations are _inherited_.
-| `@TestTemplate`      | Denotes that a method is a <<writing-tests-test-templates, template for test cases>> designed to be invoked multiple times depending on the number of invocation contexts returned by the registered <<extensions-test-templates, providers>>. Such methods are _inherited_ unless they are _overridden_.
-| `@DisplayName`       | Declares a custom display name for the test class or test method. Such annotations are not _inherited_.
-| `@BeforeEach`        | Denotes that the annotated method should be executed _before_ *each* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, or `@TestFactory` method in the current class; analogous to JUnit 4's `@Before`. Such methods are _inherited_ unless they are _overridden_.
-| `@AfterEach`         | Denotes that the annotated method should be executed _after_ *each* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, or `@TestFactory` method in the current class; analogous to JUnit 4's `@After`. Such methods are _inherited_ unless they are _overridden_.
-| `@BeforeAll`         | Denotes that the annotated method should be executed _before_ *all* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, and `@TestFactory` methods in the current class; analogous to JUnit 4's `@BeforeClass`. Such methods are _inherited_ (unless they are _hidden_ or _overridden_) and must be `static` (unless the "per-class" <<writing-tests-test-instance-lifecycle, test instance lifecycle>> is used).
-| `@AfterAll`          | Denotes that the annotated method should be executed _after_ *all* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, and `@TestFactory` methods in the current class; analogous to JUnit 4's `@AfterClass`. Such methods are _inherited_ (unless they are _hidden_ or _overridden_) and must be `static` (unless the "per-class" <<writing-tests-test-instance-lifecycle, test instance lifecycle>> is used).
-| `@Nested`            | Denotes that the annotated class is a nested, non-static test class. `@BeforeAll` and `@AfterAll` methods cannot be used directly in a `@Nested` test class unless the "per-class" <<writing-tests-test-instance-lifecycle, test instance lifecycle>> is used. Such annotations are not _inherited_.
-| `@Tag`               | Used to declare _tags_ for filtering tests, either at the class or method level; analogous to test groups in TestNG or Categories in JUnit 4. Such annotations are _inherited_ at the class level but not at the method level.
-| `@Disabled`          | Used to _disable_ a test class or test method; analogous to JUnit 4's `@Ignore`. Such annotations are not _inherited_.
-| `@ExtendWith`        | Used to register custom <<extensions,extensions>>. Such annotations are _inherited_.
+| `@Test`              | このメソッドが、テストメソッドであることを示します。JUnit 4の `@Test` アノテーションとは異なり、このアノテーションはどんな属性も宣言しません。というのも、JUnit Jupiterのテスト拡張は、それ専用のアノテーションベースで行われるからです。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@ParameterizedTest` | このメソッドが、<<writing-tests-parameterized-tests, パラメーター化テスト>> であることを示します。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@RepeatedTest`      | このメソッドが、<<writing-tests-repeated-tests, 繰り返しテスト>> のためのテストテンプレートであることを示します。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@TestFactory`       | このメソッドが、<<writing-tests-dynamic-tests, 動的テスト>> のためのテストファクトリであることを示します。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@TestInstance`      | アノテーションを付与したテストクラスに対して、<<writing-tests-test-instance-lifecycle, テストインスタンスのライフサイクル>> を設定するために使われます。このアノテーションは、_継承_ されます。
+| `@TestTemplate`      | このメソッドが、<<writing-tests-test-templates, テストケースのテンプレート>> であることを示します。このメソッドは、登録した <<extensions-test-templates, プロバイダ>> が返す実行コンテキストの数に応じて、複数回呼び出されます。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@DisplayName`       | テストクラスやテストメソッドにカスタムの表示名を指定します。このアノテーションは、_継承_ されません。
+| `@BeforeEach`        | このメソッドが、現在のクラスの `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory` メソッドの _前に毎回_ 実行されるよう指定します。JUnit 4の `@Before` と同じです。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@AfterEach`         | このメソッドが、現在のクラスの `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory` メソッドの _後に毎回_ 実行されるよう指定します。JUnit 4の `@After` と同じです。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@BeforeAll`         | このメソッドが、現在のクラスの *すべての* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory` メソッドの _前に一度だけ_ 実行されるよう指定します。JUnit 4の `@BeforeClass` と同じです。 このメソッドは、（_隠す_ か _オーバーライドする_ かしない限り）_継承_ されますが、（<<writing-tests-test-instance-lifecycle, テストインスタンスのライフサイクル>> に "per-class" が使われない限り）`static` でなければいけません。
+| `@AfterAll`          | このメソッドが、現在のクラスの *すべての* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory` メソッドの _後に一度だけ_ 実行されるよう指定します。JUnit 4の `@AfterClass` と同じです。このメソッドは、（_隠す_ か _オーバーライドする_ かしない限り）_継承_ されますが、（<<writing-tests-test-instance-lifecycle, テストインスタンスのライフサイクル>> に "per-class" が使われない限り）`static` でなければいけません。
+| `@Nested`            | このクラスが、ネストした非staticのテストクラスであることを示します。 `@BeforeAll` および `@AfterAll` メソッドは、<<writing-tests-test-instance-lifecycle, テストインスタンスのライフサイクル>> に "per-class" が使われない限り、`@Nested` テストクラスの中で直接使うことはできません。このアノテーションは、_継承_ されません。
+| `@Tag`               | クラスまたはメソッドレベルでテストをフィルタリングするための _タグ_ を宣言するのに使われます。TestNGのテストグループやJUnit 4のCategoryと同じです。このアノテーションは、クラスレベルでは _継承_ されますが、メソッドレベルでは _継承_ されません。
+| `@Disabled`          | テストクラスやテストメソッドを _無効化_ するのに使われます。JUnit 4の `@Ignore` と同じです。このアノテーションは、_継承_ されません。
+| `@ExtendWith`        | カスタムの <<extensions, 拡張機能>> を登録するために使われます。このアノテーションは、_継承_ されます。
 |===
 
-Methods annotated with `@Test`, `@TestTemplate`, `@RepeatedTest`, `@BeforeAll`,
-`@AfterAll`, `@BeforeEach`, or `@AfterEach` annotations must not return a value.
+`@Test`, `@TestTemplate`, `@RepeatedTest`, `@BeforeAll`, `@AfterAll`, `@BeforeEach`, `@AfterEach`
+アノテーションの付与されたメソッドは、戻り値を返してはいけません。
 
-WARNING: Some annotations may currently be _experimental_. Consult the table in
-<<api-evolution-experimental-apis>> for details.
+WARNING: いくつかのアノテーションは現在 _実験中_ です。詳細は、
+<<api-evolution-experimental-apis>> のテーブルを参照してください。
 
 [[writing-tests-meta-annotations]]
-==== Meta-Annotations and Composed Annotations
+==== メタアノテーションと合成アノテーション
 
-JUnit Jupiter annotations can be used as _meta-annotations_. That means that you can
-define your own _composed annotation_ that will automatically _inherit_ the semantics of
-its meta-annotations.
+JUnit Jupiterアノテーションは、_メタアノテーション_ として使うことができます。つまり、
+メタアノテーションの意味を自動的に _継承_ した独自の _合成アノテーション_ を作れるということです。
 
-For example, instead of copying and pasting `@Tag("fast")` throughout your code base (see
-<<writing-tests-tagging-and-filtering>>), you can create a custom _composed annotation_
-named `@Fast` as follows. `@Fast` can then be used as a drop-in replacement for
-`@Tag("fast")`.
+例えば、`@Tag("fast")` をコードベース全体にコピー＆ペーストする代わりに
+（<<writing-tests-tagging-and-filtering>> 参照）、以下の `@Fast`
+のような名前のカスタム _合成アノテーション_ を作ることができます。
+`@Fast` は、`@Tag("fast")` の代わりに使うことができます。
 
 [source,java,indent=0]
 ----
