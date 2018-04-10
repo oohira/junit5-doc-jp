@@ -273,22 +273,22 @@ include::{testDir}/example/ConditionalTestExecutionDemo.java[tags=user_guide_scr
 ----
 
 [[writing-tests-conditional-execution-scripts-bindings]]
-===== Script Bindings
+===== スクリプトバインディング
 
-The following names are bound to each script context and therefore usable within the
-script. An _accessor_ provides access to a map-like structure via a simple `String
-get(String name)` method.
+以下の名前は、スクリプトのコンテキストに束縛されるため、スクリプト内で使うことができます。
+_accessor_ は、単純な `String get(String name)` メソッドを介したマップ構造への
+アクセスを提供します。
 
 [cols="25,25,75"]
 |===
 | Name                          | Type          | Description
 
-| `systemEnvironment`           | _accessor_    | Operating system environment variable accessor.
-| `systemProperty`              | _accessor_    | JVM system property accessor.
-| `junitConfigurationParameter` | _accessor_    | Configuration parameter accessor.
-| `junitDisplayName`            | `String`      | Display name of the test or container.
-| `junitTags`                   | `Set<String>` | All tags assigned to the test or container.
-| `junitUniqueId`               | `String`      | Unique ID of the test or container.
+| `systemEnvironment`           | _accessor_    | オペレーティングシステムの環境変数へのアクセッサ
+| `systemProperty`              | _accessor_    | JVMのシステムプロパティへのアクセッサ
+| `junitConfigurationParameter` | _accessor_    | 構成パラメーターへのアクセッサ
+| `junitDisplayName`            | `String`      | テストやコンテナの表示名
+| `junitTags`                   | `Set<String>` | テストやコンテナにアサインされたすべてのタグ
+| `junitUniqueId`               | `String`      | テストやコンテナの一意なID
 |===
 
 
