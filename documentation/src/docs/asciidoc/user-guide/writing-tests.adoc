@@ -293,26 +293,27 @@ _accessor_ は、単純な `String get(String name)` メソッドを介したマ
 
 
 [[writing-tests-tagging-and-filtering]]
-=== Tagging and Filtering
+=== タグとフィルタリング
 
-Test classes and methods can be tagged via the `@Tag` annotation. Those tags can later be
-used to filter <<running-tests,test discovery and execution>>.
+テストクラスとテストメソッドには、`@Tag` アノテーションでタグを付与することができます。
+これらのタグはあとで <<running-tests, テストを発見・実行>> するときのフィルタリングに
+使うことができます。
 
-==== Syntax Rules for Tags
+==== タグの構文規則
 
-* A tag must not be `null` or _blank_.
-* A _trimmed_ tag must not contain whitespace.
-* A _trimmed_ tag must not contain ISO control characters.
-* A _trimmed_ tag must not contain any of the following _reserved characters_.
-  - `,`: _comma_
-  - `(`: _left parenthesis_
-  - `)`: _right parenthesis_
-  - `&`: _ampersand_
-  - `|`: _vertical bar_
-  - `!`: _exclamation point_
+* タグは、`null` または _空_ であってはならない
+* _トリミングした_ タグは、空白文字を含んではならない
+* _トリミングした_ タグは、ISO制御文字を含んではならない
+* _トリミングした_ タグは、次の _予約済み文字_ を含んではならない
+  - `,`: _カンマ_
+  - `(`: _左括弧_
+  - `)`: _右括弧_
+  - `&`: _アンパサンド_
+  - `|`: _縦棒_
+  - `!`: _感嘆符_
 
-NOTE: In the above context, "trimmed" means that leading and trailing whitespace
-characters have been removed.
+NOTE: 上のコンテキストで "トリミングした" とは、先頭および末尾の空白文字が
+取り除かれていることを意味する。
 
 [source,java,indent=0]
 ----
