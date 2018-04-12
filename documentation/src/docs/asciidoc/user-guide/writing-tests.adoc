@@ -285,7 +285,7 @@ _accessor_ は、単純な `String get(String name)` メソッドを介したマ
 
 | `systemEnvironment`           | _accessor_    | オペレーティングシステムの環境変数へのアクセッサ
 | `systemProperty`              | _accessor_    | JVMのシステムプロパティへのアクセッサ
-| `junitConfigurationParameter` | _accessor_    | 構成パラメーターへのアクセッサ
+| `junitConfigurationParameter` | _accessor_    | 設定パラメーターへのアクセッサ
 | `junitDisplayName`            | `String`      | テストやコンテナの表示名
 | `junitTags`                   | `Set<String>` | テストやコンテナにアサインされたすべてのタグ
 | `junitUniqueId`               | `String`      | テストやコンテナの一意なID
@@ -350,40 +350,39 @@ NOTE: テストインスタンスのライフサイクルのコンテキスト�
 のいずれかのアノテーションが付与されたメソッドを意味します。
 
 [[writing-tests-test-instance-lifecycle-changing-default]]
-==== Changing the Default Test Instance Lifecycle
+==== テストインスタンスのデフォルトのライフサイクルの変更
 
-If a test class or test interface is not annotated with `@TestInstance`, JUnit Jupiter
-will use a _default_ lifecycle mode. The standard _default_ mode is `PER_METHOD`;
-however, it is possible to change the _default_ for the execution of an entire test plan.
-To change the default test instance lifecycle mode, simply set the
-`junit.jupiter.testinstance.lifecycle.default` _configuration parameter_ to the name of
-an enum constant defined in `TestInstance.Lifecycle`, ignoring case. This can be supplied
-as a JVM system property, as a _configuration parameter_ in the
-`LauncherDiscoveryRequest` that is passed to the `Launcher`, or via the JUnit Platform
-configuration file (see <<running-tests-config-params>> for details).
+テストクラスやテストインターフェースに `@TestInstance` アノテーションを付与すると、
+JUnit Jupiterは _デフォルト_ のライフサイクルモードを使います。標準の _デフォルト_
+モードは `PER_METHOD` ですが、テストプラン全体で _デフォルト_ を変更することもできます。
+テストインスタンスのデフォルトのライフサイクルモードを変更するには、単に
+`junit.jupiter.testinstance.lifecycle.default` _設定パラメーター_ に
+`TestInstance.Lifecycle` で定義された列挙定数を指定するだけです。
+これは、JVMシステムプロパティや `Launcher` に渡される `LauncherDiscoveryRequest`
+の _設定パラメーター_ 、あるいはJUnit Platform設定ファイルなどで指定できます
+（詳細は、<<running-tests-config-params>> 参照）。
 
-For example, to set the default test instance lifecycle mode to `Lifecycle.PER_CLASS`,
-you can start your JVM with the following system property.
+例えば、デフォルトのライフサイクルモードを `Lifecycle.PER_CLASS` に設定するには、
+次のシステムプロパティを指定してJVMを起動します。
 
 `-Djunit.jupiter.testinstance.lifecycle.default=per_class`
 
-Note, however, that setting the default test instance lifecycle mode via the JUnit
-Platform configuration file is a more robust solution since the configuration file can be
-checked into a version control system along with your project and can therefore be used
-within IDEs and your build software.
+ただし、デフォルトのライフサイクルモードをJUnit Platform設定ファイルで指定する方が、
+よりロバストである点に注意してください。というのも、設定ファイルならプロジェクトの
+バージョン管理システムにチェックインでき、IDEやビルドツールからも使えるからです。
 
-To set the default test instance lifecycle mode to `Lifecycle.PER_CLASS` via the JUnit
-Platform configuration file, create a file named `junit-platform.properties` in the root
-of the class path (e.g., `src/test/resources`) with the following content.
+JUnit Platform設定ファイルを使ってデフォルトのライフサイクルモードを `Lifecycle.PER_CLASS`
+にするには、クラスパスのルート（例えば、`src/test/resources`）に `junit-platform.properties`
+という名前で次のファイルを作ります。
 
 `junit.jupiter.testinstance.lifecycle.default = per_class`
 
-WARNING: Changing the _default_ test instance lifecycle mode can lead to unpredictable
-results and fragile builds if not applied consistently. For example, if the build
-configures "per-class" semantics as the default but tests in the IDE are executed using
-"per-method" semantics, that can make it difficult to debug errors that occur on the
-build server. It is therefore recommended to change the default in the JUnit Platform
-configuration file instead of via a JVM system property.
+WARNING: テストインスタンスの _デフォルト_ のライフサイクルモードを変更する場合は、
+一貫性のある方法で適用しないと予測できない結果や不安定なビルドにつながる可能性があります。
+例えば、ビルドでは "per-class" をデフォルトとして設定していても、IDEが "per-method"
+でテストを実行していると、ビルドサーバーで起きたエラーをデバッグするのが難しくなります。
+そのため、JVMシステムプロパティの代わりにJUnit Platform設定ファイルを使って
+デフォルトを変更することをお勧めします。
 
 [[writing-tests-nested]]
 === Nested Tests
