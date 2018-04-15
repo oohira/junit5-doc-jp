@@ -385,24 +385,24 @@ WARNING: テストインスタンスの _デフォルト_ のライフサイク�
 デフォルトを変更することをお勧めします。
 
 [[writing-tests-nested]]
-=== Nested Tests
+=== ネストしたテスト
 
-Nested tests give the test writer more capabilities to express the relationship among
-several group of tests. Here's an elaborate example.
+ネストしたテストは、テスト作成者がテストのグループ関係を表現しやすくします。
+詳しい例は次の通りです。
 
 [source,java,indent=0]
-.Nested test suite for testing a stack
+.スタックをテストするためのネストしたテストスイート
 ----
 include::{testDir}/example/TestingAStackDemo.java[tags=user_guide]
 ----
 
-NOTE: _Only non-static nested classes_ (i.e. _inner classes_) can serve as `@Nested` test
-classes. Nesting can be arbitrarily deep, and those inner classes are considered to be
-full members of the test class family with one exception: `@BeforeAll` and `@AfterAll`
-methods do not work _by default_. The reason is that Java does not allow `static` members
-in inner classes. However, this restriction can be circumvented by annotating a `@Nested`
-test class with `@TestInstance(Lifecycle.PER_CLASS)` (see
-<<writing-tests-test-instance-lifecycle>>).
+NOTE: _非staticなネストクラス_（すなわち、_内部クラス_）だけが、`@Nested`
+テストクラスとして使えます。ネストの深さは自由で、すべての内部クラスがテストクラスの
+一部とみなされます。ただし、1つだけ例外があり、`@BeforeAll` および `@AfterAll`
+メソッドは、_デフォルトでは_ 機能しません。というのも、Javaでは内部クラスで
+`static` メンバーを使用できないからです。しかし、この制限は `@Nested` テストクラスに
+`@TestInstance(Lifecycle.PER_CLASS)` アノテーションを付与することで回避できます
+（ <<writing-tests-test-instance-lifecycle>> 参照）。
 
 [[writing-tests-dependency-injection]]
 === Dependency Injection for Constructors and Methods
