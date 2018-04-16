@@ -405,68 +405,68 @@ NOTE: _非staticなネストクラス_（すなわち、_内部クラス_）だ�
 （ <<writing-tests-test-instance-lifecycle>> 参照）。
 
 [[writing-tests-dependency-injection]]
-=== Dependency Injection for Constructors and Methods
+=== コンストラクタとメソッドへの依存性注入
 
-In all prior JUnit versions, test constructors or methods were not allowed to have
-parameters (at least not with the standard `Runner` implementations). As one of the major
-changes in JUnit Jupiter, both test constructors and methods are now permitted to have
-parameters. This allows for greater flexibility and enables _Dependency Injection_ for
-constructors and methods.
+これまでのバージョンのJUnitでは、テストクラスのコンストラクタとメソッドは
+（少なくとも標準の `Runner` 実装では）引数をもつことができませんでした。
+JUnit Jupiterの大きな変更点の1つは、テストのコンストラクタやメソッドが
+引数をもてるようになったことです。これは大きな柔軟性をもたらし、
+_依存性注入_ を可能にします。
 
-`{ParameterResolver}` defines the API for test extensions that wish to _dynamically_
-resolve parameters at runtime. If a test constructor or a `@Test`, `@TestFactory`,
-`@BeforeEach`, `@AfterEach`, `@BeforeAll`, or `@AfterAll` method accepts a parameter, the
-parameter must be resolved at runtime by a registered `ParameterResolver`.
+`{ParameterResolver}` は、実行時に _動的に_ 引数を解決したいテスト拡張のための
+APIを定義しています。もしテストコンストラクタや `@Test`, `@TestFactory`,
+`@BeforeEach`, `@AfterEach`, `@BeforeAll`, `@AfterAll` メソッドが引数をもつ場合、
+その引数は登録済みの `ParameterResolver` によって解決されます。
 
-There are currently three built-in resolvers that are registered automatically.
+現状、自動的に登録される組み込みのResolverが3つあります。
 
-* `{TestInfoParameterResolver}`: if a method parameter is of type `{TestInfo}`, the
-  `TestInfoParameterResolver` will supply an instance of `TestInfo` corresponding to the
-  current test as the value for the parameter. The `TestInfo` can then be used to retrieve
-  information about the current test such as the test's display name, the test class, the
-  test method, or associated tags. The display name is either a technical name, such as
-  the name of the test class or test method, or a custom name configured via `@DisplayName`.
+* `{TestInfoParameterResolver}`: もしメソッドの引数の型が `{TestInfo}` の場合、
+  `TestInfoParameterResolver` が現在のテストに応じた `TestInfo` をその引数の値として
+  与えます。 `TestInfo` は、テストの表示名やテストクラス、テストメソッド、付与されたタグなど、
+  現在のテストに関する情報を取得するために使用できます。表示名は、テストクラスやテストメソッド
+  の名前か、`@DisplayName` で設定されたカスタムの名前か、どちらかになります。
 +
-`{TestInfo}` acts as a drop-in replacement for the `TestName` rule from JUnit 4. The
-following demonstrates how to have `TestInfo` injected into a test constructor,
-`@BeforeEach` method, and `@Test` method.
+`{TestInfo}` は、JUnit 4の `TestName` ルールの代替として使えます。
+次の例は、`TestInfo` をテストのコンストラクタ、`@BeforeEach` メソッド、および
+`@Test` メソッドに注入する方法を示しています。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/TestInfoDemo.java[tags=user_guide]
 ----
 
-* `RepetitionInfoParameterResolver`: if a method parameter in a `@RepeatedTest`,
-  `@BeforeEach`, or `@AfterEach` method is of type `{RepetitionInfo}`, the
-  `RepetitionInfoParameterResolver` will supply an instance of `RepetitionInfo`.
-  `RepetitionInfo` can then be used to retrieve information about the current repetition
-  and the total number of repetitions for the corresponding `@RepeatedTest`. Note,
-  however, that `RepetitionInfoParameterResolver` is not registered outside the context
-  of a `@RepeatedTest`. See <<writing-tests-repeated-tests-examples>>.
+* `RepetitionInfoParameterResolver`: もし `@RepeatedTest`, `@BeforeEach`,
+  `@AfterEach` メソッドの引数の型が `{RepetitionInfo}` の場合、
+  `RepetitionInfoParameterResolver` が `RepetitionInfo` インスタンスを与えます。
+  `RepetitionInfo` は、`@RepeatedTest` の現在の繰り返し回数や合計回数の情報を
+  取得するために使用できます。ただし、`RepetitionInfoParameterResolver` は
+  `@RepeatedTest` 以外では登録されないことに注意してください。
+  <<writing-tests-repeated-tests-examples>> を参照。
 
-* `{TestReporterParameterResolver}`: if a method parameter is of type `{TestReporter}`,
-  the `TestReporterParameterResolver` will supply an instance of `TestReporter`. The
-  `TestReporter` can be used to publish additional data about the current test run. The
-  data can be consumed through `{TestExecutionListener}.reportingEntryPublished()` and
-  thus be viewed by IDEs or included in reports.
+* `{TestReporterParameterResolver}`: もしメソッドの引数の型が `{TestReporter}`
+  の場合、`TestReporterParameterResolver` が `TestReporter` インスタンスを与えます。
+  `TestReporter` は、現在のテスト実行に関する追加のデータを出力するために使用できます。
+  このデータは、`{TestExecutionListener}.reportingEntryPublished()`
+  を通して取得できるので、IDEで参照したり、レポートに含めたりできます。
 +
-In JUnit Jupiter you should use `TestReporter` where you used to print information to
-`stdout` or `stderr` in JUnit 4. Using `@RunWith(JUnitPlatform.class)` will even output
-all reported entries to `stdout`.
+JUnit Jupiterでは、JUnit 4で `stdout` や `stderr` に情報を出力していた代わりに、
+`TestReporter` を使うべきです。 `@RunWith(JUnitPlatform.class)` を使うときも、
+すべてのレポート情報が `stdout` に出力されます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/TestReporterDemo.java[tags=user_guide]
 ----
 
-NOTE: Other parameter resolvers must be explicitly enabled by registering appropriate
-<<extensions,extensions>> via `@ExtendWith`.
+NOTE: そのほかの `ParameterResolver` は、`@ExtendWith` を使って適切な
+<<extensions, 拡張機能>> を登録することで、明示的に有効にしなければなりません。
 
-Check out the `{MockitoExtension}` for an example of a custom `{ParameterResolver}`.
-While not intended to be production-ready, it demonstrates the simplicity and
-expressiveness of both the extension model and the parameter resolution process.
-`MyMockitoTest` demonstrates how to inject Mockito mocks into `@BeforeEach` and `@Test`
-methods.
+
+カスタムの `{ParameterResolver}` のサンプルとしては、`{MockitoExtension}`
+を参照してください。本番利用を想定したものではありませんが、
+拡張モデルとパラメーター解決処理のシンプルさや高い表現力を示しています。
+`MyMockitoTest` は、Mockitoのモックを `@BeforeEach` と `@Test`
+に注入する方法をデモしています。
 
 [source,java,indent=0]
 ----
