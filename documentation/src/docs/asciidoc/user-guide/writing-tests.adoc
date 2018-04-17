@@ -497,14 +497,15 @@ class MyMockitoTest {
 ----
 
 [[writing-tests-test-interfaces-and-default-methods]]
-=== Test Interfaces and Default Methods
+=== テストインターフェースとデフォルトメソッド
 
-JUnit Jupiter allows `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory`,
-`@TestTemplate`, `@BeforeEach`, and `@AfterEach` to be declared on interface `default`
-methods. `@BeforeAll` and `@AfterAll` can either be declared on `static` methods in a
-test interface or on interface `default` methods _if_ the test interface or test class is
-annotated with `@TestInstance(Lifecycle.PER_CLASS)` (see
-<<writing-tests-test-instance-lifecycle>>). Here are some examples.
+JUnit Jupiterでは、`@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory`,
+`@TestTemplate`, `@BeforeEach`, `@AfterEach` アノテーションをインターフェースの
+`default` メソッドに対して宣言することもできます。 `@BeforeAll` と `@AfterAll`
+はテストインターフェースの `static` メソッドにしか宣言できませんが、
+`@TestInstance(Lifecycle.PER_CLASS)` がテストインターフェースまたはテストクラスに
+付与されていればインターフェースの `default` メソッドに宣言することもできます
+（<<writing-tests-test-instance-lifecycle>> 参照）。以下はサンプルです。
 
 [source,java]
 ----
@@ -516,24 +517,25 @@ include::{testDir}/example/testinterface/TestLifecycleLogger.java[tags=user_guid
 include::{testDir}/example/testinterface/TestInterfaceDynamicTestsDemo.java[tags=user_guide]
 ----
 
-`@ExtendWith` and `@Tag` can be declared on a test interface so that classes that
-implement the interface automatically inherit its tags and extensions. See
-<<extensions-lifecycle-callbacks-before-after-execution>> for the source code of the
-<<extensions-lifecycle-callbacks-timing-extension, TimingExtension>>.
+`@ExtendWith` と `@Tag` はテストインターフェースに宣言することで、
+そのインタフェースを実装したクラスにタグと拡張機能を自動的に継承させることができます。
+<<extensions-lifecycle-callbacks-before-after-execution>> にある
+<<extensions-lifecycle-callbacks-timing-extension, TimingExtension>>
+のソースコードを参照してください。
 
 [source,java]
 ----
 include::{testDir}/example/testinterface/TimeExecutionLogger.java[tags=user_guide]
 ----
 
-In your test class you can then implement these test interfaces to have them applied.
+これらのインタフェースを実装することでテストクラスに適用することができます。
 
 [source,java]
 ----
 include::{testDir}/example/testinterface/TestInterfaceDemo.java[tags=user_guide]
 ----
 
-Running the `TestInterfaceDemo` results in output similar to the following:
+`TestInterfaceDemo` を実行すると、次のような出力となります。
 
 ....
 :junitPlatformTest
@@ -563,9 +565,9 @@ Test run finished after 190 ms
 BUILD SUCCESSFUL
 ....
 
-Another possible application of this feature is to write tests for interface contracts.
-For example, you can write tests for how implementations of `Object.equals` or
-`Comparable.compareTo` should behave as follows.
+この機能の別の適用例としては、インタフェース契約に対するテストが考えられます。
+例えば、`Object.equals` や `Comparable.compareTo` の実装クラスが
+どう振る舞うべきかのテストを次のように書くことができます。
 
 [source,java]
 ----
@@ -582,15 +584,15 @@ include::{testDir}/example/defaultmethods/EqualsContract.java[tags=user_guide]
 include::{testDir}/example/defaultmethods/ComparableContract.java[tags=user_guide]
 ----
 
-In your test class you can then implement both contract interfaces thereby inheriting the
-corresponding tests. Of course you'll have to implement the abstract methods.
+テストクラスでこれらの契約インターフェースを実装することで、対応するテストケースを
+継承することができます。もちろん、抽象メソッドは自分で実装する必要があります。
 
 [source,java]
 ----
 include::{testDir}/example/defaultmethods/StringTests.java[tags=user_guide]
 ----
 
-NOTE: The above tests are merely meant as examples and therefore not complete.
+NOTE: 前述のテストはサンプル目的であり、完全なものではありません。
 
 
 [[writing-tests-repeated-tests]]
