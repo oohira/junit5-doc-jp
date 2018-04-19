@@ -596,15 +596,14 @@ NOTE: 前述のテストはサンプル目的であり、完全なものでは�
 
 
 [[writing-tests-repeated-tests]]
-=== Repeated Tests
+=== 繰り返しテスト
 
-JUnit Jupiter provides the ability to repeat a test a specified number of times simply by
-annotating a method with `@RepeatedTest` and specifying the total number of repetitions
-desired. Each invocation of a repeated test behaves like the execution of a regular
-`@Test` method with full support for the same lifecycle callbacks and extensions.
+JUnit Jupiterは、`@RepeatedTest` アノテーションを使って指定した回数だけ
+繰り返しテストを実行する機能を提供しています。
+繰り返しテストの1回毎の呼び出しは、ライフサイクルコールバックや拡張機能など、通常の
+`@Test` メソッドの実行と同じように振る舞います。
 
-The following example demonstrates how to declare a test named `repeatedTest()` that
-will be automatically repeated 10 times.
+次の例は、自動的に10回繰り返す `repeatedTest()` を宣言する方法を示しています。
 
 [source,java]
 ----
@@ -614,58 +613,55 @@ void repeatedTest() {
 }
 ----
 
-In addition to specifying the number of repetitions, a custom display name can be
-configured for each repetition via the `name` attribute of the `@RepeatedTest`
-annotation. Furthermore, the display name can be a pattern composed of a combination of
-static text and dynamic placeholders. The following placeholders are currently supported.
+繰り返し回数を指定するだけでなく、`@RepeatedTest` アノテーションの `name`
+属性を使って、繰り返し実行毎の表示名を変更することもできます。表示名は、
+静的なテキストと動的なプレースホルダーを組み合わせたパターンにできます。
+以下が、現在サポートされているプレースホルダーです。
 
-- `{displayName}`: display name of the `@RepeatedTest` method
-- `{currentRepetition}`: the current repetition count
-- `{totalRepetitions}`: the total number of repetitions
+- `{displayName}`: `@RepeatedTest` メソッドの表示名
+- `{currentRepetition}`: 現在の実行回数
+- `{totalRepetitions}`: トータルの実行回数
 
-The default display name for a given repetition is generated based on the following
-pattern: `"repetition {currentRepetition} of {totalRepetitions}"`. Thus, the display
-names for individual repetitions of the previous `repeatedTest()` example would be:
-`repetition 1 of 10`, `repetition 2 of 10`, etc. If you would like the display name of
-the `@RepeatedTest` method included in the name of each repetition, you can define your
-own custom pattern or use the predefined `RepeatedTest.LONG_DISPLAY_NAME` pattern. The
-latter is equal to `"{displayName} :: repetition {currentRepetition} of
-{totalRepetitions}"` which results in display names for individual repetitions like
-`repeatedTest() :: repetition 1 of 10`, `repeatedTest() :: repetition 2 of 10`, etc.
+デフォルトの表示名は、`"repetition {currentRepetition} of {totalRepetitions}"`
+というパターンに従います。そのため、前述の `repeatedTest()` に対する表示名は、
+`repetition 1 of 10`, `repetition 2 of 10` のようになります。
+もし `@RepeatedTest` メソッドの名前を含めたい場合は、カスタムのパターンを指定するか、
+定義済みの `RepeatedTest.LONG_DISPLAY_NAME` パターンを指定できます。
+後者は、`"{displayName} :: repetition {currentRepetition} of {totalRepetitions}"`
+というパターンと同等で、`repeatedTest() :: repetition 1 of 10`,
+`repeatedTest() :: repetition 2 of 10` のようになります。
 
-In order to retrieve information about the current repetition and the total number of
-repetitions programmatically, a developer can choose to have an instance of
-`RepetitionInfo` injected into a `@RepeatedTest`, `@BeforeEach`, or `@AfterEach` method.
+現在の繰り返し回数やトータルの繰り返し回数をプログラムから取得するためには、
+`RepetitionInfo` インスタンスを `@RepeatedTest`, `@BeforeEach`, `@AfterEach`
+メソッドのいずれかに注入させることができます。
 
 [[writing-tests-repeated-tests-examples]]
-==== Repeated Test Examples
+==== 繰り返しテストの例
 
-The `RepeatedTestsDemo` class at the end of this section demonstrates several examples of
-repeated tests.
+この節の最後の `RepeatedTestsDemo` クラスは、繰り返しテストの様々な例を示しています。
 
-The `repeatedTest()` method is identical to example from the previous section; whereas,
-`repeatedTestWithRepetitionInfo()` demonstrates how to have an instance of
-`RepetitionInfo` injected into a test to access the total number of repetitions for the
-current repeated test.
+`repeatedTest()` メソッドは、前の節で紹介した例と同じです。一方、
+`repeatedTestWithRepetitionInfo()` は、トータルの繰り返し回数を取得するために
+`RepetitionInfo` インスタンスをテストに注入させる方法を示しています。
 
-The next two methods demonstrate how to include a custom `@DisplayName` for the
-`@RepeatedTest` method in the display name of each repetition. `customDisplayName()`
-combines a custom display name with a custom pattern and then uses `TestInfo` to verify
-the format of the generated display name. `Repeat!` is the `{displayName}` which comes
-from the `@DisplayName` declaration, and `1/1` comes from
-`{currentRepetition}/{totalRepetitions}`. In contrast,
-`customDisplayNameWithLongPattern()` uses the aforementioned predefined
-`RepeatedTest.LONG_DISPLAY_NAME` pattern.
+その次の2つのメソッドは、`@RepeatedTest` メソッドに対するカスタムの `@DisplayName`
+を各繰り返しの表示名に含める方法を示しています。`customDisplayName()` は、
+カスタムの表示名とパターンを組み合わせて指定し、生成された表示名を検証するのに
+`TestInfo` を使っています。
+`{displayName}` が `@DisplayName` の宣言から `Repeat!` となり、
+`{currentRepetition}/{totalRepetitions}` が `1/1` となります。
+一方、`customDisplayNameWithLongPattern()` は前述の定義済みパターン
+`RepeatedTest.LONG_DISPLAY_NAME` を使っています。
 
-`repeatedTestInGerman()` demonstrates the ability to translate display names of repeated
-tests into foreign languages -- in this case German, resulting in names for individual
-repetitions such as: `Wiederholung 1 von 5`, `Wiederholung 2 von 5`, etc.
+`repeatedTestInGerman()` は、繰り返しテストの表示名を外国語（この場合、ドイツ語）
+に翻訳する方法を示しています。各繰り返しの表示名は、`Wiederholung 1 von 5`,
+`Wiederholung 2 von 5` のようになります。
 
-Since the `beforeEach()` method is annotated with `@BeforeEach` it will get executed
-before each repetition of each repeated test. By having the `TestInfo` and
-`RepetitionInfo` injected into the method, we see that it's possible to obtain
-information about the currently executing repeated test. Executing `RepeatedTestsDemo`
-with the `INFO` log level enabled results in the following output.
+`beforeEach()` メソッドは `@BeforeEach` アノテーションが付与されているため、
+繰り返しテストの個々の繰り返し実行の度に実行されます。`TestInfo` と
+`RepetitionInfo` をメソッドに注入させることで、現在実行中の繰り返しテストに
+関する情報を取得できることが分かります。`INFO` レベルのログを有効にして
+`RepeatedTestsDemo` を実行すると、次のような出力となります。
 
 ....
 INFO: About to execute repetition 1 of 10 for repeatedTest
@@ -697,9 +693,9 @@ INFO: About to execute repetition 5 of 5 for repeatedTestInGerman
 include::{testDir}/example/RepeatedTestsDemo.java[tags=user_guide]
 ----
 
-When using the `ConsoleLauncher` or the `junitPlatformTest` Gradle plugin with the
-unicode theme enabled, execution of `RepeatedTestsDemo` results in the following output
-to the console.
+Unicodeテーマを有効にした `ConsoleLauncher` または `junitPlatformTest`
+Gradle プラグインで `RepeatedTestsDemo` を実行すると、コンソールには
+以下のように出力されます。
 
 ....
 ├─ RepeatedTestsDemo ✔
