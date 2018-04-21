@@ -730,25 +730,25 @@ Gradle プラグインで `RepeatedTestsDemo` を実行すると、コンソー�
 
 
 [[writing-tests-parameterized-tests]]
-=== Parameterized Tests
+=== パラメーター化テスト
 
-Parameterized tests make it possible to run a test multiple times with different
-arguments. They are declared just like regular `@Test` methods but use the
-`{ParameterizedTest}` annotation instead. In addition, you must declare at least one
-_source_ that will provide the arguments for each invocation.
+パラメーター化テストは、異なる引数でテストを複数回実行できるようにします。
+通常の `@Test` メソッドに似ていますが、`{ParameterizedTest}` アノテーションを
+使って宣言します。また、各呼び出しに対する引数を生成するための _ソース (source)_
+を少なくとも1つは指定しなければいけません。
 
-WARNING: Parameterized tests are currently an _experimental_ feature. Consult the table
-in <<api-evolution-experimental-apis>> for details.
+WARNING: パラーメーター化テストは、現在 _実験中_ の機能です。
+詳細は、<<api-evolution-experimental-apis>> の表を確認してください。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=first_example]
 ----
 
-This parameterized test uses the `@ValueSource` annotation to specify a `String` array as
-the source of arguments. When executing the above method, each invocation will be
-reported separately. For instance, the `ConsoleLauncher` will print output similar to the
-following.
+このパラメーター化テストは、引数のソースとして `String` 配列を指定するために、
+`@ValueSource` アノテーションを使用しています。上のメソッドを実行すると、
+各実行が別々にレポートされます。例えば、`ConsoleLauncher`
+を使うと次のように出力されます。
 
 ....
 palindromes(String) ✔
@@ -758,27 +758,25 @@ palindromes(String) ✔
 ....
 
 [[writing-tests-parameterized-tests-setup]]
-==== Required Setup
+==== 必要なセットアップ
 
-In order to use parameterized tests you need to add a dependency on the
-`junit-jupiter-params` artifact. Please refer to <<dependency-metadata>> for details.
+パラメーター化テストを使うには、`junit-jupiter-params` への依存を追加する必要があります。
+詳細は、<<dependency-metadata>> を参照してください。
 
 [[writing-tests-parameterized-tests-sources]]
-==== Sources of Arguments
+==== 引数のソース
 
-Out of the box, JUnit Jupiter provides quite a few _source_ annotations. Each of the
-following subsections provides a brief overview and an example for each of them. Please
-refer to the JavaDoc in the `{params-provider-package}` package for additional
-information.
+JUnit Jupiterは、あらかじめいくつかの _ソース_ アノテーションを提供しています。
+以降では、これらのアノテーションについて簡単な説明とサンプルを示します。
+より詳細な情報は、`{params-provider-package}` パッケージのJavaDocを参照してください。
 
 [[writing-tests-parameterized-tests-sources-ValueSource]]
 ===== @ValueSource
 
-`@ValueSource` is one of the simplest possible sources. It lets you specify a single
-array of literal values and can only be used for providing a single parameter per
-parameterized test invocation.
+`@ValueSource` は、最もシンプルなソースの1つです。リテラル値の配列を指定できますが、
+パラメーター化テストの1回の実行につき1つのパラメーターしか与えることができません。
 
-The following types of literal values are supported by `@ValueSource`.
+`@ValueSource` では、以下の型のリテラル値がサポートされています。
 
 - `short`
 - `byte`
@@ -790,8 +788,8 @@ The following types of literal values are supported by `@ValueSource`.
 - `java.lang.String`
 - `java.lang.Class`
 
-For example, the following `@ParameterizedTest` method will be invoked three times, with
-the values `1`, `2`, and `3` respectively.
+例えば、次の `@ParameterizedTest` メソッドは、`1`, `2`, `3` をパラメーターとして
+3回呼び出されます。
 
 [source,java,indent=0]
 ----
@@ -801,9 +799,9 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ValueSource_example]
 [[writing-tests-parameterized-tests-sources-EnumSource]]
 ===== @EnumSource
 
-`@EnumSource` provides a convenient way to use `Enum` constants. The annotation provides
-an optional `names` parameter that lets you specify which constants shall be used. If
-omitted, all constants will be used like in the following example.
+`@EnumSource` は、`Enum` 定数を指定する便利な方法を提供します。このアノテーションでは、
+省略可能な `names` パラメーターを指定すると、その列挙定数だけが使われます。
+省略すると、次の例のようにすべての列挙定数が使われます。
 
 [source,java,indent=0]
 ----
@@ -815,10 +813,9 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=EnumSource_example]
 include::{testDir}/example/ParameterizedTestDemo.java[tags=EnumSource_include_example]
 ----
 
-The `@EnumSource` annotation also provides an optional `mode` parameter that enables
-fine-grained control over which constants are passed to the test method. For example, you
-can exclude names from the enum constant pool or specify regular expressions as in the
-following examples.
+`@EnumSource` アノテーションは、テストメソッドに渡される列挙定数をさらに細かく制御するために、
+省略可能な `mode` パラメーターも提供しています。例えば、一部の名前をもつ列挙定数だけ除外したり、
+正規表現で列挙定数を指定したりすることができます。
 
 [source,java,indent=0]
 ----
@@ -833,39 +830,39 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=EnumSource_regex_exam
 [[writing-tests-parameterized-tests-sources-MethodSource]]
 ===== @MethodSource
 
-`@MethodSource` allows you to refer to one or more _factory_ methods of the test class.
-Such methods must return a `Stream`, `Iterable`, `Iterator`, or array of arguments. In
-addition, such methods must not accept any arguments. By default such methods must be
-`static` unless the test class is annotated with `@TestInstance(Lifecycle.PER_CLASS)`.
+`@MethodSource` は、テストクラスの _ファクトリ_ メソッドによる指定を可能にします。
+ファクトリメソッドは、`Stream`, `Iterable`, `Iterator`, または配列のいずれかを
+返さなければいけません。また、引数を受け取ることもできません。デフォルトでは、テストクラスに
+`@TestInstance(Lifecycle.PER_CLASS)` アノテーションが付与されていない限り、
+`static` メソッドでなければいけません。
 
-If you only need a single parameter, you can return a `Stream` of instances of the
-parameter type as demonstrated by the following example.
+パラメーターが1つしか必要なければ、次の例のようにパラメーターのインスタンスを
+`Stream` で返すことができます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=simple_MethodSource_example]
 ----
 
-If you do not explicitly provide a factory method name via `@MethodSource`, JUnit Jupiter
-will search for a _factory_ method that has the same name as the current
-`@ParameterizedTest` method by convention. This is demonstrated in the following example.
+もし `@MethodSource` でファクトリメソッドの名前を明示的に指定しなかった場合、JUnit Jupiter
+は `@ParameterizedTest` メソッドと同じ名前をもつファクトリメソッドを自動的に探します。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=simple_MethodSource_without_value_example]
 ----
 
-Streams for primitive types (`DoubleStream`, `IntStream`, and `LongStream`) are also
-supported as demonstrated by the following example.
+プリミティブ型のストリーム (`DoubleStream`, `IntStream`, `LongStream`)
+もサポートされています。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=primitive_MethodSource_example]
 ----
 
-If a test method declares multiple parameters, you need to return a collection or stream
-of `Arguments` instances as shown below. Note that `Arguments.of(Object...)` is a static
-factory method defined in the `Arguments` interface.
+テストメソッドが複数のパラメーターを宣言している場合、以下で示すように `Arguments`
+のコレクションかストリームを返す必要があります。`Arguments.of(Object...)` は、
+`Arguments` インターフェースで定義されるstaticファクトリメソッドである点に注意してください。
 
 [source,java,indent=0]
 ----
@@ -875,19 +872,20 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=multi_arg_MethodSourc
 [[writing-tests-parameterized-tests-sources-CsvSource]]
 ===== @CsvSource
 
-`@CsvSource` allows you to express argument lists as comma-separated values (i.e.,
-`String` literals).
+`@CsvSource` は、引数のリストをカンマ区切りの値（`String` リテラル）
+で指定できるようにします。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=CsvSource_example]
 ----
 
-`@CsvSource` uses a single quote `'` as its quote character. See the `'baz, qux'` value
-in the example above and in the table below. An empty, quoted value `''` results in an
-empty `String`; whereas, an entirely _empty_ value is interpreted as a `null` reference.
-An `ArgumentConversionException` is raised if the target type of a `null` reference is a
-primitive type.
+`@CsvSource` は、シングルクォート `'` を引用符として使います。
+上の例の `'baz, qux'` と、以下のテーブルを参照してください。
+引用符で囲まれた空の値 `''` は空の `String` になりますが、
+（引用符で囲まれない）完全に _空_ の値は `null` と解釈されます。
+`null` の代入先パラメーターがプリミティブ型の場合は、
+`ArgumentConversionException` が発生します。
 
 [cols="50,50"]
 |===
@@ -902,8 +900,8 @@ primitive type.
 [[writing-tests-parameterized-tests-sources-CsvFileSource]]
 ===== @CsvFileSource
 
-`@CsvFileSource` lets you use CSV files from the classpath. Each line from a CSV file
-results in one invocation of the parameterized test.
+`@CsvFileSource` は、クラスパスにあるCSVファイルを使えるようにします。
+CSVファイルの各行は、パラメーター化テストの1回の実行になります。
 
 [source,java,indent=0]
 ----
@@ -916,17 +914,18 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=CsvFileSource_example
 include::{testResourcesDir}/two-column.csv[]
 ----
 
-NOTE: In contrast to the syntax used in `@CsvSource`, `@CsvFileSource` uses a double
-quote `"` as the quote character. See the `"United States of America"` value in the
-example above. An empty, quoted value `""` results in an empty `String`; whereas, an
-entirely _empty_ value is interpreted as a `null` reference. An
-`ArgumentConversionException` is raised if the target type of a `null` reference is a
-primitive type.
+NOTE: `@CsvSource` のシンタックスとは異なり、`@CsvFileSource` はダブルクォート `"`
+を引用符として使います。上の例の、`"United States of America"` を参考にしてください。
+引用符で囲まれた空の値 `""` は空の `String` になりますが、
+（引用符で囲まれない）完全に _空_ の値は `null` と解釈されます。
+`null` の代入先パラメーターがプリミティブ型の場合は、
+`ArgumentConversionException` が発生します。
 
 [[writing-tests-parameterized-tests-sources-ArgumentsSource]]
 ===== @ArgumentsSource
 
-`@ArgumentsSource` can be used to specify a custom, reusable `ArgumentsProvider`.
+`@ArgumentsSource` は、カスタムの再利用可能な `ArgumentsProvider`
+を指定する場合に使えます。
 
 [source,java,indent=0]
 ----
