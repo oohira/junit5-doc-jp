@@ -14,11 +14,11 @@ package example;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("A special test case")
+@DisplayName("特殊なテストケース")
 class DisplayNameDemo {
 
 	@Test
-	@DisplayName("Custom test name containing spaces")
+	@DisplayName("スペースを 含む カスタムの テスト名")
 	void testWithDisplayNameContainingSpaces() {
 	}
 
