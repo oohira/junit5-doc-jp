@@ -934,25 +934,25 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsSource_examp
 
 
 [[writing-tests-parameterized-tests-argument-conversion]]
-==== Argument Conversion
+==== 引数の変換
 
 [[writing-tests-parameterized-tests-argument-conversion-implicit]]
-===== Implicit Conversion
+===== 暗黙的な変換
 
-To support use cases like `@CsvSource`, JUnit Jupiter provides a number of built-in
-implicit type converters. The conversion process depends on the declared type of each
-method parameter.
+`@CsvSource` のようなユースケースをサポートするために、JUnit Jupiter
+は多くの組み込みの型変換を提供しています。
+変換処理は、メソッド引数の型に依存します。
 
-For example, if a `@ParameterizedTest` declares a parameter of type `TimeUnit` and the
-actual type supplied by the declared source is a `String`, the string will be
-automatically converted into the corresponding `TimeUnit` enum constant.
+例えば、`@ParameterizedTest` が `TimeUnit` 型のパラメーターを宣言し、
+ソースから実際に渡される型が `String` の場合、その文字列は対応する
+`TimeUnit` 列挙定数に自動的に変換されます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=implicit_conversion_example]
 ----
 
-`String` instances are currently implicitly converted to the following target types.
+`String` インスタンスは、今のところ次のようなターゲット型に暗黙的に変換されます。
 
 [[writing-tests-parameterized-tests-argument-conversion-implicit-table]]
 [cols="10,90"]
@@ -990,26 +990,26 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=implicit_conversion_e
 |===
 
 [[writing-tests-parameterized-tests-argument-conversion-implicit-fallback]]
-====== Fallback String-to-Object Conversion
+====== String → Object変換のフォールバック
 
-In addition to implicit conversion from strings to the target types listed in the above
-table, JUnit Jupiter also provides a fallback mechanism for automatic conversion from a
-`String` to a given target type if the target type declares exactly one suitable _factory
-method_ or a _factory constructor_ as defined below.
+上の表で示した文字列からターゲット型への暗黙的な変換に加えて、JUnit Jupiter
+は `String` 型からターゲット型に自動変換するフォールバックの仕組みも提供しています。
+この変換は、ターゲット型が以下に示す _ファクトリメソッド_ か _ファクトリコンストラクタ_
+を1つだけ宣言している場合に機能します。
 
-- __factory method__: a non-private, `static` method declared in the target type that
-  accepts a single `String` argument and returns an instance of the target type. The name
-  of the method can be arbitrary and need not follow any particular convention.
-- __factory constructor__: a non-private constructor in the target type that accepts a
-  single `String` argument.
+- __ファクトリメソッド__: ターゲット型に宣言された非privateの `static` メソッドで、
+  `String` 型の引数を1つだけ受け取ってターゲット型のインスタンスを返す。
+  メソッドの名前は任意であり、特定のルールに従う必要はない。
+- __ファクトリコンストラクタ__: ターゲット型に宣言された非privateのコンストラクタで、
+  `String` 型の引数を1つだけ受け取ってインスタンスを作る。
 
-NOTE: If multiple _factory methods_ are discovered, they will be ignored. If a _factory
-method_ and a _factory constructor_ are discovered, the factory method will be used
-instead of the constructor.
+NOTE: 複数の _ファクトリメソッド_ が見つかった場合、それらは無視されます。
+_ファクトリメソッド_ と _ファクトリコンストラクタ_ が両方見つかった場合は、
+ファクトリメソッドの方が使われます。
 
-For example, in the following `@ParameterizedTest` method, the `Book` argument will be
-created by invoking the `Book.fromTitle(String)` factory method and passing `"42 Cats"`
-as the title of the book.
+例えば、次の `@ParameterizedTest` メソッドでは、`Book` 型の引数は
+`Book.fromTitle(String)` ファクトリメソッドに本のタイトルとして `"42 Cats"`
+を渡して実行することで作られます。
 
 [source,java,indent=0]
 ----
@@ -1017,21 +1017,20 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=implicit_fallback_con
 ----
 
 [[writing-tests-parameterized-tests-argument-conversion-explicit]]
-===== Explicit Conversion
+===== 明示的な変換
 
-Instead of relying on implicit argument conversion you may explicitly specify an
-`ArgumentConverter` to use for a certain parameter using the `@ConvertWith` annotation
-like in the following example.
+引数の暗黙的な変換を使う代わりに、`@ConvertWith` アノテーションで
+特定のパラメーターの変換に使う `ArgumentConverter` を明示的に指定することもできます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=explicit_conversion_example]
 ----
 
-Explicit argument converters are meant to be implemented by test and extension authors.
-Thus, `junit-jupiter-params` only provides a single explicit argument converter that may
-also serve as a reference implementation: `JavaTimeArgumentConverter`. It is used via the
-composed annotation `JavaTimeConversionPattern`.
+明示的な型変換器はテストまたは拡張機能の作者に実装されることを想定しています。
+そのため、`junit-jupiter-params` モジュールは参照実装として `JavaTimeArgumentConverter`
+の1つだけしか提供していません。これは、合成アノテーション `JavaTimeConversionPattern`
+経由で使用できます。
 
 [source,java,indent=0]
 ----
@@ -1040,19 +1039,18 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=explicit_java_time_co
 
 
 [[writing-tests-parameterized-tests-display-names]]
-==== Customizing Display Names
+==== 表示名のカスタマイズ
 
-By default, the display name of a parameterized test invocation contains the invocation
-index and the `String` representation of all arguments for that specific invocation.
-However, you can customize invocation display names via the `name` attribute of the
-`@ParameterizedTest` annotation like in the following example.
+デフォルトでは、パラメーター化テストの表示名には、呼び出しインデックスとすべての引数の
+`String` 表現が含まれます。ただし、`@ParameterizedTest` アノテーションの `name`
+属性を指定すれば、次の例のようにカスタマイズすることもできます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=custom_display_names]
 ----
 
-When executing the above method using the `ConsoleLauncher` you will see output similar to the following.
+上のメソッドを `ConsoleLauncher` で実行すると、以下のような出力となります。
 
 ....
 Display name of container ✔
@@ -1061,32 +1059,32 @@ Display name of container ✔
 └─ 3 ==> first='baz, qux', second=3 ✔
 ....
 
-The following placeholders are supported within custom display names.
+次のプレースホルダーがサポートされています。
 
 [cols="20,80"]
 |===
 | Placeholder       | Description
 
-| `{index}`         | the current invocation index (1-based)
-| `{arguments}`     | the complete, comma-separated arguments list
-| `{0}`, `{1}`, ... | an individual argument
+| `{index}`         | 現在の呼び出しインデックス（1始まり）
+| `{arguments}`     | カンマ区切りの完全な引数のリスト
+| `{0}`, `{1}`, ... | 引数
 |===
 
 
 [[writing-tests-parameterized-tests-lifecycle-interop]]
-==== Lifecycle and Interoperability
+==== ライフサイクルと相互運用性
 
-Each invocation of a parameterized test has the same lifecycle as a regular `@Test`
-method. For example, `@BeforeEach` methods will be executed before each invocation.
-Similar to <<writing-tests-dynamic-tests>>, invocations will appear one by one in the
-test tree of an IDE. You may at will mix regular `@Test` methods and `@ParameterizedTest`
-methods within the same test class.
+パラメーター化テストの各呼び出しは、通常の `@Test` メソッドと同じライフサイクルをもちます。
+例えば、`@BeforeEach` メソッドが各呼び出しの前に実行されます。
+<<writing-tests-dynamic-tests>> と同様に、パラメーター化テストの各呼び出しは、
+IDEのテストツリーの中に1つずつ表示されます。同じテストクラスの中で、
+`@Test` メソッドと `@ParameterizedTest` メソッドを混在させるのも自由です。
 
-You may use `ParameterResolver` extensions with `@ParameterizedTest` methods. However,
-method parameters that are resolved by argument sources need to come first in the
-argument list. Since a test class may contain regular tests as well as parameterized
-tests with different parameter lists, values from argument sources are not resolved for
-lifecycle methods (e.g. `@BeforeEach`) and test class constructors.
+`ParameterResolver` 拡張を `@ParameterizedTest` メソッドと使いたいかもしれません。
+その場合は、パラメーター化テストのソースから渡される引数を先に宣言する必要があります。
+テストクラスは、パラメーター化テストだけでなく通常のテストも含んでいる可能性があるので、
+引数ソースからの値はライフサイクルメソッド (例えば、`@BeforeEach`)
+やテストコンストラクタに対しては渡すことができません。
 
 [source,java,indent=0]
 ----
