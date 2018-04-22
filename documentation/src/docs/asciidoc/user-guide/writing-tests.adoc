@@ -1093,15 +1093,15 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ParameterResolver_exa
 
 
 [[writing-tests-test-templates]]
-=== Test Templates
+=== テストテンプレート
 
-A `{TestTemplate}` method is not a regular test case but rather a template for test
-cases. As such, it is designed to be invoked multiple times depending on the number of
-invocation contexts returned by the registered providers. Thus, it must be used in
-conjunction with a registered `{TestTemplateInvocationContextProvider}` extension. Each
-invocation of a test template method behaves like the execution of a regular `@Test`
-method with full support for the same lifecycle callbacks and extensions. Please refer to
-<<extensions-test-templates>> for usage examples.
+`{TestTemplate}` メソッドは、通常のテストケースではなく、テストケースのテンプレートです。
+登録したプロバイダが返す実行コンテキストの数に応じて、複数回呼び出されるよう設計されています。
+そのため、テストテンプレートは `{TestTemplateInvocationContextProvider}`
+と一緒に使う必要があります。
+テストテンプレートメソッドの各呼び出しは、ライフサイクルコールバックや拡張機能など、
+通常の `@Test` メソッドの実行と同じように振る舞います。使用例については、
+<<extensions-test-templates>> を参照してください。
 
 
 [[writing-tests-dynamic-tests]]
