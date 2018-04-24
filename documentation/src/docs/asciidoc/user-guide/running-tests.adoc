@@ -1,30 +1,31 @@
 [[running-tests]]
-== Running Tests
+== テストを実行する
 
 [[running-tests-ide]]
-=== IDE Support
+=== IDEのサポート
 
 [[running-tests-ide-intellij-idea]]
 ==== IntelliJ IDEA
 
-IntelliJ IDEA supports running tests on the JUnit Platform since version 2016.2. For
-details please see the
-https://blog.jetbrains.com/idea/2016/08/using-junit-5-in-intellij-idea/[post on the
-IntelliJ IDEA blog]. Note, however, that it is recommended to use IDEA 2017.3 or newer
-since these newer versions of IDEA will download the following JARs automatically based
-on the API version used in the project: `junit-platform-launcher`,
-`junit-jupiter-engine`, and `junit-vintage-engine`.
+IntelliJ IDEAは、バージョン2016.2からJUnit Platform上でのテスト実行をサポートしています。
+詳細は、
+https://blog.jetbrains.com/idea/2016/08/using-junit-5-in-intellij-idea/[IntelliJ IDEAブログの投稿]
+を参照してください。ただし、実際にはIntelliJ IDEA 2017.3またはそれより新しいバージョンの
+利用が推奨される点に注意してください。というのも、プロジェクトで利用されるAPIバージョンに応じて
+`junit-platform-launcher`, `junit-jupiter-engine`, `junit-vintage-engine`
+のJARを自動的にダウンロードしてくれるからです。
 
-WARNING: IntelliJ IDEA releases prior to IDEA 2017.3 bundle specific versions of JUnit 5.
-Thus, if you want to use a newer version of JUnit Jupiter, execution of tests within the
-IDE might fail due to version conflicts. In such cases, please follow the instructions
-below to use a newer version of JUnit 5 than the one bundled with IntelliJ IDEA.
+WARNING: IntelliJ IDEAのバージョン2017.3より前のリリースは、JUnit 5
+の特定のバージョンを同梱している点に注意してください。もしもJUnit Jupiter
+の新しいバージョンを使いたい場合、IDE内でのテスト実行はバージョンのコンフリクトで
+失敗する可能性があります。そのような場合は、IntelliJ IDEAに同梱されている
+JUnit 5より新しいバージョンを使うために、以下の手順に従ってください。
 
-In order to use a different JUnit 5 version (e.g., {jupiter-version}), you may need to
-include the corresponding versions of the `junit-platform-launcher`,
-`junit-jupiter-engine`, and `junit-vintage-engine` JARs in the classpath.
+JUnit 5の異なるバージョン (例えば、 {jupiter-version}) を使うには、
+`junit-platform-launcher`, `junit-jupiter-engine`, `junit-vintage-engine`
+の対応するバージョンのJARをクラスパスに追加する必要があります。
 
-.Additional Gradle Dependencies
+.Gradleの追加の依存関係
 [source,groovy]
 [subs=attributes+]
 ----
@@ -34,7 +35,7 @@ testRuntime("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
 testRuntime("org.junit.vintage:junit-vintage-engine:{vintage-version}")
 ----
 
-.Additional Maven Dependencies
+.Mavenの追加の依存関係
 [source,xml]
 [subs=attributes+]
 ----
@@ -62,22 +63,21 @@ testRuntime("org.junit.vintage:junit-vintage-engine:{vintage-version}")
 [[running-tests-ide-eclipse]]
 ==== Eclipse
 
-Eclipse IDE offers support for the JUnit Platform since the Eclipse Oxygen.1a (4.7.1a)
-release.
+Eclipse IDEは、Oxygen.1a (4.7.1a)リリースからJUnit Platformをサポートしています。
 
-For more information on using JUnit 5 in Eclipse consult the official _Eclipse support
-for JUnit 5_ section of the
+EclipseでJUnit 5を使うための情報は、公式ドキュメント
 https://www.eclipse.org/eclipse/news/4.7.1a/#junit-5-support[Eclipse Project Oxygen.1a
-(4.7.1a) - New and Noteworthy] documentation.
+(4.7.1a) - New and Noteworthy] の _Eclipse support for JUnit 5_ の節を参照してください。
 
 [[running-tests-ide-other]]
-==== Other IDEs
+==== その他のIDE
 
-At the time of this writing, there is no direct support for running tests on the JUnit
-Platform within IDEs other than IntelliJ IDEA and Eclipse. However, the JUnit team
-provides two intermediate solutions so that you can go ahead and try out JUnit 5 within
-your IDE today. You can use the <<running-tests-console-launcher>> manually or execute
-tests with a <<running-tests-junit-platform-runner,JUnit 4 based Runner>>.
+本書執筆時点では、IntelliJ IDEAとEclipse以外のIDEは、JUnit Platform
+上でのテスト実行を直接はサポートしていません。しかし、JUnitチームは
+あなたが使っているIDEでJUnit 5を試せるように、2つの中間解を提供しています。
+<<running-tests-console-launcher>> を手動で使うか、
+<<running-tests-junit-platform-runner,JUnit 4ベースのランナー>>
+でテストを実行することができます。
 
 [[running-tests-build]]
 === Build Support
