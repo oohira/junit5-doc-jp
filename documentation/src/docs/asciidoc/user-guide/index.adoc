@@ -1,5 +1,5 @@
 [[user-guide]]
-= JUnit 5 User Guide
+= WIP: JUnit 5 ユーザーガイド
 Stefan Bechtold; Sam Brannen; Johannes Link; Matthias Merdes; Marc Philipp; Christian Stein
 :imagesdir: images
 :imagesoutdir: {outdir}/user-guide/images
@@ -13,6 +13,20 @@ ifdef::backend-pdf[:imagesdir: {imagesoutdir}]
 //
 :sectnums:
 //
+
+ifdef::backend-html5[]
+++++
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-88560400-3"></script>
+<script>
+if (window.location.host == "oohira.github.io") {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-88560400-3');
+}
+</script>
+++++
+endif::[]
 
 include::../link-attributes.adoc[]
 
@@ -33,6 +47,6 @@ include::api-evolution.adoc[]
 include::contributors.adoc[]
 
 [[release-notes]]
-== Release Notes
+== リリースノート
 
-The release notes are available <<../release-notes/index.adoc#release-notes,here>>.
+リリースノートは、 <<../release-notes/index.adoc#release-notes, こちら>> から参照できます。

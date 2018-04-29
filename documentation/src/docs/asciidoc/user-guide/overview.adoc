@@ -9,7 +9,13 @@
 [TIP]
 .Translations
 ====
-This document is also available in http://sjyuan.cc/junit5/user-guide-cn[Simplified Chinese].
+『JUnit 5 User Guide』の
+https://junit.org/junit5/docs/{docs-version}/user-guide/[v{docs-version}]
+時点の日本語訳です。最新の情報は、
+https://junit.org/junit5/docs/current/user-guide/[公式サイト] を参照してください。
+誤訳や誤植などのフィードバックは、
+https://github.com/oohira/junit5-doc-jp[GitHub] または https://twitter.com/oohira[@oohira]
+までお願いします。
 ====
 
 [[overview-what-is-junit-5]]
