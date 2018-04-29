@@ -8,10 +8,13 @@
  * http://www.eclipse.org/legal/epl-v20.html
  */
 
-package org.junit.vintage.engine.samples.junit4;
+package org.junit.platform.launcher.listeners;
 
-import org.junit.Ignore;
+import org.junit.platform.launcher.TestExecutionListener;
 
-@Ignore("empty")
-public class EmptyIgnoredTestClass {
+/**
+ * @since 1.0
+ */
+public class NoopTestExecutionListener implements TestExecutionListener {
+	// empty on purpose
 }

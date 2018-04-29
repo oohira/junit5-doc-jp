@@ -12,6 +12,7 @@ package org.junit.jupiter.api;
 
 import static org.junit.jupiter.api.AssertionTestUtils.assertMessageContains;
 import static org.junit.jupiter.api.AssertionTestUtils.assertMessageEquals;
+import static org.junit.jupiter.api.AssertionTestUtils.assertNullMessage;
 import static org.junit.jupiter.api.AssertionTestUtils.expectAssertionFailedError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -27,6 +28,17 @@ import org.opentest4j.AssertionFailedError;
  * @since 5.0
  */
 class FailAssertionsTests {
+
+	@Test
+	void failWithoutArgument() {
+		try {
+			fail();
+			expectAssertionFailedError();
+		}
+		catch (AssertionFailedError ex) {
+			assertNullMessage(ex);
+		}
+	}
 
 	@Test
 	void failWithString() {
@@ -57,7 +69,7 @@ class FailAssertionsTests {
 			expectAssertionFailedError();
 		}
 		catch (AssertionFailedError ex) {
-			assertMessageEquals(ex, "");
+			assertNullMessage(ex);
 		}
 	}
 
@@ -68,7 +80,7 @@ class FailAssertionsTests {
 			expectAssertionFailedError();
 		}
 		catch (AssertionFailedError ex) {
-			assertMessageEquals(ex, "");
+			assertNullMessage(ex);
 		}
 	}
 
@@ -92,7 +104,7 @@ class FailAssertionsTests {
 			expectAssertionFailedError();
 		}
 		catch (AssertionFailedError ex) {
-			assertMessageEquals(ex, "");
+			assertNullMessage(ex);
 			Throwable cause = ex.getCause();
 			assertMessageContains(cause, "cause");
 		}
@@ -119,7 +131,7 @@ class FailAssertionsTests {
 			expectAssertionFailedError();
 		}
 		catch (AssertionFailedError ex) {
-			assertMessageEquals(ex, "");
+			assertNullMessage(ex);
 			Throwable cause = ex.getCause();
 			assertMessageContains(cause, "cause");
 		}

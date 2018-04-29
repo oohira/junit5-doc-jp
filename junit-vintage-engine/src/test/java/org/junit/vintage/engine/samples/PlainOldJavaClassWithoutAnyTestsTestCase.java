@@ -8,10 +8,15 @@
  * http://www.eclipse.org/legal/epl-v20.html
  */
 
-package org.junit.platform.launcher.listener;
+package org.junit.vintage.engine.samples;
 
-import org.junit.platform.launcher.TestExecutionListener;
+/**
+ * @since 4.12
+ */
+public class PlainOldJavaClassWithoutAnyTestsTestCase {
 
-public class NoopTestExecutionListener implements TestExecutionListener {
-	// empty on purpose
+	public void doSomething() {
+		// no-op
+	}
+
 }
