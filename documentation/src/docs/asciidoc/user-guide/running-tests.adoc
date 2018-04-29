@@ -1,30 +1,31 @@
 [[running-tests]]
-== Running Tests
+== テストを実行する
 
 [[running-tests-ide]]
-=== IDE Support
+=== IDEのサポート
 
 [[running-tests-ide-intellij-idea]]
 ==== IntelliJ IDEA
 
-IntelliJ IDEA supports running tests on the JUnit Platform since version 2016.2. For
-details please see the
-https://blog.jetbrains.com/idea/2016/08/using-junit-5-in-intellij-idea/[post on the
-IntelliJ IDEA blog]. Note, however, that it is recommended to use IDEA 2017.3 or newer
-since these newer versions of IDEA will download the following JARs automatically based
-on the API version used in the project: `junit-platform-launcher`,
-`junit-jupiter-engine`, and `junit-vintage-engine`.
+IntelliJ IDEAは、バージョン2016.2からJUnit Platform上でのテスト実行をサポートしています。
+詳細は、
+https://blog.jetbrains.com/idea/2016/08/using-junit-5-in-intellij-idea/[IntelliJ IDEAブログの投稿]
+を参照してください。ただし、実際にはIntelliJ IDEA 2017.3またはそれより新しいバージョンの
+利用が推奨される点に注意してください。というのも、プロジェクトで利用されるAPIバージョンに応じて
+`junit-platform-launcher`, `junit-jupiter-engine`, `junit-vintage-engine`
+のJARを自動的にダウンロードしてくれるからです。
 
-WARNING: IntelliJ IDEA releases prior to IDEA 2017.3 bundle specific versions of JUnit 5.
-Thus, if you want to use a newer version of JUnit Jupiter, execution of tests within the
-IDE might fail due to version conflicts. In such cases, please follow the instructions
-below to use a newer version of JUnit 5 than the one bundled with IntelliJ IDEA.
+WARNING: IntelliJ IDEAのバージョン2017.3より前のリリースは、JUnit 5
+の特定のバージョンを同梱している点に注意してください。もしもJUnit Jupiter
+の新しいバージョンを使いたい場合、IDE内でのテスト実行はバージョンのコンフリクトで
+失敗する可能性があります。そのような場合は、IntelliJ IDEAに同梱されている
+JUnit 5より新しいバージョンを使うために、以下の手順に従ってください。
 
-In order to use a different JUnit 5 version (e.g., {jupiter-version}), you may need to
-include the corresponding versions of the `junit-platform-launcher`,
-`junit-jupiter-engine`, and `junit-vintage-engine` JARs in the classpath.
+JUnit 5の異なるバージョン (例えば、 {jupiter-version}) を使うには、
+`junit-platform-launcher`, `junit-jupiter-engine`, `junit-vintage-engine`
+の対応するバージョンのJARをクラスパスに追加する必要があります。
 
-.Additional Gradle Dependencies
+.Gradleの追加の依存関係
 [source,groovy]
 [subs=attributes+]
 ----
@@ -34,7 +35,7 @@ testRuntime("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
 testRuntime("org.junit.vintage:junit-vintage-engine:{vintage-version}")
 ----
 
-.Additional Maven Dependencies
+.Mavenの追加の依存関係
 [source,xml]
 [subs=attributes+]
 ----
@@ -62,39 +63,38 @@ testRuntime("org.junit.vintage:junit-vintage-engine:{vintage-version}")
 [[running-tests-ide-eclipse]]
 ==== Eclipse
 
-Eclipse IDE offers support for the JUnit Platform since the Eclipse Oxygen.1a (4.7.1a)
-release.
+Eclipse IDEは、Oxygen.1a (4.7.1a)リリースからJUnit Platformをサポートしています。
 
-For more information on using JUnit 5 in Eclipse consult the official _Eclipse support
-for JUnit 5_ section of the
+EclipseでJUnit 5を使うための情報は、公式ドキュメント
 https://www.eclipse.org/eclipse/news/4.7.1a/#junit-5-support[Eclipse Project Oxygen.1a
-(4.7.1a) - New and Noteworthy] documentation.
+(4.7.1a) - New and Noteworthy] の _Eclipse support for JUnit 5_ の節を参照してください。
 
 [[running-tests-ide-other]]
-==== Other IDEs
+==== その他のIDE
 
-At the time of this writing, there is no direct support for running tests on the JUnit
-Platform within IDEs other than IntelliJ IDEA and Eclipse. However, the JUnit team
-provides two intermediate solutions so that you can go ahead and try out JUnit 5 within
-your IDE today. You can use the <<running-tests-console-launcher>> manually or execute
-tests with a <<running-tests-junit-platform-runner,JUnit 4 based Runner>>.
+本書執筆時点では、IntelliJ IDEAとEclipse以外のIDEは、JUnit Platform
+上でのテスト実行を直接はサポートしていません。しかし、JUnitチームは
+あなたが使っているIDEでJUnit 5を試せるように、2つの中間解を提供しています。
+<<running-tests-console-launcher>> を手動で使うか、
+<<running-tests-junit-platform-runner,JUnit 4ベースのランナー>>
+でテストを実行することができます。
 
 [[running-tests-build]]
-=== Build Support
+=== ビルドサポート
 
 [[running-tests-build-gradle]]
 ==== Gradle
 
-The JUnit team has developed a very basic Gradle plugin that allows you to run any kind
-of test that is supported by a `TestEngine` (e.g., JUnit 3, JUnit 4, JUnit Jupiter,
-{Specsy}, etc.). See `build.gradle` in the `{junit5-gradle-consumer}` project for an
-example of the plugin in action.
+JUnitチームは、`TestEngine` でサポートされるあらゆる種類のテスト（例えば、
+JUnit 3、JUnit 4、JUnit Jupiter、 {Specsy} など）を実行できるGradle
+プラグインを開発しました。プラグインの使用例は、`{junit5-gradle-consumer}`
+プロジェクトの `build.gradle` を参照してください。
 
 [[running-tests-build-gradle-junit-enable]]
-===== Enabling the JUnit Gradle Plugin
+===== JUnit Gradleプラグインを有効にする
 
-To use the JUnit Gradle plugin, you first need to make sure that you are running Gradle
-2.5 or higher. Once you've done that, you can configure `build.gradle` as follows.
+JUnit Gradleプラグインを使うには、まずGradle 2.5以上であることを
+確認してください。その後、`build.gradle` を次のように設定できます。
 
 [source,java,indent=0]
 [subs=attributes+]
@@ -114,9 +114,9 @@ apply plugin: 'org.junit.platform.gradle.plugin'
 ----
 
 [[running-tests-build-gradle-junit-configure]]
-===== Configuring the JUnit Gradle Plugin
+===== JUnit Gradleプラグインを設定する
 
-Once the JUnit Gradle plugin has been applied, you can configure it as follows.
+JUnit Gradleプラグインを適用後、次のように設定を変更できます。
 
 [source,java,indent=0]
 [subs=attributes+]
@@ -131,14 +131,14 @@ junitPlatform {
 }
 ----
 
-By default, the JUnit Gradle plugin disables the standard Gradle `test` task, but this
-can be overridden via the `enableStandardTestTask` flag.
+デフォルトでは、JUnit GradleプラグインはGradle標準の `test` タスクを無効化しますが、
+`enableStandardTestTask` フラグで変更できます。
 
 [[running-tests-build-gradle-selectors]]
-===== Configuring Selectors
+===== セレクタを設定する
 
-By default, the plugin will scan your project's output directories for tests. However,
-you can specify which tests to execute explicitly using the `selectors` extension element.
+デフォルトでは、テストはプロジェクトの出力ディレクトリから探されます。
+しかし、`selectors` 拡張要素を使えば、実行するテストを明示的に指定することもできます。
 
 [source,java,indent=0]
 ----
@@ -165,23 +165,23 @@ junitPlatform {
 	// ...
 }
 ----
-<1> URIs
-<2> Local files
-<3> Local directories
-<4> Packages
-<5> Classes, fully qualified class names
-<6> Methods, fully qualified method names (see {DiscoverySelectors_selectMethod})
-<7> Classpath resources
-<8> Module names
+<1> URI（訳注：URIからどうテストを解決するかは個々のテストエンジンに依存しており、JUnit Platformが関知するところではない）
+<2> ローカルファイル
+<3> ローカルディレクトリ
+<4> パッケージ
+<5> クラスの完全修飾名
+<6> メソッドの完全修飾名 ({DiscoverySelectors_selectMethod} を参照)
+<7> クラスパスリソース
+<8> モジュール名
 
 [[running-tests-build-gradle-filters]]
-===== Configuring Filters
+===== フィルタを設定する
 
-You can configure filters for the test plan by using the `filters` extension. By default,
-all engines and tags are included in the test plan. Only the default
-`includeClassNamePattern` (`{standard-include-class-name-pattern}`) is applied. You can
-override the default pattern as in the following example. When you specify multiple
-patterns, they are combined using OR semantics.
+`filters` 拡張を使うことで、テストプランのフィルタを設定できます。デフォルトでは、
+すべてのエンジンとタグがテストプランに含まれ、`includeClassNamePattern`
+(`{standard-include-class-name-pattern}`) だけが適用されます。
+次の例で示すように、デフォルトパターンは変更することができます。
+複数のパターンを指定した場合は、OR (論理和) で結合されます。
 
 [source,java,indent=0]
 ----
@@ -207,21 +207,23 @@ junitPlatform {
 }
 ----
 
-If you supply a _Test Engine ID_ via `engines {include ...}` or `engines {exclude ...}`,
-the JUnit Gradle plugin will only run tests for the desired test engines. Similarly, if
-you supply _tags_ or <<running-tests-tag-expressions, _tag expressions_>> via
-`tags {include ...}` or `tags {exclude ...}`, the JUnit Gradle plugin will only run tests
-that are _tagged_ accordingly (e.g., via the `@Tag` annotation for JUnit Jupiter based
-tests). The same applies to package names that can be included or excluded using
-`packages {include ...}` or `packages {exclude ...}`.
+`engines {include ...}` または `engines {exclude ...}` で _テストエンジンID_
+を指定すると、JUnit Gradleプラグインはそのテストエンジンのテストだけを実行します。
+同様に、`tags {include ...}` または `tags {exclude ...}` で _タグ_ や
+<<running-tests-tag-expressions, _タグ式_>> を指定すると、JUnit Gradle
+プラグインは（例えば、JUnit Jupiterベースのテストの場合は `@Tag` アノテーションで）
+タグ付けされたテストだけを実行します。
+`packages {include ...}` または `packages {exclude ...}` を使って、
+パッケージ名についても同様のことができます。
 
 [[running-tests-build-gradle-config-params]]
-===== Configuration Parameters
+===== 設定パラメーター
 
-You can set configuration parameters to influence test discovery and execution by using
-the `configurationParameter` or `configurationParameters` DSL. The former can be used to
-set a single configuration parameter, while the latter takes a map of configuration
-parameters to set multiple key-value pairs at once. All keys and values must be `Strings`.
+`configurationParameter` または `configurationParameters` DSL を使って、
+テストを発見・実行するための設定パラメーターを指定できます。前者は、
+単一の設定パラメーターを指定するのに使えます。後者は、
+一度に複数のキー・値のペアを指定するために、設定パラメーターのマップを受け取ります。
+すべてのキーと値は、`String` でなければなりません。
 
 [source,java,indent=0]
 ----
@@ -237,14 +239,14 @@ junitPlatform {
 ----
 
 [[running-tests-build-gradle-engines-configure]]
-===== Configuring Test Engines
+===== テストエンジンを設定する
 
-In order to have the JUnit Gradle plugin run any tests at all, a `TestEngine`
-implementation must be on the classpath.
+JUnit Gradleプラグインにテストを実行させるためには、`TestEngine`
+の実装がクラスパスに存在しなければなりません。
 
-To configure support for JUnit Jupiter based tests, configure a `testCompile` dependency
-on the JUnit Jupiter API and a `testRuntime` dependency on the JUnit Jupiter `TestEngine`
-implementation similar to the following.
+JUnit Jupiterベースのテストをサポートするためには、JUnit Jupiter API
+に対する `testCompile` 依存と、JUnit Jupiter `TestEngine`
+実装に対する `testRuntime` 依存を次のように指定する必要があります。
 
 [source,java,indent=0]
 [subs=attributes+]
@@ -255,9 +257,9 @@ dependencies {
 }
 ----
 
-The JUnit Gradle plugin can run JUnit 4 based tests as long as you configure a
-`testCompile` dependency on JUnit 4 and a `testRuntime` dependency on the JUnit Vintage
-`TestEngine` implementation similar to the following.
+JUnit Gradleプラグインは、JUnit 4ベースのテストも実行することができます。
+そのためには、JUnit 4に対する `testCompile` 依存と、JUnit Vintage
+`TestEngine` 実装に対する `testRuntime` 依存が必要です。
 
 [source,java,indent=0]
 [subs=attributes+]
@@ -269,19 +271,18 @@ dependencies {
 ----
 
 [[running-tests-build-gradle-logging]]
-===== Configuring Logging (optional)
+===== ロギングを設定する（省略可）
 
-JUnit uses the Java Logging APIs in the `java.util.logging` package (a.k.a. _JUL_) to
-emit warnings and debug information. Please refer to the official documentation of
-`{LogManager}` for configuration options.
+JUnitは、`java.util.logging` パッケージ（別名、_JUL_）の Java Logging API
+を警告やデバッグ情報の出力に利用しています。設定オプションについては、
+`{LogManager}` の公式ドキュメントを参照してください。
 
-Alternatively, it's possible to redirect log messages to other logging frameworks such as
-{Log4j} or {Logback}. To use a logging framework that provides a custom implementation of
-`{LogManager}`, configure the `logManager` extension property of the JUnit Gradle plugin.
-This will set the `java.util.logging.manager` system property to the supplied _fully
-qualified class name_ of the `{LogManager}` implementation to use. The example below
-demonstrates how to configure Log4j{nbsp}2.x (see {Log4j_JDK_Logging_Adapter} for
-details).
+ログを {Log4j} や {Logback} のような他のロギングフレームワークにリダイレクトする
+ことも可能です。`{LogManager}` のカスタム実装を提供するロギングフレームワークを
+使う場合は、JUnit Gradleプラグインの `logManager` 拡張プロパティを設定してください。
+指定した `{LogManager}` 実装クラスの _完全修飾名_ が、`java.util.logging.manager`
+システムプロパティに設定されます。以下は、Log4j{nbsp}2.x
+（詳細は、{Log4j_JDK_Logging_Adapter} 参照）を設定する例です。
 
 [source,java,indent=0]
 [subs=attributes+]
@@ -291,24 +292,23 @@ junitPlatform {
 }
 ----
 
-Other logging frameworks provide different means to redirect messages logged using
-`java.util.logging`. For example, for {Logback} you can use the
-https://www.slf4j.org/legacy.html#jul-to-slf4j[JUL to SLF4J Bridge] by adding an
-additional dependency to the runtime classpath.
+その他のロギングフレームワークは、`java.util.logging` のログをリダイレクトする
+方法が異なります。例えば {Logback} では、
+https://www.slf4j.org/legacy.html#jul-to-slf4j[JULからSLF4Jへのブリッジ]
+を実行時のクラスパスに依存関係として追加して使います。
 
 [[running-tests-build-gradle-junit-using]]
-===== Using the JUnit Gradle Plugin
+===== JUnit Gradleプラグインを使う
 
-Once the JUnit Gradle plugin has been applied and configured, you have a new
-`junitPlatformTest` task at your disposal.
+JUnit Gradleプラグインを適用すると、`junitPlatformTest` タスクが使えるようになります。
 
-Invoking `gradlew junitPlatformTest` (or `gradlew test`) from the command line will
-execute all tests within the project whose class names match the regular expression
-supplied via the `includeClassNamePattern` (which defaults to
-`{standard-include-class-name-pattern}`).
+コマンドラインで `gradlew junitPlatformTest`（または、`gradlew test`）
+を呼び出すと、プロジェクトの中でクラス名が `includeClassNamePattern`
+（デフォルトでは、`{standard-include-class-name-pattern}`）
+の正規表現にマッチするすべてのテストが実行されます。
 
-Executing the `junitPlatformTest` task in the `{junit5-gradle-consumer}` project results
-in output similar to the following:
+`{junit5-gradle-consumer}` プロジェクトで `junitPlatformTest`
+タスクを実行すると、次のような出力になります。
 
 ....
 :junitPlatformTest
@@ -330,7 +330,7 @@ Test run finished after 93 ms
 BUILD SUCCESSFUL
 ....
 
-If a test fails, the build will fail with output similar to the following:
+もしテストが失敗すると、次のような出力とともにビルドが失敗します。
 
 [subs=-callouts]
 ....
@@ -364,23 +364,23 @@ Execution failed for task ':junitPlatformTest'.
 > Process 'command '/Library/Java/JavaVirtualMachines/jdk1.8.0_92.jdk/Contents/Home/bin/java'' finished with non-zero exit value 1
 ....
 
-NOTE: The _exit value_ is `1` if any containers or tests failed; otherwise, it is `0`.
+NOTE: コンテナやテストが失敗した場合、_終了コード_ は `1` になります。成功した場合は、`0` です。
 
-.Current Limitations of the JUnit Gradle Plugin
-WARNING: The results of any tests run via the JUnit Gradle plugin will not be included
-in the standard test report generated by Gradle; however, the test results can
-typically be aggregated on a CI server. See the `reportsDir` property of the plugin.
+.JUnit Gradleプラグインの現在の制限事項
+WARNING: JUnit Gradleプラグインに実行されたテストの結果は、
+Gradleが出力する標準のテストレポートには含まれません。ただし、
+典型的なCIサーバーではテスト結果として収集できます。
+プラグインの、`reportsDir` プロパティを参照してください。
 
 [[running-tests-build-maven]]
 ==== Maven
 
-The JUnit team has developed a very basic provider for Maven Surefire that lets you run
-JUnit 4 and JUnit Jupiter tests via `mvn test`. The `pom.xml` file in the
-`{junit5-maven-consumer}` project demonstrates how to use it and can serve as a starting
-point.
+JUnitチームは、`mvn test` でJUnit 4とJUnit Jupiterのテストを実行できる
+Maven Surefireプロバイダを開発しました。 `{junit5-maven-consumer}`
+プロジェクトの `pom.xml` ファイルが使い方を示しています。
 
-WARNING: Due to a memory leak in Surefire 2.20 and issues running on Java 9,
-the `junit-platform-surefire-provider` currently only works with Surefire 2.19.1.
+WARNING: Surefire 2.20のメモリリークとJava 9実行時の問題のため、
+`junit-platform-surefire-provider` は現在Surefire 2.19.1のみで動作します。
 
 [source,xml,indent=0]
 [subs=attributes+]
@@ -406,14 +406,14 @@ the `junit-platform-surefire-provider` currently only works with Surefire 2.19.1
 ----
 
 [[running-tests-build-maven-engines-configure]]
-===== Configuring Test Engines
+===== テストエンジンを設定する
 
-In order to have Maven Surefire run any tests at all, a `TestEngine` implementation must
-be added to the runtime classpath.
+Maven Surefireにテストを実行させるためには、`TestEngine` の実装が
+実行時のクラスパスに必要です。
 
-To configure support for JUnit Jupiter based tests, configure a `test` dependency on the
-JUnit Jupiter API, and add the JUnit Jupiter `TestEngine` implementation to the
-dependencies of the `maven-surefire-plugin` similar to the following.
+JUnit Jupiterベースのテストをサポートするためには、JUnit Jupiter API
+に対する `test` 依存と、JUnit Jupiter `TestEngine` 実装に対する
+`maven-surefire-plugin` の依存を次のように指定する必要があります。
 
 [source,xml,indent=0]
 [subs=attributes+]
@@ -453,9 +453,9 @@ dependencies of the `maven-surefire-plugin` similar to the following.
 	...
 ----
 
-The JUnit Platform Surefire Provider can run JUnit 4 based tests as long as you configure
-a `test` dependency on JUnit 4 and add the JUnit Vintage `TestEngine` implementation to
-the dependencies of the `maven-surefire-plugin` similar to the following.
+JUnit Platform Surefireプロバイダは、JUnit 4ベースのテストも実行することができます。
+そのためには、JUnit 4に対する `test` 依存と、JUnit Vintage `TestEngine` 実装に対する
+`maven-surefire-plugin` の依存が必要です。
 
 [source,xml,indent=0]
 [subs=attributes+]
@@ -497,38 +497,38 @@ the dependencies of the `maven-surefire-plugin` similar to the following.
 ----
 
 [[running-tests-build-maven-test-system-property]]
-===== Running a Single Test Class
+===== 単一のテストクラスを実行する
 
-The JUnit Platform Surefire Provider supports the `test` JVM system property supported by
-the Maven Surefire Plugin. For example, to run only test methods in the
-`org.example.MyTest` test class you can execute `mvn -Dtest=org.example.MyTest test` from
-the command line. For further details, consult the
-https://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html[Maven Surefire Plugin]
-documentation.
+JUnit Platform Surefireプロバイダは、Maven Surefireプラグインがサポートする
+JVMシステムプロパティ `test` に対応しています。例えば、コマンドラインから
+`mvn -Dtest=org.example.MyTest test` を実行することで、テストクラス
+`org.example.MyTest` のテストメソッドだけを実行できます。詳細は、
+https://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html[Maven Surefireプラグイン]
+のドキュメントを参照してください。
 
 [[running-tests-build-maven-filter-test-class-names]]
-===== Filtering by Test Class Names
+===== テストクラス名でフィルタリングする
 
-The Maven Surefire Plugin will scan for test classes whose fully qualified names match
-the following patterns.
+Maven Surefireプラグインは、完全修飾名が次のパターンにマッチするテストクラスを探します。
 
 - `+**/Test*.java+`
 - `+**/*Test.java+`
 - `+**/*TestCase.java+`
 
-Note, however, that you can override this default behavior by configuring explicit
-`include` and `exclude` rules in your `pom.xml` file. See the
+ただし、`pom.xml` ファイルの `include` および `exclude`
+ルールを明示的に設定することで、デフォルトの動作を変更することもできます。
+詳細は、 Maven Surefireのドキュメント
 https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html[Inclusions and Exclusions of Tests]
-documentation for Maven Surefire for details.
+を参照してください。
 
 [[running-tests-build-maven-filter-tags]]
-===== Filtering by Tags
+===== タグでフィルタリングする
 
-You can filter tests by tags or <<running-tests-tag-expressions, tag expressions>> using
-the following configuration properties.
+次のように、タグまたは <<running-tests-tag-expressions, タグ式>>
+を使ってテストをフィルタリングすることもできます。
 
-- to include _tags_ or _tag expressions_, use either `groups` or `includeTags`.
-- to exclude _tags_ or _tag expressions_, use either `excludedGroups` or `excludeTags`.
+- _タグ_ または _タグ式_ をテスト対象に含めるには、`groups` または `includeTags` を指定します。
+- _タグ_ または _タグ式_ をテスト対象から除外するには、`excludedGroups` または `excludeTags` を指定します。
 
 [source,xml,indent=0]
 ----
@@ -555,11 +555,10 @@ the following configuration properties.
 ----
 
 [[running-tests-build-maven-config-params]]
-===== Configuration Parameters
+===== 設定パラメーター
 
-You can set configuration parameters to influence test discovery and execution by using
-the `configurationParameters` property and providing key-value pairs in the Java
-`Properties` file syntax.
+`configurationParameters` プロパティにJavaの `Properties` ファイル形式の
+キー・値のペアを与えることで、テストを発見・実行するための設定パラメーターを指定できます。
 
 [source,xml,indent=0]
 ----
@@ -591,19 +590,19 @@ the `configurationParameters` property and providing key-value pairs in the Java
 [[running-tests-console-launcher]]
 === Console Launcher
 
-The `{ConsoleLauncher}` is a command-line Java application that lets you launch
-the JUnit Platform from the console. For example, it can be used to run JUnit
-Vintage and JUnit Jupiter tests and print test execution results to the console.
+`{ConsoleLauncher}` は、コンソールからJUnit Platformを起動するための
+Javaのコマンドラインアプリケーションです。例えば、JUnit VintageとJUnit Jupiter
+のテストを実行し、結果をコンソールに表示するのに使えます。
 
-An executable `junit-platform-console-standalone-{platform-version}.jar` with all
-dependencies included is published in the central Maven repository under the
+すべての依存関係を含んだ実行可能な `junit-platform-console-standalone-{platform-version}.jar`
+がMavenセントラルリポジトリの
 https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone[junit-platform-console-standalone]
-directory. You can https://docs.oracle.com/javase/tutorial/deployment/jar/run.html[run] the
-standalone `ConsoleLauncher` as shown below.
+ディレクトリで公開されています。スタンドアロン版の `ConsoleLauncher` は、次のように
+https://docs.oracle.com/javase/tutorial/deployment/jar/run.html[実行する] ことができます。
 
 `java -jar junit-platform-console-standalone-{platform-version}.jar <<<running-tests-console-launcher-options>>>`
 
-Here's an example of its output:
+出力の例は次の通りです。
 
 ....
 ├─ JUnit Vintage
@@ -633,12 +632,12 @@ Test run finished after 64 ms
 [         0 tests failed          ]
 ....
 
-.Exit Code
-NOTE: The `{ConsoleLauncher}` exits with a status code of `1` if any containers or tests
-failed. Otherwise the exit code is `0`.
+.終了コード
+NOTE: `{ConsoleLauncher}` は、コンテナやテストが失敗するとステータスコード
+`1` で終了します。成功した場合は、`0` です。
 
 [[running-tests-console-launcher-options]]
-==== Options
+==== オプション
 
 ----
 include::{consoleLauncherOptionsFile}[]
@@ -646,66 +645,79 @@ include::{consoleLauncherOptionsFile}[]
 
 
 [[running-tests-junit-platform-runner]]
-=== Using JUnit 4 to run the JUnit Platform
+=== JUnit Platformの実行にJUnit 4を使う
 
-The `JUnitPlatform` runner is a JUnit 4 based `Runner` which enables you to run any test
-whose programming model is supported on the JUnit Platform in a JUnit 4 environment --
-for example, a JUnit Jupiter test class.
+`JUnitPlatform` ランナーは、JUnit Platformのプログラミングモデルに従ったテスト
+（例えば、JUnit Jupiterのテストクラス）をJUnit 4環境で実行可能にするための
+JUnit 4ベースの `Runner` です。
 
-Annotating a class with `@RunWith(JUnitPlatform.class)` allows it to be run with IDEs and
-build systems that support JUnit 4 but do not yet support the JUnit Platform directly.
+テストクラスに `@RunWith(JUnitPlatform.class)` アノテーションを付与すると、
+まだJUnit Platformを直接はサポートしていないけれどもJUnit 4ならサポートしている
+IDEやビルドシステムでも実行できるようになります。
 
-NOTE: Since the JUnit Platform has features that JUnit 4 does not have, the runner is
-only able to support a subset of the JUnit Platform functionality, especially with regard
-to reporting (see <<running-tests-junit-platform-runner-technical-names>>). But for the
-time being the `JUnitPlatform` runner is an easy way to get started.
+NOTE: JUnit PlatformはJUnit 4にない機能をもっているため、特にレポート周り
+(<<running-tests-junit-platform-runner-technical-names>> を参照)など、
+JUnit Platformの機能のサブセットしかサポートすることができません。
+しかし、さしあたっては `JUnitPlatform` ランナーを使って始めるのが簡単です。
 
 [[running-tests-junit-platform-runner-setup]]
-==== Setup
+==== セットアップ
 
-You need the following artifacts and their dependencies on the classpath. See
-<<dependency-metadata>> for details regarding group IDs, artifact IDs, and versions.
+クラスパスに以下のライブラリとその依存ライブラリが必要です。Group IDやArtifact ID、
+バージョンの詳細については、 <<dependency-metadata>> を参照してください。
 
-===== Explicit Dependencies
+===== 明示的な依存関係
 
-* `junit-platform-runner` in _test_ scope: location of the `JUnitPlatform` runner
-* `junit-{junit4-version}.jar` in _test_ scope: to run tests using JUnit 4
-* `junit-jupiter-api` in _test_ scope: API for writing tests using JUnit Jupiter, including `@Test`, etc.
-* `junit-jupiter-engine` in _test runtime_ scope: implementation of the `TestEngine` API for JUnit Jupiter
+* `junit-platform-runner` は _test_ スコープ: `JUnitPlatform` ランナーが含まれる
+* `junit-{junit4-version}.jar` は _test_ スコープ: JUnit 4を使ってテストを実行するため
+* `junit-jupiter-api` は _test_ スコープ: `@Test` などJUnit Jupiterを使ってテストを書くためのAPI
+* `junit-jupiter-engine` は _test runtime_ スコープ: JUnit Jupiterのための `TestEngine` API実装
 
-===== Transitive Dependencies
+===== 推移的な依存関係
 
-* `junit-platform-suite-api` in _test_ scope
-* `junit-platform-launcher` in _test_ scope
-* `junit-platform-engine` in _test_ scope
-* `junit-platform-commons` in _test_ scope
-* `opentest4j` in _test_ scope
+* `junit-platform-suite-api` は _test_ スコープ
+* `junit-platform-launcher` は _test_ スコープ
+* `junit-platform-engine` は _test_ スコープ
+* `junit-platform-commons` は _test_ スコープ
+* `opentest4j` は _test_ スコープ
 
 [[running-tests-junit-platform-runner-technical-names]]
-==== Display Names vs. Technical Names
+==== 表示名 vs. 技術名
 
-To define a custom _display name_ for the class run via `@RunWith(JUnitPlatform.class)`
-simply annotate the class with `@SuiteDisplayName` and provide a custom value.
+[TIP]
+====
+訳注：本文書では _Display Name_ に対して _表示名_ という訳語を使用し、
+本節で登場する _Technical Name_ に対しては _技術名_ という訳語を使用した。
+しかし、後者は直感的ではないと思うので、適切な訳があればフィードバックをいただきたい。
+====
 
-By default, _display names_ will be used for test artifacts; however, when the
-`JUnitPlatform` runner is used to execute tests with a build tool such as Gradle or
-Maven, the generated test report often needs to include the _technical names_ of test
-artifacts — for example, fully qualified class names — instead of shorter display names
-like the simple name of a test class or a custom display name containing special
-characters. To enable technical names for reporting purposes, simply declare the
-`@UseTechnicalNames` annotation alongside `@RunWith(JUnitPlatform.class)`.
+`@RunWith(JUnitPlatform.class)` ランナーで実行されるクラスにカスタムの
+_表示名 (display name)_ を定義するためには、`@SuiteDisplayName`
+アノテーションを付与します。
 
-Note that the presence of `@UseTechnicalNames` overrides any custom display name
-configured via `@SuiteDisplayName`.
+デフォルトでは、 _表示名_ はテストの成果物に使われます。しかし、Gradleや
+Mavenのようなビルドツールが `JUnitPlatform` ランナーを使う場合、
+生成されるテストレポートには、テストクラスの単純名や
+特殊文字を含むカスタム表示名ではなく、完全修飾クラス名のような
+_技術名 (technical name)_ が必要になることがあります。
+レポート出力で _技術名_ を有効にするためには、
+`@RunWith(JUnitPlatform.class)` と一緒に `@UseTechnicalNames`
+アノテーションを宣言してください。
+
+`@UseTechnicalNames` を付与すると、`@SuiteDisplayName`
+でしたカスタム表示名は無視される点に注意してください。
 
 [[running-tests-junit-platform-runner-single-test]]
-==== Single Test Class
+==== 単一のテストクラス
 
-One way to use the `JUnitPlatform` runner is to annotate a test class with
-`@RunWith(JUnitPlatform.class)` directly. Please note that the test methods in the
-following example are annotated with `org.junit.jupiter.api.Test` (JUnit Jupiter), not
-`org.junit.Test` (JUnit Vintage). Moreover, in this case the test class must be `public`;
-otherwise, some IDEs and build tools might not recognize it as a JUnit 4 test class.
+`JUnitPlatform` ランナーを使う方法の1つは、テストクラスに直接
+`@RunWith(JUnitPlatform.class)` アノテーションを付与することです。
+以下の例のテストメソッドには、`org.junit.Test` (JUnit Vintage) ではなく、
+`org.junit.jupiter.api.Test` (JUnit Jupiter)
+アノテーションが付与されている点に注意してください。さらに、
+この場合はテストクラスを `public` にしなければならない点にも注意してください。
+そうしないと、一部のIDEやビルドツールではJUnit 4のテストクラスとして
+認識されません。
 
 [source,java,indent=0]
 ----
@@ -713,98 +725,95 @@ include::{testDir}/example/JUnit4ClassDemo.java[tags=user_guide]
 ----
 
 [[running-tests-junit-platform-runner-test-suite]]
-==== Test Suite
+==== テストスイート
 
-If you have multiple test classes you can create a test suite as can be seen in the
-following example.
+複数のテストクラスがある場合、次の例のようにテストスイートを作成できます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/JUnit4SuiteDemo.java[tags=user_guide]
 ----
 
-The `JUnit4SuiteDemo` will discover and run all tests in the `example` package
-and its subpackages. By default, it will only include test classes whose names match the
-pattern `{standard-include-class-name-pattern}`.
+`JUnit4SuiteDemo` は、`example` パッケージとそのサブパッケージから
+すべてのテストを探して実行します。デフォルトでは、名前が
+`{standard-include-class-name-pattern}` のパターンにマッチする
+テストクラスだけを実行します。
 
-.Additional Configuration Options
-NOTE: There are more configuration options for discovering and filtering tests than just
-`@SelectPackages`. Please consult the
-{javadoc-root}/org/junit/platform/suite/api/package-summary.html[Javadoc] for further
-details.
+.追加の設定オプション
+NOTE: `@SelectPackages` 以外にも、テストを検索したりフィルタリングしたりするための
+設定オプションがあります。詳細は、
+{javadoc-root}/org/junit/platform/suite/api/package-summary.html[Javadoc]
+を参照してください。
 
 [[running-tests-config-params]]
-=== Configuration Parameters
+=== 設定パラメーター
 
-In addition to instructing the platform which test classes and test engines to include,
-which packages to scan, etc., it is sometimes necessary to provide additional custom
-configuration parameters that are specific to a particular test engine. For example, the
-JUnit Jupiter `TestEngine` supports _configuration parameters_ for the following use
-cases.
+どのテストクラスやテストエンジンを含むか、どのパッケージを検索するか、といったことを
+プラットフォームに指示するだけでなく、特定のテストエンジンに固有の追加の設定パラメーター
+を渡したい場合もあります。例えば、JUnit Jupiterの `TestEngine` は、
+次のユースケースのために _設定パラメーター_ をサポートしています。
 
 - <<writing-tests-test-instance-lifecycle-changing-default>>
 - <<extensions-registration-automatic-enabling>>
 - <<extensions-conditions-deactivation>>
 
-_Configuration Parameters_ are text-based key-value pairs that can be supplied to test
-engines running on the JUnit Platform via one of the following mechanisms.
+_設定パラメーター_ は、テキストベースのキーと値のペアで、JUnit Platform
+で動作するテストエンジンに次のいずれかの方法で渡されます。
 
-1. The `configurationParameter()` and `configurationParameters()` methods in the
-  `LauncherDiscoveryRequestBuilder` which is used to build a request supplied to the
-  <<launcher-api, `Launcher` API>>. When running tests via one of the tools provided
-  by the JUnit Platform you can specify configuration parameters as follows:
-  * <<running-tests-console-launcher,Console Launcher>>: use the `--config`
-    command-line option.
-  * <<running-tests-build-gradle-config-params,Gradle plugin>>: use the
-    `configurationParameter` or `configurationParameters` DSL.
-  * <<running-tests-build-maven-config-params,Maven Surefire provider>>: use the
-    `configurationParameters` property.
-2. JVM system properties.
-3. The JUnit Platform configuration file: a file named `junit-platform.properties` in the
-  root of the class path that follows the syntax rules for a Java `Properties` file.
+1. `LauncherDiscoveryRequestBuilder` クラスの `configurationParameter()`
+  または `configurationParameters()` メソッドを使って構築したリクエストを
+  <<launcher-api, `Launcher` API>> に渡します。JUnit Platform
+  が提供するツールを使ってテストを実行する場合、設定パラメーターは次のように指定できます。
+  * <<running-tests-console-launcher,Console Launcher>>: `--config`
+    コマンドラインオプションを使います
+  * <<running-tests-build-gradle-config-params,Gradleプラグイン>>:
+    `configurationParameter` または `configurationParameters` DSLを使います
+  * <<running-tests-build-maven-config-params,Maven Surefireプロバイダ>>:
+    `configurationParameters` プロパティを使います
+2. JVMシステムプロパティ
+3. JUnit Platform設定ファイル: クラスパスのルートに `junit-platform.properties`
+  という名前で配置され、Javaの `Properties` ファイルと同じシンタックスに従います。
 
-NOTE: Configuration parameters are looked up in the exact order defined above.
-Consequently, configuration parameters supplied directly to the `Launcher` take
-precedence over those supplied via system properties and the configuration file.
-Similarly, configuration parameters supplied via system properties take precedence over
-those supplied via the configuration file.
+NOTE: 設定パラメーターは、上で定義された順番に従って解決されます。つまり、
+`Launcher` に直接与えられた設定パラメーターの方が、システムプロパティや設定ファイルで
+与えられたものより優先されます。同様に、システムプロパティで与えられた設定パラメーターの方が、
+設定ファイルで与えられたものより優先されます。
 
 [[running-tests-tag-expressions]]
-=== Tag Expressions
-Tag expressions are boolean expressions with the operators `!`, `&` and `|`. In addition,
-`(` and `)` can be used to adjust for operator precedence.
+=== タグ式
+タグ式は、 `!`, `&`, `|` 演算子からなるブール式です。
+演算子の優先順位を調整するために、`(` と `)` も使えます。
 
-.Operators (in descending order of precedence)
+.演算子 (優先順位の降順)
 |===
-| Operator | Meaning | Associativity
+| 演算子    | 意味    | 結合性
 
 | `!`      | not     | right
 | `&`      | and     | left
 | `\|`     | or      | left
 |===
 
-If you are tagging your tests across multiple dimensions, tag expressions help you to
-select which tests to execute. Tagging by test type (e.g. _micro_, _integration_,
-_end-to-end_) and feature (e.g. *foo*, *bar*, *baz*) the following tag expressions can be
-useful.
+テストに直交するタグを付与している場合、実行するテストを選択するのにタグ式は便利です。
+テストの種類 (例えば、_micro_, _integration_, _end-to-end_) と機能
+(例えば、 *foo*, *bar*, *baz*) のタグを付与すると、次のようなタグ式が使えます。
 
 [%header,cols="40,60"]
 |===
-| Tag Expression
-| Selection
+| タグ式
+| 該当するテスト
 
 | +foo+
-| all tests for *foo*
+| *foo* に対するすべてのテスト
 
 | +bar \| baz+
-| all tests for *bar* plus all tests for *baz*
+| *bar* または *baz* に対するすべてのテスト
 
 | +bar & baz+
-| all tests for the interaction between *bar* and *baz*
+| *bar* かつ *baz* に対するすべてのテスト
 
 | +foo & !end-to-end+
-| all tests for *foo*, but not the _end-to-end_ tests
+| *foo*　に対するテストのうち、_end-to-end_ レベル以外のすべてのテスト
 
 | +(micro \| integration) & (foo \| baz)+
-| all _micro_ or _integration_ tests for *foo* or *baz*
+| *foo* または *baz* に対するテストのうち、_micro_ または _integration_ レベルのすべてのテスト
 |===
