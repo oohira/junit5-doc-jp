@@ -375,13 +375,12 @@ Gradleが出力する標準のテストレポートには含まれません。�
 [[running-tests-build-maven]]
 ==== Maven
 
-The JUnit team has developed a very basic provider for Maven Surefire that lets you run
-JUnit 4 and JUnit Jupiter tests via `mvn test`. The `pom.xml` file in the
-`{junit5-maven-consumer}` project demonstrates how to use it and can serve as a starting
-point.
+JUnitチームは、`mvn test` でJUnit 4とJUnit Jupiterのテストを実行できる
+Maven Surefireプロバイダを開発しました。 `{junit5-maven-consumer}`
+プロジェクトの `pom.xml` ファイルが使い方を示しています。
 
-WARNING: Due to a memory leak in Surefire 2.20 and issues running on Java 9,
-the `junit-platform-surefire-provider` currently only works with Surefire 2.19.1.
+WARNING: Surefire 2.20のメモリリークとJava 9実行時の問題のため、
+`junit-platform-surefire-provider` は現在Surefire 2.19.1のみで動作します。
 
 [source,xml,indent=0]
 [subs=attributes+]
@@ -407,14 +406,14 @@ the `junit-platform-surefire-provider` currently only works with Surefire 2.19.1
 ----
 
 [[running-tests-build-maven-engines-configure]]
-===== Configuring Test Engines
+===== テストエンジンを設定する
 
-In order to have Maven Surefire run any tests at all, a `TestEngine` implementation must
-be added to the runtime classpath.
+Maven Surefireにテストを実行させるためには、`TestEngine` の実装が
+実行時のクラスパスに必要です。
 
-To configure support for JUnit Jupiter based tests, configure a `test` dependency on the
-JUnit Jupiter API, and add the JUnit Jupiter `TestEngine` implementation to the
-dependencies of the `maven-surefire-plugin` similar to the following.
+JUnit Jupiterベースのテストをサポートするためには、JUnit Jupiter API
+に対する `test` 依存と、JUnit Jupiter `TestEngine` 実装に対する
+`maven-surefire-plugin` の依存を次のように指定する必要があります。
 
 [source,xml,indent=0]
 [subs=attributes+]
@@ -454,9 +453,9 @@ dependencies of the `maven-surefire-plugin` similar to the following.
 	...
 ----
 
-The JUnit Platform Surefire Provider can run JUnit 4 based tests as long as you configure
-a `test` dependency on JUnit 4 and add the JUnit Vintage `TestEngine` implementation to
-the dependencies of the `maven-surefire-plugin` similar to the following.
+JUnit Platform Surefireプロバイダは、JUnit 4ベースのテストも実行することができます。
+そのためには、JUnit 4に対する `test` 依存と、JUnit Vintage `TestEngine` 実装に対する
+`maven-surefire-plugin` の依存が必要です。
 
 [source,xml,indent=0]
 [subs=attributes+]
@@ -498,38 +497,38 @@ the dependencies of the `maven-surefire-plugin` similar to the following.
 ----
 
 [[running-tests-build-maven-test-system-property]]
-===== Running a Single Test Class
+===== 単一のテストクラスを実行する
 
-The JUnit Platform Surefire Provider supports the `test` JVM system property supported by
-the Maven Surefire Plugin. For example, to run only test methods in the
-`org.example.MyTest` test class you can execute `mvn -Dtest=org.example.MyTest test` from
-the command line. For further details, consult the
-https://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html[Maven Surefire Plugin]
-documentation.
+JUnit Platform Surefireプロバイダは、Maven Surefireプラグインがサポートする
+JVMシステムプロパティ `test` に対応しています。例えば、コマンドラインから
+`mvn -Dtest=org.example.MyTest test` を実行することで、テストクラス
+`org.example.MyTest` のテストメソッドだけを実行できます。詳細は、
+https://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html[Maven Surefireプラグイン]
+のドキュメントを参照してください。
 
 [[running-tests-build-maven-filter-test-class-names]]
-===== Filtering by Test Class Names
+===== テストクラス名でフィルタリングする
 
-The Maven Surefire Plugin will scan for test classes whose fully qualified names match
-the following patterns.
+Maven Surefireプラグインは、完全修飾名が次のパターンにマッチするテストクラスを探します。
 
 - `+**/Test*.java+`
 - `+**/*Test.java+`
 - `+**/*TestCase.java+`
 
-Note, however, that you can override this default behavior by configuring explicit
-`include` and `exclude` rules in your `pom.xml` file. See the
+ただし、`pom.xml` ファイルの `include` および `exclude`
+ルールを明示的に設定することで、デフォルトの動作を変更することもできます。
+詳細は、 Maven Surefireのドキュメント
 https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html[Inclusions and Exclusions of Tests]
-documentation for Maven Surefire for details.
+を参照してください。
 
 [[running-tests-build-maven-filter-tags]]
-===== Filtering by Tags
+===== タグでフィルタリングする
 
-You can filter tests by tags or <<running-tests-tag-expressions, tag expressions>> using
-the following configuration properties.
+次のように、タグまたは <<running-tests-tag-expressions, タグ式>>
+を使ってテストをフィルタリングすることもできます。
 
-- to include _tags_ or _tag expressions_, use either `groups` or `includeTags`.
-- to exclude _tags_ or _tag expressions_, use either `excludedGroups` or `excludeTags`.
+- _タグ_ または _タグ式_ をテスト対象に含めるには、`groups` または `includeTags` を指定します。
+- _タグ_ または _タグ式_ をテスト対象から除外するには、`excludedGroups` または `excludeTags` を指定します。
 
 [source,xml,indent=0]
 ----
@@ -556,11 +555,10 @@ the following configuration properties.
 ----
 
 [[running-tests-build-maven-config-params]]
-===== Configuration Parameters
+===== 設定パラメーター
 
-You can set configuration parameters to influence test discovery and execution by using
-the `configurationParameters` property and providing key-value pairs in the Java
-`Properties` file syntax.
+`configurationParameters` プロパティにJavaの `Properties` ファイル形式の
+キー・値のペアを与えることで、テストを発見・実行するための設定パラメーターを指定できます。
 
 [source,xml,indent=0]
 ----
