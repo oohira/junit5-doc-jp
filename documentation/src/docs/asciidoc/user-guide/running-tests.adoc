@@ -645,66 +645,79 @@ include::{consoleLauncherOptionsFile}[]
 
 
 [[running-tests-junit-platform-runner]]
-=== Using JUnit 4 to run the JUnit Platform
+=== JUnit Platformの実行にJUnit 4を使う
 
-The `JUnitPlatform` runner is a JUnit 4 based `Runner` which enables you to run any test
-whose programming model is supported on the JUnit Platform in a JUnit 4 environment --
-for example, a JUnit Jupiter test class.
+`JUnitPlatform` ランナーは、JUnit Platformのプログラミングモデルに従ったテスト
+（例えば、JUnit Jupiterのテストクラス）をJUnit 4環境で実行可能にするための
+JUnit 4ベースの `Runner` です。
 
-Annotating a class with `@RunWith(JUnitPlatform.class)` allows it to be run with IDEs and
-build systems that support JUnit 4 but do not yet support the JUnit Platform directly.
+テストクラスに `@RunWith(JUnitPlatform.class)` アノテーションを付与すると、
+まだJUnit Platformを直接はサポートしていないけれどもJUnit 4ならサポートしている
+IDEやビルドシステムでも実行できるようになります。
 
-NOTE: Since the JUnit Platform has features that JUnit 4 does not have, the runner is
-only able to support a subset of the JUnit Platform functionality, especially with regard
-to reporting (see <<running-tests-junit-platform-runner-technical-names>>). But for the
-time being the `JUnitPlatform` runner is an easy way to get started.
+NOTE: JUnit PlatformはJUnit 4にない機能をもっているため、特にレポート周り
+(<<running-tests-junit-platform-runner-technical-names>> を参照)など、
+JUnit Platformの機能のサブセットしかサポートすることができません。
+しかし、さしあたっては `JUnitPlatform` ランナーを使って始めるのが簡単です。
 
 [[running-tests-junit-platform-runner-setup]]
-==== Setup
+==== セットアップ
 
-You need the following artifacts and their dependencies on the classpath. See
-<<dependency-metadata>> for details regarding group IDs, artifact IDs, and versions.
+クラスパスに以下のライブラリとその依存ライブラリが必要です。Group IDやArtifact ID、
+バージョンの詳細については、 <<dependency-metadata>> を参照してください。
 
-===== Explicit Dependencies
+===== 明示的な依存関係
 
-* `junit-platform-runner` in _test_ scope: location of the `JUnitPlatform` runner
-* `junit-{junit4-version}.jar` in _test_ scope: to run tests using JUnit 4
-* `junit-jupiter-api` in _test_ scope: API for writing tests using JUnit Jupiter, including `@Test`, etc.
-* `junit-jupiter-engine` in _test runtime_ scope: implementation of the `TestEngine` API for JUnit Jupiter
+* `junit-platform-runner` は _test_ スコープ: `JUnitPlatform` ランナーが含まれる
+* `junit-{junit4-version}.jar` は _test_ スコープ: JUnit 4を使ってテストを実行するため
+* `junit-jupiter-api` は _test_ スコープ: `@Test` などJUnit Jupiterを使ってテストを書くためのAPI
+* `junit-jupiter-engine` は _test runtime_ スコープ: JUnit Jupiterのための `TestEngine` API実装
 
-===== Transitive Dependencies
+===== 推移的な依存関係
 
-* `junit-platform-suite-api` in _test_ scope
-* `junit-platform-launcher` in _test_ scope
-* `junit-platform-engine` in _test_ scope
-* `junit-platform-commons` in _test_ scope
-* `opentest4j` in _test_ scope
+* `junit-platform-suite-api` は _test_ スコープ
+* `junit-platform-launcher` は _test_ スコープ
+* `junit-platform-engine` は _test_ スコープ
+* `junit-platform-commons` は _test_ スコープ
+* `opentest4j` は _test_ スコープ
 
 [[running-tests-junit-platform-runner-technical-names]]
-==== Display Names vs. Technical Names
+==== 表示名 vs. 技術名
 
-To define a custom _display name_ for the class run via `@RunWith(JUnitPlatform.class)`
-simply annotate the class with `@SuiteDisplayName` and provide a custom value.
+[TIP]
+====
+訳注：本文書では _Display Name_ に対して _表示名_ という訳語を使用し、
+本節で登場する _Technical Name_ に対しては _技術名_ という訳語を使用した。
+しかし、後者は直感的ではないと思うので、適切な訳があればフィードバックをいただきたい。
+====
 
-By default, _display names_ will be used for test artifacts; however, when the
-`JUnitPlatform` runner is used to execute tests with a build tool such as Gradle or
-Maven, the generated test report often needs to include the _technical names_ of test
-artifacts — for example, fully qualified class names — instead of shorter display names
-like the simple name of a test class or a custom display name containing special
-characters. To enable technical names for reporting purposes, simply declare the
-`@UseTechnicalNames` annotation alongside `@RunWith(JUnitPlatform.class)`.
+`@RunWith(JUnitPlatform.class)` ランナーで実行されるクラスにカスタムの
+_表示名 (display name)_ を定義するためには、`@SuiteDisplayName`
+アノテーションを付与します。
 
-Note that the presence of `@UseTechnicalNames` overrides any custom display name
-configured via `@SuiteDisplayName`.
+デフォルトでは、 _表示名_ はテストの成果物に使われます。しかし、Gradleや
+Mavenのようなビルドツールが `JUnitPlatform` ランナーを使う場合、
+生成されるテストレポートには、テストクラスの単純名や
+特殊文字を含むカスタム表示名ではなく、完全修飾クラス名のような
+_技術名 (technical name)_ が必要になることがあります。
+レポート出力で _技術名_ を有効にするためには、
+`@RunWith(JUnitPlatform.class)` と一緒に `@UseTechnicalNames`
+アノテーションを宣言してください。
+
+`@UseTechnicalNames` を付与すると、`@SuiteDisplayName`
+でしたカスタム表示名は無視される点に注意してください。
 
 [[running-tests-junit-platform-runner-single-test]]
-==== Single Test Class
+==== 単一のテストクラス
 
-One way to use the `JUnitPlatform` runner is to annotate a test class with
-`@RunWith(JUnitPlatform.class)` directly. Please note that the test methods in the
-following example are annotated with `org.junit.jupiter.api.Test` (JUnit Jupiter), not
-`org.junit.Test` (JUnit Vintage). Moreover, in this case the test class must be `public`;
-otherwise, some IDEs and build tools might not recognize it as a JUnit 4 test class.
+`JUnitPlatform` ランナーを使う方法の1つは、テストクラスに直接
+`@RunWith(JUnitPlatform.class)` アノテーションを付与することです。
+以下の例のテストメソッドには、`org.junit.Test` (JUnit Vintage) ではなく、
+`org.junit.jupiter.api.Test` (JUnit Jupiter)
+アノテーションが付与されている点に注意してください。さらに、
+この場合はテストクラスを `public` にしなければならない点にも注意してください。
+そうしないと、一部のIDEやビルドツールではJUnit 4のテストクラスとして
+認識されません。
 
 [source,java,indent=0]
 ----
@@ -712,25 +725,25 @@ include::{testDir}/example/JUnit4ClassDemo.java[tags=user_guide]
 ----
 
 [[running-tests-junit-platform-runner-test-suite]]
-==== Test Suite
+==== テストスイート
 
-If you have multiple test classes you can create a test suite as can be seen in the
-following example.
+複数のテストクラスがある場合、次の例のようにテストスイートを作成できます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/JUnit4SuiteDemo.java[tags=user_guide]
 ----
 
-The `JUnit4SuiteDemo` will discover and run all tests in the `example` package
-and its subpackages. By default, it will only include test classes whose names match the
-pattern `{standard-include-class-name-pattern}`.
+`JUnit4SuiteDemo` は、`example` パッケージとそのサブパッケージから
+すべてのテストを探して実行します。デフォルトでは、名前が
+`{standard-include-class-name-pattern}` のパターンにマッチする
+テストクラスだけを実行します。
 
-.Additional Configuration Options
-NOTE: There are more configuration options for discovering and filtering tests than just
-`@SelectPackages`. Please consult the
-{javadoc-root}/org/junit/platform/suite/api/package-summary.html[Javadoc] for further
-details.
+.追加の設定オプション
+NOTE: `@SelectPackages` 以外にも、テストを検索したりフィルタリングしたりするための
+設定オプションがあります。詳細は、
+{javadoc-root}/org/junit/platform/suite/api/package-summary.html[Javadoc]
+を参照してください。
 
 [[running-tests-config-params]]
 === Configuration Parameters
