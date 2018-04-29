@@ -1,5 +1,5 @@
 [[user-guide]]
-= JUnit 5 User Guide
+= WIP: JUnit 5 ユーザーガイド
 Stefan Bechtold; Sam Brannen; Johannes Link; Matthias Merdes; Marc Philipp; Christian Stein
 :imagesdir: images
 :imagesoutdir: {outdir}/user-guide/images
@@ -47,6 +47,6 @@ include::api-evolution.adoc[]
 include::contributors.adoc[]
 
 [[release-notes]]
-== Release Notes
+== リリースノート
 
-The release notes are available <<../release-notes/index.adoc#release-notes,here>>.
+リリースノートは、 <<../release-notes/index.adoc#release-notes, こちら>> から参照できます。
