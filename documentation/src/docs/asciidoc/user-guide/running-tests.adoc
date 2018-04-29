@@ -746,77 +746,74 @@ NOTE: `@SelectPackages` 以外にも、テストを検索したりフィルタ�
 を参照してください。
 
 [[running-tests-config-params]]
-=== Configuration Parameters
+=== 設定パラメーター
 
-In addition to instructing the platform which test classes and test engines to include,
-which packages to scan, etc., it is sometimes necessary to provide additional custom
-configuration parameters that are specific to a particular test engine. For example, the
-JUnit Jupiter `TestEngine` supports _configuration parameters_ for the following use
-cases.
+どのテストクラスやテストエンジンを含むか、どのパッケージを検索するか、といったことを
+プラットフォームに指示するだけでなく、特定のテストエンジンに固有の追加の設定パラメーター
+を渡したい場合もあります。例えば、JUnit Jupiterの `TestEngine` は、
+次のユースケースのために _設定パラメーター_ をサポートしています。
 
 - <<writing-tests-test-instance-lifecycle-changing-default>>
 - <<extensions-registration-automatic-enabling>>
 - <<extensions-conditions-deactivation>>
 
-_Configuration Parameters_ are text-based key-value pairs that can be supplied to test
-engines running on the JUnit Platform via one of the following mechanisms.
+_設定パラメーター_ は、テキストベースのキーと値のペアで、JUnit Platform
+で動作するテストエンジンに次のいずれかの方法で渡されます。
 
-1. The `configurationParameter()` and `configurationParameters()` methods in the
-  `LauncherDiscoveryRequestBuilder` which is used to build a request supplied to the
-  <<launcher-api, `Launcher` API>>. When running tests via one of the tools provided
-  by the JUnit Platform you can specify configuration parameters as follows:
-  * <<running-tests-console-launcher,Console Launcher>>: use the `--config`
-    command-line option.
-  * <<running-tests-build-gradle-config-params,Gradle plugin>>: use the
-    `configurationParameter` or `configurationParameters` DSL.
-  * <<running-tests-build-maven-config-params,Maven Surefire provider>>: use the
-    `configurationParameters` property.
-2. JVM system properties.
-3. The JUnit Platform configuration file: a file named `junit-platform.properties` in the
-  root of the class path that follows the syntax rules for a Java `Properties` file.
+1. `LauncherDiscoveryRequestBuilder` クラスの `configurationParameter()`
+  または `configurationParameters()` メソッドを使って構築したリクエストを
+  <<launcher-api, `Launcher` API>> に渡します。JUnit Platform
+  が提供するツールを使ってテストを実行する場合、設定パラメーターは次のように指定できます。
+  * <<running-tests-console-launcher,Console Launcher>>: `--config`
+    コマンドラインオプションを使います
+  * <<running-tests-build-gradle-config-params,Gradleプラグイン>>:
+    `configurationParameter` または `configurationParameters` DSLを使います
+  * <<running-tests-build-maven-config-params,Maven Surefireプロバイダ>>:
+    `configurationParameters` プロパティを使います
+2. JVMシステムプロパティ
+3. JUnit Platform設定ファイル: クラスパスのルートに `junit-platform.properties`
+  という名前で配置され、Javaの `Properties` ファイルと同じシンタックスに従います。
 
-NOTE: Configuration parameters are looked up in the exact order defined above.
-Consequently, configuration parameters supplied directly to the `Launcher` take
-precedence over those supplied via system properties and the configuration file.
-Similarly, configuration parameters supplied via system properties take precedence over
-those supplied via the configuration file.
+NOTE: 設定パラメーターは、上で定義された順番に従って解決されます。つまり、
+`Launcher` に直接与えられた設定パラメーターの方が、システムプロパティや設定ファイルで
+与えられたものより優先されます。同様に、システムプロパティで与えられた設定パラメーターの方が、
+設定ファイルで与えられたものより優先されます。
 
 [[running-tests-tag-expressions]]
-=== Tag Expressions
-Tag expressions are boolean expressions with the operators `!`, `&` and `|`. In addition,
-`(` and `)` can be used to adjust for operator precedence.
+=== タグ式
+タグ式は、 `!`, `&`, `|` 演算子からなるブール式です。
+演算子の優先順位を調整するために、`(` と `)` も使えます。
 
-.Operators (in descending order of precedence)
+.演算子 (優先順位の降順)
 |===
-| Operator | Meaning | Associativity
+| 演算子    | 意味    | 結合性
 
 | `!`      | not     | right
 | `&`      | and     | left
 | `\|`     | or      | left
 |===
 
-If you are tagging your tests across multiple dimensions, tag expressions help you to
-select which tests to execute. Tagging by test type (e.g. _micro_, _integration_,
-_end-to-end_) and feature (e.g. *foo*, *bar*, *baz*) the following tag expressions can be
-useful.
+テストに直交するタグを付与している場合、実行するテストを選択するのにタグ式は便利です。
+テストの種類 (例えば、_micro_, _integration_, _end-to-end_) と機能
+(例えば、 *foo*, *bar*, *baz*) のタグを付与すると、次のようなタグ式が使えます。
 
 [%header,cols="40,60"]
 |===
-| Tag Expression
-| Selection
+| タグ式
+| 該当するテスト
 
 | +foo+
-| all tests for *foo*
+| *foo* に対するすべてのテスト
 
 | +bar \| baz+
-| all tests for *bar* plus all tests for *baz*
+| *bar* または *baz* に対するすべてのテスト
 
 | +bar & baz+
-| all tests for the interaction between *bar* and *baz*
+| *bar* かつ *baz* に対するすべてのテスト
 
 | +foo & !end-to-end+
-| all tests for *foo*, but not the _end-to-end_ tests
+| *foo*　に対するテストのうち、_end-to-end_ レベル以外のすべてのテスト
 
 | +(micro \| integration) & (foo \| baz)+
-| all _micro_ or _integration_ tests for *foo* or *baz*
+| *foo* または *baz* に対するテストのうち、_micro_ または _integration_ レベルのすべてのテスト
 |===
