@@ -127,6 +127,19 @@ JUnit 5を実行するには、Java 8（またはそれ以上）が必要とな�
     JUnit Vintageのテストエンジン実装です。JUnit 3またはJUnit 4で書かれた昔のテストを
     新しいJUnit Platform上で実行できるようにします。
 
+[[dependency-metadata-junit-bom]]
+==== Bill of Materials (BOM)
+
+_Bill of Materials_ POM を使うと、
+https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Importing_Dependencies[Maven]
+または
+https://docs.gradle.org/current/userguide/managing_transitive_dependencies.html#sec:bom_import[Gradle]
+で前述のライブラリを複数参照するときに依存関係の管理を容易にすることができます。
+
+* *Group ID*: `org.junit`
+* *Artifact ID*: `junit-bom`
+* *Version*: `{bom-version}`
+
 [[dependency-metadata-dependencies]]
 ==== 依存関係
 
@@ -229,5 +242,5 @@ vintage_engine ..> junit4
 JUnit JupiterベースとJUnit Vintageベースのプロジェクトの様々なサンプルを提供します。
 次のプロジェクトで `build.gradle` と `pom.xml` を見つけられるでしょう。
 
-* Gradleの場合は、`{junit5-gradle-consumer}` プロジェクトを参照してください
-* Mavenの場合は、`{junit5-maven-consumer}` プロジェクトを参照してください
+* Gradleの場合は、`{junit5-jupiter-starter-gradle}` プロジェクトを参照してください
+* Mavenの場合は、`{junit5-jupiter-starter-maven}` プロジェクトを参照してください
