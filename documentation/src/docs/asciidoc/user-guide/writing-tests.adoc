@@ -730,13 +730,26 @@ Gradle プラグインで `RepeatedTestsDemo` を実行すると、コンソー�
 [[writing-tests-parameterized-tests]]
 === パラメーター化テスト
 
-パラメーター化テストは、異なる引数でテストを複数回実行できるようにします。
-通常の `@Test` メソッドに似ていますが、`{ParameterizedTest}` アノテーションを
-使って宣言します。また、各呼び出しに対する引数を生成するための _ソース (source)_
-を少なくとも1つは宣言し、その引数をテストメソッドで _消費 (consume)_ しなければいけません。
+[TIP]
+====
+訳注：計算機科学の用語に従うのであれば、
+_argument_ を _実引数（メソッドを呼び出す側から見た引数）_、
+_parameter_ を _仮引数（メソッドを呼ばれる側から見た引数）_
+と区別して訳すべきだが、パラメーター化テストの説明では前者の
+_argument_ を _パラメーター_ と訳してしまった方が
+直感的にイメージしやすいと訳者は考える。
+原文でも両者の区別があいまいな箇所があるため、以降では
+訳者の解釈に従って意訳している。気になる場合は、原文をあたること。
+====
 
-以下は、引数のソースとして `String` 配列を指定するために `@ValueSource`
-アノテーションを使用したパラメーター化テストの例を示しています。
+パラメーター化テストは、異なる実引数でテストを複数回実行できるようにします。
+通常の `@Test` メソッドに似ていますが、`{ParameterizedTest}` アノテーションを
+使って宣言します。各呼び出しに対するパラメーターを生成するための _ソース (source)_
+を少なくとも1つは宣言し、そのパラメーターはテストメソッドで _消費 (consume)_
+する必要があります。
+
+以下は、パラメーターのソースとして `String` 配列を指定するために `@ValueSource`
+アノテーションを使用した例を示しています。
 
 [source,java,indent=0]
 ----
@@ -762,32 +775,34 @@ WARNING: パラーメーター化テストは、現在 _実験中_ の機能で�
 パラメーター化テストを使うには、`junit-jupiter-params` への依存を追加する必要があります。
 詳細は、<<dependency-metadata>> を参照してください。
 
-//TODO: to be translated
 [[writing-tests-parameterized-tests-consuming-arguments]]
-=== Consuming Arguments
+=== パラメーターの消費
 
-Parameterized test methods typically _consume_ arguments directly from the configured
-source (see <<writing-tests-parameterized-tests-sources>>) following a one-to-one
-correlation between argument source index and method parameter index (see examples in
-<<writing-tests-parameterized-tests-sources-CsvSource>>). However, a parameterized test
-method may also choose to _aggregate_ arguments from the source into a single object
-passed to the method (see <<writing-tests-parameterized-tests-argument-aggregation>>).
-Additional arguments may also be provided by a `ParameterResolver` (e.g., to obtain an
-instance of `TestInfo`, `TestReporter`, etc.). Specifically, a parameterized test method
-must declare formal parameters according to the following rules.
+パラメーター化テストのメソッドは、通常は設定されたソース
+(<<writing-tests-parameterized-tests-sources>> 参照)
+からパラメーターのインデックスとメソッドの仮引数のインデックスが1対1となるように
+パラメーターを _消費_ します
+(<<writing-tests-parameterized-tests-sources-CsvSource>> の例を参照)。
+しかし、ソースのすべてのパラメーターを単一のオブジェクトに _集約_
+してメソッドに渡すこともできます
+(<<writing-tests-parameterized-tests-argument-aggregation>> 参照)。
+また、`ParameterResolver` を使って追加の引数を渡すこともできます
+(例えば、`TestInfo` や `TestReporter` のインスタンスなど)。
+パラメーター化テストメソッドは、次のルールに従って仮引数を宣言しなければなりません。
 
-* Zero or more _indexed arguments_ must be declared first.
-* Zero or more _aggregators_ must be declared next.
-* Zero or more arguments supplied by a `ParameterResolver` must be declared last.
+* 最初に、_インデックス付き引数 (indexed argument)_ を0個以上宣言します
+* その次に、_アグリゲーター (aggregator)_ を0個以上宣言します
+* 最後に、`ParameterResolver` によって渡される引数を0個以上宣言します
 
-In this context, an _indexed argument_ is an argument for a given index in the
-`Arguments` provided by an `ArgumentsProvider` that is passed as an argument to the
-parameterized method at the same index in the method's formal parameter list. An
-_aggregator_ is any parameter of type `ArgumentsAccessor` or any parameter annotated with
-`@AggregateWith`.
+ここで、_インデックス付き引数 (indexed argument)_ は、`ArgumentsProvider`
+が生成した `Arguments` 中の指定されたインデックスに対するパラメーターです。
+このパラメーターは、パラメーター化テストメソッドの仮引数リストで
+同じインデックスに実引数として渡されます。
+_アグリゲーター (aggregator)_ は、`ArgumentsAccessor` 型または `@AggregateWith`
+アノテーションが付与された仮引数です。
 
 [[writing-tests-parameterized-tests-sources]]
-==== 引数のソース
+==== パラメーターのソース
 
 JUnit Jupiterは、あらかじめいくつかの _ソース_ アノテーションを提供しています。
 以降では、これらのアノテーションについて簡単な説明とサンプルを示します。
@@ -811,7 +826,7 @@ JUnit Jupiterは、あらかじめいくつかの _ソース_ アノテーショ
 - `java.lang.String`
 - `java.lang.Class`
 
-例えば、次の `@ParameterizedTest` メソッドは、`1`, `2`, `3` をパラメーターとして
+例えば、次の `@ParameterizedTest` メソッドは、値 `1`, `2`, `3` をパラメーターとして
 3回呼び出されます。
 
 [source,java,indent=0]
@@ -823,7 +838,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ValueSource_example]
 ===== @EnumSource
 
 `@EnumSource` は、`Enum` 定数を指定する便利な方法を提供します。このアノテーションでは、
-省略可能な `names` パラメーターを指定すると、その列挙定数だけが使われます。
+省略可能な `names` 属性を指定すると、その列挙定数だけが使われます。
 省略すると、次の例のようにすべての列挙定数が使われます。
 
 [source,java,indent=0]
@@ -837,7 +852,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=EnumSource_include_ex
 ----
 
 `@EnumSource` アノテーションは、テストメソッドに渡される列挙定数をさらに細かく制御するために、
-省略可能な `mode` パラメーターも提供しています。例えば、一部の名前をもつ列挙定数だけ除外したり、
+省略可能な `mode` 属性も提供しています。例えば、一部の名前をもつ列挙定数だけ除外したり、
 正規表現で列挙定数を指定したりすることができます。
 
 [source,java,indent=0]
@@ -853,8 +868,9 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=EnumSource_regex_exam
 [[writing-tests-parameterized-tests-sources-MethodSource]]
 ===== @MethodSource
 
-`@MethodSource` は、テストクラスまたは外部のクラスの _ファクトリ_ メソッドによる指定を可能にします。
-ファクトリメソッドは、`Stream`, `Iterable`, `Iterator`, または配列のいずれかを
+`@MethodSource` は、テストクラスまたは外部のクラスの _ファクトリ_
+メソッドによるパラメーターの指定を可能にします。
+ファクトリメソッドは、`Stream`, `Iterable`, `Iterator` または配列のいずれかを
 返さなければいけません。また、引数を受け取ることもできません。
 テストクラス内のファクトリメソッドは、`@TestInstance(Lifecycle.PER_CLASS)`
 アノテーションが付与されていない限り、`static` でなければいけません。
@@ -884,7 +900,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=simple_MethodSource_w
 include::{testDir}/example/ParameterizedTestDemo.java[tags=primitive_MethodSource_example]
 ----
 
-テストメソッドが複数のパラメーターを宣言している場合、以下で示すように `Arguments`
+テストメソッドが複数の仮引数を宣言している場合、以下で示すように `Arguments`
 のコレクションかストリームを返す必要があります。`Arguments.of(Object...)` は、
 `Arguments` インターフェースで定義されるstaticファクトリメソッドである点に注意してください。
 
@@ -906,7 +922,7 @@ include::{testDir}/example/ExternalMethodSourceDemo.java[tags=external_MethodSou
 [[writing-tests-parameterized-tests-sources-CsvSource]]
 ===== @CsvSource
 
-`@CsvSource` は、引数のリストをカンマ区切りの値（`String` リテラル）
+`@CsvSource` は、パラメーターのリストをカンマ区切りの値（`String` リテラル）
 で指定できるようにします。
 
 [source,java,indent=0]
@@ -918,7 +934,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=CsvSource_example]
 上の例の `'baz, qux'` と、以下のテーブルを参照してください。
 引用符で囲まれた空の値 `''` は空の `String` になりますが、
 （引用符で囲まれない）完全に _空_ の値は `null` と解釈されます。
-`null` の代入先パラメーターがプリミティブ型の場合は、
+`null` の代入先の型がプリミティブ型の場合は、
 `ArgumentConversionException` が発生します。
 
 [cols="50,50"]
@@ -952,7 +968,7 @@ NOTE: `@CsvSource` のシンタックスとは異なり、`@CsvFileSource` は�
 を引用符として使います。上の例の、`"United States of America"` を参考にしてください。
 引用符で囲まれた空の値 `""` は空の `String` になりますが、
 （引用符で囲まれない）完全に _空_ の値は `null` と解釈されます。
-`null` の代入先パラメーターがプリミティブ型の場合は、
+`null` の代入先の型がプリミティブ型の場合は、
 `ArgumentConversionException` が発生します。
 
 [[writing-tests-parameterized-tests-sources-ArgumentsSource]]
@@ -968,25 +984,25 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsSource_examp
 
 
 [[writing-tests-parameterized-tests-argument-conversion]]
-==== 引数の変換
+==== パラメーターの変換
 
 [[writing-tests-parameterized-tests-argument-conversion-widening]]
 ===== 拡大変換
 
-JUnit Jupiterは、`@ParameterizedTest` に与えられた引数に対して、
+JUnit Jupiterは、`@ParameterizedTest` に与えられたパラメーターに対して、
 https://docs.oracle.com/javase/specs/jls/se8/html/jls-5.html#jls-5.1.2[プリミティブ型の
 拡大変換] をサポートしています。例えば、`@ValueSource(ints = { 1, 2, 3 })`
-アノテーションが付与されたパラメーター化テストは、 `int` 型の引数だけでなく
-`long` や `float`、`double` 型の引数でも宣言することができます。
+アノテーションが付与されたパラメーター化テストでは、テストメソッドの仮引数を
+`int` 型だけでなく `long` や `float`、`double` 型でも宣言することができます。
 
 [[writing-tests-parameterized-tests-argument-conversion-implicit]]
 ===== 暗黙的な変換
 
 `@CsvSource` のようなユースケースをサポートするために、JUnit Jupiter
 は多くの組み込みの型変換を提供しています。
-変換処理は、メソッド引数の型に依存します。
+変換処理は、メソッドの仮引数の型に依存します。
 
-例えば、`@ParameterizedTest` が `TimeUnit` 型のパラメーターを宣言し、
+例えば、`@ParameterizedTest` が `TimeUnit` 型の仮引数を宣言し、
 ソースから実際に渡される型が `String` の場合、その文字列は対応する
 `TimeUnit` 列挙定数に自動的に変換されます。
 
@@ -1062,8 +1078,8 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=implicit_fallback_con
 [[writing-tests-parameterized-tests-argument-conversion-explicit]]
 ===== 明示的な変換
 
-引数の暗黙的な変換を使う代わりに、`@ConvertWith` アノテーションで
-特定のパラメーターの変換に使う `ArgumentConverter` を明示的に指定することもできます。
+暗黙的な変換を使う代わりに、`@ConvertWith` アノテーションで
+仮引数の変換に使う `ArgumentConverter` を明示的に指定することもできます。
 
 [source,java,indent=0]
 ----
@@ -1080,49 +1096,50 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=explicit_conversion_e
 include::{testDir}/example/ParameterizedTestDemo.java[tags=explicit_java_time_converter]
 ----
 
-//TODO: to be translated
 [[writing-tests-parameterized-tests-argument-aggregation]]
-==== Argument Aggregation
+==== パラメーターの集約
 
-By default, each _argument_ provided to a `@ParameterizedTest` method corresponds to a
-single method parameter. Consequently, argument sources which are expected to supply a
-large number of arguments can lead to large method signatures.
+デフォルトでは、`@ParameterizedTest` のメソッドに与えられる各パラメーター
+は、1つの仮引数に対応します。結果として、ソースが多数のパラメーターを生成する場合、
+メソッドシグネチャが大きく（仮引数が多く）なります。
 
-In such cases, an `{ArgumentsAccessor}` can be used instead of multiple parameters. Using
-this API, you can access the provided arguments through a single argument passed to your
-test method. In addition, type conversion is supported as discussed in
-<<writing-tests-parameterized-tests-argument-conversion-implicit>>.
+そのような場合には、複数の仮引数を定義する代わりに `{ArgumentsAccessor}`
+を使うことができます。このAPIを使うと、テストメソッドに渡した単一の
+`{ArgumentsAccessor}` 経由ですべてのパラメーターにアクセスすることができます。
+加えて、
+<<writing-tests-parameterized-tests-argument-conversion-implicit>>
+で説明した型変換もサポートされます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsAccessor_example]
 ----
 
-_An instance of `ArgumentsAccessor` is automatically injected into any parameter of type
-`ArgumentsAccessor`._
+`ArgumentsAccessor` 型の仮引数には、自動的に `ArgumentsAccessor` のインスタンスが注入されます。
 
 [[writing-tests-parameterized-tests-argument-aggregation-custom]]
-===== Custom Aggregators
+===== カスタムアグリゲーター
 
-Apart from direct access to a `@ParameterizedTest` method's arguments using an
-`ArgumentsAccessor`, JUnit Jupiter also supports the usage of custom, reusable
-_aggregators_.
+`ArgumentsAccessor` を使って `@ParameterizedTest` メソッドのパラメーターに
+直接アクセスする以外に、JUnit Jupiterはカスタムの再利用可能な
+_アグリゲーター (aggregator)_ もサポートしています。
 
-To use a custom aggregator simply implement the `{ArgumentsAggregator}` interface and
-register it via the `@AggregateWith` annotation on a compatible parameter in the
-`@ParameterizedTest` method. The result of the aggregation will then be provided as an
-argument for the corresponding parameter when the parameterized test is invoked.
+カスタムアグリゲーターを使うには、`{ArgumentsAggregator}` インターフェースを実装し、
+`@ParameterizedTest` メソッドの仮引数に `@AggregateWith`
+アノテーションを使って登録します。集約した結果は、
+パラメーター化テストが実行されるときに
+対象の仮引数に対する実引数として渡されます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsAggregator_example]
 ----
 
-If you find yourself repeatedly declaring `@AggregateWith(MyTypeAggregator.class)` for
-multiple parameterized test methods across your codebase, you may wish to create a custom
-_composed annotation_ such as `@CsvToMyType` that is meta-annotated with
-`@AggregateWith(MyTypeAggregator.class)`. The following example demonstrates this in
-action with a custom `@CsvToPerson` annotation.
+複数のパラメーター化テストメソッドに対して何回も `@AggregateWith(MyTypeAggregator.class)`
+を宣言していることに気付いたら、`@AggregateWith(MyTypeAggregator.class)`
+をメタアノテーションとして付与した `@CsvToMyType` のようなカスタム _合成アノテーション_
+を作りたくなるでしょう。
+次の例は、実際にカスタムの `@CsvToPerson` アノテーションを作る例を示しています。
 
 [source,java,indent=0]
 ----
@@ -1133,7 +1150,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsAggregator_w
 [[writing-tests-parameterized-tests-display-names]]
 ==== 表示名のカスタマイズ
 
-デフォルトでは、パラメーター化テストの表示名には、呼び出しインデックスとすべての引数の
+デフォルトでは、パラメーター化テストの表示名には、呼び出しインデックスとすべてのパラメーターの
 `String` 表現が含まれます。ただし、`@ParameterizedTest` アノテーションの `name`
 属性を指定すれば、次の例のようにカスタマイズすることもできます。
 
@@ -1158,8 +1175,8 @@ Display name of container ✔
 | Placeholder       | Description
 
 | `{index}`         | 現在の呼び出しインデックス（1始まり）
-| `{arguments}`     | カンマ区切りの完全な引数のリスト
-| `{0}`, `{1}`, ... | 引数
+| `{arguments}`     | カンマ区切りの完全なパラメーターのリスト
+| `{0}`, `{1}`, ... | 個々のパラメーター
 |===
 
 
@@ -1173,10 +1190,10 @@ IDEのテストツリーの中に1つずつ表示されます。同じテスト�
 `@Test` メソッドと `@ParameterizedTest` メソッドを混在させるのも自由です。
 
 `ParameterResolver` 拡張を `@ParameterizedTest` メソッドと使いたいかもしれません。
-その場合は、パラメーター化テストのソースから渡される引数を先に宣言する必要があります。
-テストクラスは、パラメーター化テストだけでなく通常のテストも含んでいる可能性があるので、
-引数ソースからの値はライフサイクルメソッド (例えば、`@BeforeEach`)
-やテストコンストラクタに対しては渡すことができません。
+その場合は、パラメーターのソースから渡される引数を先に宣言する必要があります。
+テストクラスは、パラメーター化テストだけでなく通常のテストを含んでいる可能性もあるので、
+パラメーターをライフサイクルメソッド (例えば、`@BeforeEach`)
+やテストコンストラクタに渡すことができません。
 
 [source,java,indent=0]
 ----
