@@ -452,35 +452,34 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 	...
 ----
 
-//TODO: to be translated
 [[running-tests-build-ant]]
 ==== Ant
 
-Starting with version `1.10.3` of link:https://ant.apache.org/[Ant], a new
-link:https://ant.apache.org/manual/Tasks/junitlauncher.html[`junitlauncher`] task has
-been introduced to provide native support for launching tests on the JUnit Platform. The
-`junitlauncher` task is solely responsible for launching the JUnit Platform and passing
-it the selected collection of tests. The JUnit Platform then delegates to registered test
-engines to discover and execute the tests.
+link:https://ant.apache.org/[Ant] のバージョン `1.10.3` から、
+JUnit Platform上でのテスト実行をネイティブサポートするために
+link:https://ant.apache.org/manual/Tasks/junitlauncher.html[`junitlauncher`]
+タスクが導入されました。`junitlauncher` タスクは、単にJUnit Platform
+を起動して、選択したテストを渡すだけの責務をもちます。その後、JUnit Platform
+が登録されたテストエンジンにテストの発見・実行を移譲します。
 
-The `junitlauncher` task attempts to align as close as possible with native Ant
-constructs such as
-link:https://ant.apache.org/manual/Types/resources.html#collection[resource collections]
-for allowing users to select the tests that they want executed by test engines. This
-gives the task a consistent and natural feel when compared to many other core Ant tasks.
+`junitlauncher` タスクは、
+ユーザーがテストエンジンに実行させたいテストを選択するための
+link:https://ant.apache.org/manual/Types/resources.html#collection[リソース集合]
+のように、Antの既存機能と可能な限り一貫性を保とうとしています。
+これにより、Antの他のコアタスクと比べても、一貫性があり直感的なものになっています。
 
-NOTE: The version of the `junitlauncher` task shipped in Ant 1.10.3 provides basic,
-minimal support for launching the JUnit Platform. Additional enhancements (including
-support for forking the tests in a separate JVM) will be available in subsequent releases
-of Ant.
+NOTE: Ant 1.10.3 でリリースされた `junitlauncher` タスクは、
+JUnit Platformを起動する基本的かつ最低限のサポートだけを提供します。
+追加の機能強化 (異なるJVMにforkしてのテスト実行サポートを含む) は、
+今後のAntリリースで利用可能になる予定です。
 
-The `build.xml` file in the `{junit5-jupiter-starter-ant}` project demonstrates how to use
-it and can serve as a starting point.
+`{junit5-jupiter-starter-ant}` プロジェクトの `build.xml`
+ファイルが使い方を示しています。
 
-===== Basic Usage
+===== 基本的な使い方
 
-The following example demonstrates how to configure the `junitlauncher` task to select a
-single test class (i.e., `org.myapp.test.MyFirstJUnit5Test`).
+次の例は、単一のテストクラス (`org.myapp.test.MyFirstJUnit5Test`)
+を選択するように `junitlauncher` タスクを設定する方法を示します。
 
 [source,xml,indent=0]
 ----
@@ -497,13 +496,12 @@ single test class (i.e., `org.myapp.test.MyFirstJUnit5Test`).
 	</junitlauncher>
 ----
 
-The `test` element allows you to specify a single test class that you want to be selected
-and executed. The `classpath` element allows you to specify the classpath to be used to
-launch the JUnit Platform. This classpath will also be used to locate test classes that
-are part of the execution.
+`test` 要素で実行したい単一のテストクラスを指定することができます。
+`classpath` 要素でJUnit Platformを起動するのに使うクラスパスを指定することができます。
+このクラスパスは、実行するテストクラスを探すのにも使われます。
 
-The following example demonstrates how to configure the `junitlauncher` task to select
-test classes from multiple locations.
+次の例は、複数の場所からテストクラスを選択するように `junitlauncher`
+タスクを設定する方法を示します。
 
 [source,xml,indent=0]
 ----
@@ -525,12 +523,11 @@ test classes from multiple locations.
 	</junitlauncher>
 ----
 
-In the above example, the `testclasses` element allows you to select multiple test
-classes that reside in different locations.
+上の例のように `testclasses` 要素を使うと、異なる場所にある複数のテストクラスを選択できます。
 
-For further details on usage and configuration options please refer to the official Ant
-documentation for the
-link:https://ant.apache.org/manual/Tasks/junitlauncher.html[`junitlauncher` task].
+使い方と設定オプションに関する詳細は、Ant公式ドキュメントの
+link:https://ant.apache.org/manual/Tasks/junitlauncher.html[`junitlauncher` タスク]
+を参照してください。
 
 [[running-tests-console-launcher]]
 === Console Launcher
