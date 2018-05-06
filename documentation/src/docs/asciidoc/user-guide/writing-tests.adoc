@@ -57,11 +57,16 @@ JUnit Jupiterアノテーションは、_メタアノテーション_ として�
 include::{testDir}/example/Fast.java[tags=user_guide]
 ----
 
-[[writing-tests-standard]]
-=== 標準的なテストクラス
+[[writing-tests-classes-and-methods]]
+=== テストクラスとテストメソッド
+
+_テストメソッド (test method)_ とは、`@Test`, `@RepeatedTest`, `@ParameterizedTest`,
+`@TestFactory`, `@TestTemplate` のいずれかが直接またはメタアノテーションとして付与された
+インスタンスメソッドです。_テストクラス (test class)_ とは、テストメソッドを少なくとも1つもつ
+トップレベルまたはstaticな内部クラスです。
 
 [source,java,indent=0]
-.標準的なテストケース
+.標準的なテストクラス
 ----
 include::{testDir}/example/StandardTests.java[tags=user_guide]
 ----
@@ -98,7 +103,7 @@ JUnit Jupiterは、 https://kotlinlang.org/[Kotlin]
 // TODO: Change to using kotlin language highlighting after switch to rouge syntax highlighter
 [source,groovy,indent=0]
 ----
-include::{kotlinTestDir}/example/AssertionsDemoKotlin.kt[tags=user_guide]
+include::{kotlinTestDir}/example/AssertionsKotlinDemo.kt[tags=user_guide]
 ----
 
 [[writing-tests-assertions-third-party]]
@@ -323,11 +328,17 @@ include::{testDir}/example/TaggingDemo.java[tags=user_guide]
 [[writing-tests-test-instance-lifecycle]]
 === テストインスタンスのライフサイクル
 
-個々のテストメソッドを隔離された環境で実行し、テストインスタンスをミュータブルにすると
-起こりうる意図しない副作用を避けるため、JUnitは _テスト_ メソッド毎にそのテストクラスの
-新しいインスタンスを生成して実行します（_テスト_ メソッドが何を指すかは、後述のNOTEを参照）。
+個々のテストメソッドを隔離された環境で実行し、
+テストインスタンスをミュータブルにすると起こりうる意図しない副作用を避けるため、
+JUnitは _テストメソッド_ （<<writing-tests-classes-and-methods>> 参照）
+毎にそのテストクラスの新しいインスタンスを生成して実行します。
 この "per-method（メソッド毎）" のテストインスタンスライフサイクルは、JUnit Jupiter
 のデフォルトの挙動で、過去のJUnitのバージョンと同じです。
+
+NOTE: "per-method" のテストインスタンスライフサイクルモードが有効であったとしても、
+<<writing-tests-conditional-execution, 条件>> (例えば、`@Disabled` や
+`@DisabledOnOs` など)によって _テストメソッド_ が _無効化_ されている場合は、
+テストクラスのインスタンスが作り直されない点に注意してください。
 
 もしすべてのテストメソッドを同じテストインスタンスで実行させたい場合は、テストクラスに
 `@TestInstance(Lifecycle.PER_CLASS)` アノテーションを付与してください。
@@ -344,10 +355,6 @@ include::{testDir}/example/TaggingDemo.java[tags=user_guide]
 もしプログラミング言語Kotlinでテストを書く場合は、テストインスタンスのライフサイクルを
 "per-class" モードに切り替えると、`@BeforeAll` および `@AfterAll` メソッドを
 より実装しやすいでしょう。
-
-NOTE: テストインスタンスのライフサイクルのコンテキストでは、_テスト_ メソッドとは
-`@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory`, `@TestTemplate`
-のいずれかのアノテーションが付与されたメソッドを意味します。
 
 [[writing-tests-test-instance-lifecycle-changing-default]]
 ==== テストインスタンスのデフォルトのライフサイクルの変更
@@ -435,7 +442,7 @@ APIを定義しています。もしテストコンストラクタや `@Test`, `
 include::{testDir}/example/TestInfoDemo.java[tags=user_guide]
 ----
 
-* `RepetitionInfoParameterResolver`: もし `@RepeatedTest`, `@BeforeEach`,
+* `{RepetitionInfoParameterResolver}`: もし `@RepeatedTest`, `@BeforeEach`,
   `@AfterEach` メソッドの引数の型が `{RepetitionInfo}` の場合、
   `RepetitionInfoParameterResolver` が `RepetitionInfo` インスタンスを与えます。
   `RepetitionInfo` は、`@RepeatedTest` の現在の繰り返し回数や合計回数の情報を
@@ -461,40 +468,31 @@ include::{testDir}/example/TestReporterDemo.java[tags=user_guide]
 NOTE: そのほかの `ParameterResolver` は、`@ExtendWith` を使って適切な
 <<extensions, 拡張機能>> を登録することで、明示的に有効にしなければなりません。
 
-
-カスタムの `{ParameterResolver}` のサンプルとしては、`{MockitoExtension}`
+カスタムの `{ParameterResolver}` のサンプルとしては、`{RandomParametersExtension}`
 を参照してください。本番利用を想定したものではありませんが、
 拡張モデルとパラメーター解決処理のシンプルさや高い表現力を示しています。
-`MyMockitoTest` は、Mockitoのモックを `@BeforeEach` と `@Test`
-に注入する方法をデモしています。
+`MyRandomParametersTest` は、乱数を `@Test` メソッドに注入する例になっています。
 
 [source,java,indent=0]
 ----
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+@ExtendWith(RandomParametersExtension.class)
+class MyRandomParametersTest {
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import com.example.Person;
-import com.example.mockito.MockitoExtension;
-
-@ExtendWith(MockitoExtension.class)
-class MyMockitoTest {
-
-	@BeforeEach
-	void init(@Mock Person person) {
-		when(person.getName()).thenReturn("Dilbert");
+	@Test
+	void injectsInteger(@Random int i, @Random int j) {
+		assertNotEquals(i, j);
 	}
 
 	@Test
-	void simpleTestWithInjectedMock(@Mock Person person) {
-		assertEquals("Dilbert", person.getName());
+	void injectsDouble(@Random double d) {
+		assertEquals(0.0, d, 1.0);
 	}
 
 }
 ----
+
+実世界のユースケースとしては、`{MockitoExtension}` や `{SpringExtension}`
+のソースコードを確認してください。
 
 [[writing-tests-test-interfaces-and-default-methods]]
 === テストインターフェースとデフォルトメソッド
@@ -732,23 +730,34 @@ Gradle プラグインで `RepeatedTestsDemo` を実行すると、コンソー�
 [[writing-tests-parameterized-tests]]
 === パラメーター化テスト
 
-パラメーター化テストは、異なる引数でテストを複数回実行できるようにします。
-通常の `@Test` メソッドに似ていますが、`{ParameterizedTest}` アノテーションを
-使って宣言します。また、各呼び出しに対する引数を生成するための _ソース (source)_
-を少なくとも1つは指定しなければいけません。
+[TIP]
+====
+訳注：計算機科学の用語に従うのであれば、
+_argument_ を _実引数（メソッドを呼び出す側から見た引数）_、
+_parameter_ を _仮引数（メソッドを呼ばれる側から見た引数）_
+と区別して訳すべきだが、パラメーター化テストの説明では前者の
+_argument_ を _パラメーター_ と訳してしまった方が
+直感的にイメージしやすいと訳者は考える。
+原文でも両者の区別があいまいな箇所があるため、以降では
+訳者の解釈に従って意訳している。気になる場合は、原文をあたること。
+====
 
-WARNING: パラーメーター化テストは、現在 _実験中_ の機能です。
-詳細は、<<api-evolution-experimental-apis>> の表を確認してください。
+パラメーター化テストは、異なる実引数でテストを複数回実行できるようにします。
+通常の `@Test` メソッドに似ていますが、`{ParameterizedTest}` アノテーションを
+使って宣言します。各呼び出しに対するパラメーターを生成するための _ソース (source)_
+を少なくとも1つは宣言し、そのパラメーターはテストメソッドで _消費 (consume)_
+する必要があります。
+
+以下は、パラメーターのソースとして `String` 配列を指定するために `@ValueSource`
+アノテーションを使用した例を示しています。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=first_example]
 ----
 
-このパラメーター化テストは、引数のソースとして `String` 配列を指定するために、
-`@ValueSource` アノテーションを使用しています。上のメソッドを実行すると、
-各実行が別々にレポートされます。例えば、`ConsoleLauncher`
-を使うと次のように出力されます。
+上のパラメーター化テストメソッドを実行すると、各実行が別々にレポートされます。
+例えば、`ConsoleLauncher` を使うと次のように出力されます。
 
 ....
 palindromes(String) ✔
@@ -757,14 +766,43 @@ palindromes(String) ✔
 └─ [3] able was I ere I saw elba ✔
 ....
 
+WARNING: パラーメーター化テストは、現在 _実験中_ の機能です。
+詳細は、<<api-evolution-experimental-apis>> の表を確認してください。
+
 [[writing-tests-parameterized-tests-setup]]
 ==== 必要なセットアップ
 
 パラメーター化テストを使うには、`junit-jupiter-params` への依存を追加する必要があります。
 詳細は、<<dependency-metadata>> を参照してください。
 
+[[writing-tests-parameterized-tests-consuming-arguments]]
+=== パラメーターの消費
+
+パラメーター化テストのメソッドは、通常は設定されたソース
+(<<writing-tests-parameterized-tests-sources>> 参照)
+からパラメーターのインデックスとメソッドの仮引数のインデックスが1対1となるように
+パラメーターを _消費_ します
+(<<writing-tests-parameterized-tests-sources-CsvSource>> の例を参照)。
+しかし、ソースのすべてのパラメーターを単一のオブジェクトに _集約_
+してメソッドに渡すこともできます
+(<<writing-tests-parameterized-tests-argument-aggregation>> 参照)。
+また、`ParameterResolver` を使って追加の引数を渡すこともできます
+(例えば、`TestInfo` や `TestReporter` のインスタンスなど)。
+パラメーター化テストメソッドは、次のルールに従って仮引数を宣言しなければなりません。
+
+* 最初に、_インデックス付き引数 (indexed argument)_ を0個以上宣言します
+* その次に、_アグリゲーター (aggregator)_ を0個以上宣言します
+* 最後に、`ParameterResolver` によって渡される引数を0個以上宣言します
+
+ここで、_インデックス付き引数 (indexed argument)_ は、`ArgumentsProvider`
+が生成した `Arguments` 中の指定されたインデックスに対するパラメーターです。
+このパラメーターは、パラメーター化テストメソッドの仮引数リストで
+同じインデックスに実引数として渡されます。
+_アグリゲーター (aggregator)_ は、`ArgumentsAccessor` 型または `@AggregateWith`
+アノテーションが付与された仮引数です。
+
 [[writing-tests-parameterized-tests-sources]]
-==== 引数のソース
+==== パラメーターのソース
 
 JUnit Jupiterは、あらかじめいくつかの _ソース_ アノテーションを提供しています。
 以降では、これらのアノテーションについて簡単な説明とサンプルを示します。
@@ -788,7 +826,7 @@ JUnit Jupiterは、あらかじめいくつかの _ソース_ アノテーショ
 - `java.lang.String`
 - `java.lang.Class`
 
-例えば、次の `@ParameterizedTest` メソッドは、`1`, `2`, `3` をパラメーターとして
+例えば、次の `@ParameterizedTest` メソッドは、値 `1`, `2`, `3` をパラメーターとして
 3回呼び出されます。
 
 [source,java,indent=0]
@@ -800,7 +838,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ValueSource_example]
 ===== @EnumSource
 
 `@EnumSource` は、`Enum` 定数を指定する便利な方法を提供します。このアノテーションでは、
-省略可能な `names` パラメーターを指定すると、その列挙定数だけが使われます。
+省略可能な `names` 属性を指定すると、その列挙定数だけが使われます。
 省略すると、次の例のようにすべての列挙定数が使われます。
 
 [source,java,indent=0]
@@ -814,7 +852,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=EnumSource_include_ex
 ----
 
 `@EnumSource` アノテーションは、テストメソッドに渡される列挙定数をさらに細かく制御するために、
-省略可能な `mode` パラメーターも提供しています。例えば、一部の名前をもつ列挙定数だけ除外したり、
+省略可能な `mode` 属性も提供しています。例えば、一部の名前をもつ列挙定数だけ除外したり、
 正規表現で列挙定数を指定したりすることができます。
 
 [source,java,indent=0]
@@ -830,11 +868,13 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=EnumSource_regex_exam
 [[writing-tests-parameterized-tests-sources-MethodSource]]
 ===== @MethodSource
 
-`@MethodSource` は、テストクラスの _ファクトリ_ メソッドによる指定を可能にします。
-ファクトリメソッドは、`Stream`, `Iterable`, `Iterator`, または配列のいずれかを
-返さなければいけません。また、引数を受け取ることもできません。デフォルトでは、テストクラスに
-`@TestInstance(Lifecycle.PER_CLASS)` アノテーションが付与されていない限り、
-`static` メソッドでなければいけません。
+`@MethodSource` は、テストクラスまたは外部のクラスの _ファクトリ_
+メソッドによるパラメーターの指定を可能にします。
+ファクトリメソッドは、`Stream`, `Iterable`, `Iterator` または配列のいずれかを
+返さなければいけません。また、引数を受け取ることもできません。
+テストクラス内のファクトリメソッドは、`@TestInstance(Lifecycle.PER_CLASS)`
+アノテーションが付与されていない限り、`static` でなければいけません。
+一方、外部クラスのファクトリメソッドは、常に `static` でなければいけません。
 
 パラメーターが1つしか必要なければ、次の例のようにパラメーターのインスタンスを
 `Stream` で返すことができます。
@@ -860,7 +900,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=simple_MethodSource_w
 include::{testDir}/example/ParameterizedTestDemo.java[tags=primitive_MethodSource_example]
 ----
 
-テストメソッドが複数のパラメーターを宣言している場合、以下で示すように `Arguments`
+テストメソッドが複数の仮引数を宣言している場合、以下で示すように `Arguments`
 のコレクションかストリームを返す必要があります。`Arguments.of(Object...)` は、
 `Arguments` インターフェースで定義されるstaticファクトリメソッドである点に注意してください。
 
@@ -869,10 +909,20 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=primitive_MethodSourc
 include::{testDir}/example/ParameterizedTestDemo.java[tags=multi_arg_MethodSource_example]
 ----
 
+次の例で示すように、_メソッドの完全修飾名_ を指定することで、外部の `static` な
+_ファクトリ_ メソッドを参照することもできます。
+
+[source,java,indent=0]
+----
+package example;
+
+include::{testDir}/example/ExternalMethodSourceDemo.java[tags=external_MethodSource_example]
+----
+
 [[writing-tests-parameterized-tests-sources-CsvSource]]
 ===== @CsvSource
 
-`@CsvSource` は、引数のリストをカンマ区切りの値（`String` リテラル）
+`@CsvSource` は、パラメーターのリストをカンマ区切りの値（`String` リテラル）
 で指定できるようにします。
 
 [source,java,indent=0]
@@ -884,7 +934,7 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=CsvSource_example]
 上の例の `'baz, qux'` と、以下のテーブルを参照してください。
 引用符で囲まれた空の値 `''` は空の `String` になりますが、
 （引用符で囲まれない）完全に _空_ の値は `null` と解釈されます。
-`null` の代入先パラメーターがプリミティブ型の場合は、
+`null` の代入先の型がプリミティブ型の場合は、
 `ArgumentConversionException` が発生します。
 
 [cols="50,50"]
@@ -918,7 +968,7 @@ NOTE: `@CsvSource` のシンタックスとは異なり、`@CsvFileSource` は�
 を引用符として使います。上の例の、`"United States of America"` を参考にしてください。
 引用符で囲まれた空の値 `""` は空の `String` になりますが、
 （引用符で囲まれない）完全に _空_ の値は `null` と解釈されます。
-`null` の代入先パラメーターがプリミティブ型の場合は、
+`null` の代入先の型がプリミティブ型の場合は、
 `ArgumentConversionException` が発生します。
 
 [[writing-tests-parameterized-tests-sources-ArgumentsSource]]
@@ -934,16 +984,25 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsSource_examp
 
 
 [[writing-tests-parameterized-tests-argument-conversion]]
-==== 引数の変換
+==== パラメーターの変換
+
+[[writing-tests-parameterized-tests-argument-conversion-widening]]
+===== 拡大変換
+
+JUnit Jupiterは、`@ParameterizedTest` に与えられたパラメーターに対して、
+https://docs.oracle.com/javase/specs/jls/se8/html/jls-5.html#jls-5.1.2[プリミティブ型の
+拡大変換] をサポートしています。例えば、`@ValueSource(ints = { 1, 2, 3 })`
+アノテーションが付与されたパラメーター化テストでは、テストメソッドの仮引数を
+`int` 型だけでなく `long` や `float`、`double` 型でも宣言することができます。
 
 [[writing-tests-parameterized-tests-argument-conversion-implicit]]
 ===== 暗黙的な変換
 
 `@CsvSource` のようなユースケースをサポートするために、JUnit Jupiter
 は多くの組み込みの型変換を提供しています。
-変換処理は、メソッド引数の型に依存します。
+変換処理は、メソッドの仮引数の型に依存します。
 
-例えば、`@ParameterizedTest` が `TimeUnit` 型のパラメーターを宣言し、
+例えば、`@ParameterizedTest` が `TimeUnit` 型の仮引数を宣言し、
 ソースから実際に渡される型が `String` の場合、その文字列は対応する
 `TimeUnit` 列挙定数に自動的に変換されます。
 
@@ -1019,8 +1078,8 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=implicit_fallback_con
 [[writing-tests-parameterized-tests-argument-conversion-explicit]]
 ===== 明示的な変換
 
-引数の暗黙的な変換を使う代わりに、`@ConvertWith` アノテーションで
-特定のパラメーターの変換に使う `ArgumentConverter` を明示的に指定することもできます。
+暗黙的な変換を使う代わりに、`@ConvertWith` アノテーションで
+仮引数の変換に使う `ArgumentConverter` を明示的に指定することもできます。
 
 [source,java,indent=0]
 ----
@@ -1037,11 +1096,61 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=explicit_conversion_e
 include::{testDir}/example/ParameterizedTestDemo.java[tags=explicit_java_time_converter]
 ----
 
+[[writing-tests-parameterized-tests-argument-aggregation]]
+==== パラメーターの集約
+
+デフォルトでは、`@ParameterizedTest` のメソッドに与えられる各パラメーター
+は、1つの仮引数に対応します。結果として、ソースが多数のパラメーターを生成する場合、
+メソッドシグネチャが大きく（仮引数が多く）なります。
+
+そのような場合には、複数の仮引数を定義する代わりに `{ArgumentsAccessor}`
+を使うことができます。このAPIを使うと、テストメソッドに渡した単一の
+`{ArgumentsAccessor}` 経由ですべてのパラメーターにアクセスすることができます。
+加えて、
+<<writing-tests-parameterized-tests-argument-conversion-implicit>>
+で説明した型変換もサポートされます。
+
+[source,java,indent=0]
+----
+include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsAccessor_example]
+----
+
+`ArgumentsAccessor` 型の仮引数には、自動的に `ArgumentsAccessor` のインスタンスが注入されます。
+
+[[writing-tests-parameterized-tests-argument-aggregation-custom]]
+===== カスタムアグリゲーター
+
+`ArgumentsAccessor` を使って `@ParameterizedTest` メソッドのパラメーターに
+直接アクセスする以外に、JUnit Jupiterはカスタムの再利用可能な
+_アグリゲーター (aggregator)_ もサポートしています。
+
+カスタムアグリゲーターを使うには、`{ArgumentsAggregator}` インターフェースを実装し、
+`@ParameterizedTest` メソッドの仮引数に `@AggregateWith`
+アノテーションを使って登録します。集約した結果は、
+パラメーター化テストが実行されるときに
+対象の仮引数に対する実引数として渡されます。
+
+[source,java,indent=0]
+----
+include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsAggregator_example]
+----
+
+複数のパラメーター化テストメソッドに対して何回も `@AggregateWith(MyTypeAggregator.class)`
+を宣言していることに気付いたら、`@AggregateWith(MyTypeAggregator.class)`
+をメタアノテーションとして付与した `@CsvToMyType` のようなカスタム _合成アノテーション_
+を作りたくなるでしょう。
+次の例は、実際にカスタムの `@CsvToPerson` アノテーションを作る例を示しています。
+
+[source,java,indent=0]
+----
+include::{testDir}/example/ParameterizedTestDemo.java[tags=ArgumentsAggregator_with_custom_annotation_example]
+----
+
 
 [[writing-tests-parameterized-tests-display-names]]
 ==== 表示名のカスタマイズ
 
-デフォルトでは、パラメーター化テストの表示名には、呼び出しインデックスとすべての引数の
+デフォルトでは、パラメーター化テストの表示名には、呼び出しインデックスとすべてのパラメーターの
 `String` 表現が含まれます。ただし、`@ParameterizedTest` アノテーションの `name`
 属性を指定すれば、次の例のようにカスタマイズすることもできます。
 
@@ -1066,8 +1175,8 @@ Display name of container ✔
 | Placeholder       | Description
 
 | `{index}`         | 現在の呼び出しインデックス（1始まり）
-| `{arguments}`     | カンマ区切りの完全な引数のリスト
-| `{0}`, `{1}`, ... | 引数
+| `{arguments}`     | カンマ区切りの完全なパラメーターのリスト
+| `{0}`, `{1}`, ... | 個々のパラメーター
 |===
 
 
@@ -1081,10 +1190,10 @@ IDEのテストツリーの中に1つずつ表示されます。同じテスト�
 `@Test` メソッドと `@ParameterizedTest` メソッドを混在させるのも自由です。
 
 `ParameterResolver` 拡張を `@ParameterizedTest` メソッドと使いたいかもしれません。
-その場合は、パラメーター化テストのソースから渡される引数を先に宣言する必要があります。
-テストクラスは、パラメーター化テストだけでなく通常のテストも含んでいる可能性があるので、
-引数ソースからの値はライフサイクルメソッド (例えば、`@BeforeEach`)
-やテストコンストラクタに対しては渡すことができません。
+その場合は、パラメーターのソースから渡される引数を先に宣言する必要があります。
+テストクラスは、パラメーター化テストだけでなく通常のテストを含んでいる可能性もあるので、
+パラメーターをライフサイクルメソッド (例えば、`@BeforeEach`)
+やテストコンストラクタに渡すことができません。
 
 [source,java,indent=0]
 ----
