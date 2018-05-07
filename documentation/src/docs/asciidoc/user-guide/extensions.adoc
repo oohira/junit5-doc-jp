@@ -1,31 +1,35 @@
 [[extensions]]
-== Extension Model
+== 拡張モデル
 
 [[extensions-overview]]
-=== Overview
+=== 概要
 
-In contrast to the competing `Runner`, `@Rule`, and `@ClassRule` extension points in
-JUnit 4, the JUnit Jupiter extension model consists of a single, coherent concept: the
-`Extension` API. Note, however, that `Extension` itself is just a marker interface.
+JUnit 4の `Runner`, `@Rule`, `@ClassRule` などの拡張ポイントとは異なり、
+JUnit Jupiterの拡張モデルは、単一の一貫したコンセプトである `Extension` API
+で構成されます。ただし、`Extension` 自身はただのマーカーインタフェースである点に
+注意してください。
 
 [[extensions-registration]]
-=== Registering Extensions
+=== 拡張機能の登録
 
-Extensions can be registered _declaratively_ via
-<<extensions-registration-declarative,`@ExtendWith`>>, _programmatically_ via
-<<extensions-registration-programmatic,`@RegisterExtension`>>, or _automatically_ via
-Java's <<extensions-registration-automatic,`ServiceLoader`>> mechanism.
+拡張機能は、 <<extensions-registration-declarative,`@ExtendWith`>>
+を使って _宣言的に_ 登録するか、
+<<extensions-registration-programmatic,`@RegisterExtension`>>
+を使って _手続き的に_ 登録するか、あるいは
+Javaの <<extensions-registration-automatic,`ServiceLoader`>>
+の仕組みを使って _自動的に_ 登録することができます。
 
 [[extensions-registration-declarative]]
-==== Declarative Extension Registration
+==== 宣言的な登録
 
-Developers can register one or more extensions _declaratively_ by annotating a test
-interface, test class, test method, or custom _<<writing-tests-meta-annotations,composed
-annotation>>_ with `@ExtendWith(...)` and supplying class references for the extensions
-to register.
+開発者は、テストインターフェースやテストクラス、テストメソッド、
+_<<writing-tests-meta-annotations, 合成アノテーション>>_ に
+`@ExtendWith(...)` アノテーションを付与し、
+拡張機能として登録したいクラスの参照を指定することで
+1つ以上の拡張機能を _宣言的に_ 登録することができます。
 
-For example, to register a custom `RandomParametersExtension` for a particular test method, you
-would annotate the test method as follows.
+例えば、特定のテストメソッドに `RandomParametersExtension` を登録したい場合は、
+テストメソッドに次のようにアノテーションを付与します。
 
 [source,java,indent=0]
 ----
@@ -36,8 +40,8 @@ void test(@Random int i) {
 }
 ----
 
-To register a custom `RandomParametersExtension` for all tests in a particular class and its
-subclasses, you would annotate the test class as follows.
+特定のクラスとそのサブクラスのすべてのテストに `RandomParametersExtension`
+を登録したい場合は、テストクラスに次のようにアノテーションを付与します。
 
 [source,java,indent=0]
 ----
@@ -47,7 +51,7 @@ class MyTests {
 }
 ----
 
-Multiple extensions can be registered together like this:
+複数の拡張機能は、次のように同時に登録することができます。
 
 [source,java,indent=0]
 ----
@@ -57,7 +61,7 @@ class MyFirstTests {
 }
 ----
 
-As an alternative, multiple extensions can be registered separately like this:
+別の方法としては、次のように個別に登録することができます。
 
 [source,java,indent=0]
 ----
@@ -68,14 +72,13 @@ class MySecondTests {
 }
 ----
 
-.Extension Registration Order
-NOTE: Extensions registered declaratively via `@ExtendWith` will be executed in the order
-in which they are declared in the source code. For example, the execution of tests in
-both `MyFirstTests` and `MySecondTests` will be extended by the `FooExtension` and
-`BarExtension`, **in exactly that order**.
+.拡張機能の登録順序
+NOTE: `@ExtendWith` で宣言的に登録された拡張機能は、ソースコード上での宣言順で実行されます。
+例えば、`MyFirstTests` と `MySecondTests` のテスト実行は、`FooExtension` と
+`BarExtension` によって **まさにこの順序で** 拡張されます。
 
 [[extensions-registration-programmatic]]
-==== Programmatic Extension Registration
+==== 手続き的な登録
 
 Developers can register extensions _programmatically_ by annotating fields in test
 classes with `{RegisterExtension}`.
@@ -144,7 +147,7 @@ include::{testDir}/example/registration/DocumentationDemo.java[tags=user_guide]
 ----
 
 [[extensions-registration-automatic]]
-==== Automatic Extension Registration
+==== 自動的な登録
 
 In addition to <<extensions-registration-declarative,declarative extension registration>>
 and <<extensions-registration-programmatic,programmatic extension registration>> support
