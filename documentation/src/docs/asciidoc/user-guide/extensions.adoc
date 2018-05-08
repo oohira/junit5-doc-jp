@@ -80,46 +80,47 @@ NOTE: `@ExtendWith` で宣言的に登録された拡張機能は、ソースコ
 [[extensions-registration-programmatic]]
 ==== 手続き的な登録
 
-Developers can register extensions _programmatically_ by annotating fields in test
-classes with `{RegisterExtension}`.
+開発者は、テストクラスのフィールドに
+`{RegisterExtension}` アノテーションを付与することで、
+拡張機能を _手続き的に_ 登録することができます。
 
-When an extension is registered _declaratively_ via
-<<extensions-registration-declarative,`@ExtendWith`>>, it can typically only be
-configured via annotations. In contrast, when an extension is registered via
-`@RegisterExtension`, it can be configured _programmatically_ – for example, in order to
-pass arguments to the extension's constructor, a static factory method, or a builder API.
+拡張機能を <<extensions-registration-declarative,`@ExtendWith`>> で
+_宣言的に_ 登録する場合、拡張機能の設定はアノテーション経由でしか行なえません。
+しかし、拡張機能を `@RegisterExtension` で登録する場合は、
+拡張機能のコンストラクタやstaticファクトリメソッド、
+ビルダーAPIに引数を渡して _手続き的に_ 設定することができます。
 
-NOTE: `@RegisterExtension` fields must not be `private` or `null` (at evaluation time)
-but may be either `static` or non-static.
+NOTE: `@RegisterExtension` フィールドは、`private` または `null` (評価時)
+であってはなりませんが、`static` か非 `static` はどちらでもかまいません。
 
 [[extensions-registration-programmatic-static-fields]]
-===== Static Fields
+===== staticフィールド
 
-If a `@RegisterExtension` field is `static`, the extension will be registered after
-extensions that are registered at the class level via `@ExtendWith`. Such _static
-extensions_ are not limited in which extension APIs they can implement. Extensions
-registered via static fields may therefore implement class-level and instance-level
-extension APIs such as `BeforeAllCallback`, `AfterAllCallback`, and
-`TestInstancePostProcessor` as well as method-level extension APIs such as
-`BeforeEachCallback`, etc.
+`@RegisterExtension` フィールドが `static` の場合、その拡張機能は
+`@ExtendWith` でクラスレベルに登録される拡張機能の後で登録されます。
+そのような _staticな拡張機能_ は、実装する拡張APIに制限がありません。
+そのため、staticフィールドとして登録される拡張機能は、
+`BeforeAllCallback`, `AfterAllCallback`, `TestInstancePostProcessor`
+のようなクラスレベルやインスタンスレベルの拡張APIだけでなく、
+`BeforeEachCallback` などのようなメソッドレベルの拡張APIも実装できます。
 
-In the following example, the `server` field in the test class is initialized
-programmatically by using a builder pattern supported by the `WebServerExtension`. The
-configured `WebServerExtension` will be automatically registered as an extension at the
-class level – for example, in order to start the server before all tests in the class and
-then stop the server after all tests in the class have completed. In addition, static
-lifecycle methods annotated with `@BeforeAll` or `@AfterAll` as well as `@BeforeEach`,
-`@AfterEach`, and `@Test` methods can access the instance of the extension via the
-`server` field if necessary.
+次の例では、テストクラスの `server` フィールドは `WebServerExtension`
+がサポートするビルダーパターンを使って手続き的に初期化されます。設定された
+`WebServerExtension` は、クラスレベルの拡張機能として自動的に登録され、
+例えば、すべてのテストを開始する前にサーバーを起動したり、
+すべてのテストが完了した後でサーバーを停止したりすることができます。
+加えて、`@BeforeEach`, `@AfterEach`, `@Test` メソッドだけでなく、
+`@BeforeAll` や `@AfterAll` のようなstaticなライフサイクルメソッドも
+必要であれば `server` フィールド経由でこの拡張機能のインスタンスにアクセスできます。
 
 [source,java,indent=0]
-.An extension registered via a static field
+.staticフィールド経由で登録される拡張機能
 ----
 include::{testDir}/example/registration/WebServerDemo.java[tags=user_guide]
 ----
 
 [[extensions-registration-programmatic-instance-fields]]
-===== Instance Fields
+===== インスタンスフィールド
 
 If a `@RegisterExtension` field is non-static (i.e., an instance field), the extension
 will be registered after the test class has been instantiated and after each registered
