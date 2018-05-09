@@ -122,27 +122,27 @@ include::{testDir}/example/registration/WebServerDemo.java[tags=user_guide]
 [[extensions-registration-programmatic-instance-fields]]
 ===== インスタンスフィールド
 
-If a `@RegisterExtension` field is non-static (i.e., an instance field), the extension
-will be registered after the test class has been instantiated and after each registered
-`TestInstancePostProcessor` has been given a chance to post-process the test instance
-(potentially injecting the instance of the extension to be used into the annotated
-field). Thus, if such an _instance extension_ implements class-level or instance-level
-extension APIs such as `BeforeAllCallback`, `AfterAllCallback`, or
-`TestInstancePostProcessor`, those APIs will not be honored. By default, an instance
-extension will be registered _after_ extensions that are registered at the method level
-via `@ExtendWith`; however, if the test class is configured with
-`@TestInstance(Lifecycle.PER_CLASS)` semantics, an instance extension will be registered
-_before_ extensions that are registered at the method level via `@ExtendWith`.
+`@RegisterExtension` フィールドが非static (つまり、インスタンスフィールド)
+の場合、その拡張機能はテストクラスがインスタンス化され、登録済みの各
+`TestInstancePostProcessor` がテストインスタンスの事後処理
+(拡張機能のインスタンスをアノテーションの付与されたフィールドに注入するなど)
+をした後で登録されます。そのため、_インスタンスフィールドの拡張機能_ が
+`BeforeAllCallback`, `AfterAllCallback`, `TestInstancePostProcessor`
+のようなクラスレベルやインスタンスレベルの拡張APIを実装しても意味がありません。
+デフォルトでは、インスタンスフィールドの拡張機能は `@ExtendWith`
+でメソッドレベルに登録される拡張機能より _後で_ 登録されます。しかし、
+テストクラスが `@TestInstance(Lifecycle.PER_CLASS)` モードに設定されている場合は、
+`@ExtendWith` でメソッドレベルに登録される拡張機能の _前に_ 登録されます。
 
-In the following example, the `docs` field in the test class is initialized
-programmatically by invoking a custom `lookUpDocsDir()` method and supplying the result
-to the static `forPath()` factory method in the `DocumentationExtension`. The configured
-`DocumentationExtension` will be automatically registered as an extension at the method
-level. In addition, `@BeforeEach`, `@AfterEach`, and `@Test` methods can access the
-instance of the extension via the `docs` field if necessary.
+次の例では、テストクラスの `docs` フィールドは `lookUpDocsDir()`
+メソッドを呼び出した結果を `DocumentationExtension` のstaticファクトリメソッド
+`forPath()` に渡すことで、手続き的に初期化されます。設定された
+`DocumentationExtension` は、メソッドレベルの拡張機能として自動的に登録されます。
+加えて、`@BeforeEach`, `@AfterEach`, `@Test` メソッドは
+必要であれば `docs` フィールド経由でこの拡張機能のインスタンスにアクセスできます。
 
 [source,java,indent=0]
-.An extension registered via an instance field
+.インスタンスフィールド経由で登録される拡張機能
 ----
 include::{testDir}/example/registration/DocumentationDemo.java[tags=user_guide]
 ----
