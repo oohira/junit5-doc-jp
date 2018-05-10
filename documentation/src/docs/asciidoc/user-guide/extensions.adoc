@@ -150,41 +150,43 @@ include::{testDir}/example/registration/DocumentationDemo.java[tags=user_guide]
 [[extensions-registration-automatic]]
 ==== 自動的な登録
 
-In addition to <<extensions-registration-declarative,declarative extension registration>>
-and <<extensions-registration-programmatic,programmatic extension registration>> support
-using annotations, JUnit Jupiter also supports _global extension registration_ via Java's
-`java.util.ServiceLoader` mechanism, allowing third-party extensions to be auto-detected
-and automatically registered based on what is available in the classpath.
+アノテーションを使った拡張機能の
+<<extensions-registration-declarative, 宣言的な登録>> と
+<<extensions-registration-programmatic, 手続き的な登録>> に加えて、
+JUnit JupiterはJavaの `java.util.ServiceLoader` の仕組みを使った拡張機能の
+_グローバルな登録_ もサポートしています。
+これにより、クラスパスから利用可能なサードパーティの拡張機能を自動検出し、
+自動的に登録させることができます。
 
-Specifically, a custom extension can be registered by supplying its fully qualified class
-name in a file named `org.junit.jupiter.api.extension.Extension` within the
-`/META-INF/services` folder in its enclosing JAR file.
+具体的には、JARファイルの `/META-INF/services` フォルダの中に
+`org.junit.jupiter.api.extension.Extension` という名前のファイルを作成し、
+クラスの完全修飾名を指定することで拡張機能を登録できます。
 
 [[extensions-registration-automatic-enabling]]
-===== Enabling Automatic Extension Detection
+===== 拡張機能の自動検出を有効にする
 
-Auto-detection is an advanced feature and is therefore not enabled by default. To enable
-it, simply set the `junit.jupiter.extensions.autodetection.enabled` _configuration
-parameter_ to `true`. This can be supplied as a JVM system property, as a _configuration
-parameter_ in the `LauncherDiscoveryRequest` that is passed to the `Launcher`, or via the
-JUnit Platform configuration file (see <<running-tests-config-params>> for details).
+自動検出は高度な機能なので、デフォルトでは有効になっていません。有効化するには、
+_設定パラメーター_ `junit.jupiter.extensions.autodetection.enabled`
+に `true` を指定します。これは、JVMのシステムプロパティか、
+`Launcher` に渡される `LauncherDiscoveryRequest` の _設定パラメーター_、
+あるいはJUnit Platform 設定ファイルで指定することができます
+(詳細は、<<running-tests-config-params>> を参照)。
 
-For example, to enable auto-detection of extensions, you can start your JVM with the
-following system property.
+例えば、拡張機能の自動検出を有効化するには、JVMを次のシステムプロパティ付きで起動します。
 
 `-Djunit.jupiter.extensions.autodetection.enabled=true`
 
-When auto-detection is enabled, extensions discovered via the `ServiceLoader` mechanism
-will be added to the extension registry after JUnit Jupiter's global extensions (e.g.,
-support for `TestInfo`, `TestReporter`, etc.).
+自動検出が有効化されると、`ServiceLoader` の仕組みで検知された拡張機能は、
+JUnit Jupiterのグローバルな拡張機能 (例えば、`TestInfo` や `TestReporter`
+のサポート) の後で拡張機能レジストリに登録されます。
 
 [[extensions-registration-inheritance]]
-==== Extension Inheritance
+==== 拡張機能の継承
 
-Registered extensions are inherited within test class hierarchies with top-down
-semantics. Similarly, extensions registered at the class-level are inherited at the
-method-level. Furthermore, a specific extension implementation can only be registered
-once for a given extension context and its parent contexts. Consequently, any attempt to
+登録された拡張機能は、テストクラス階層の中で親から子に継承されます。
+同様に、クラスレベルで登録された拡張機能は、メソッドレベルに継承されます。
+Furthermore, a specific extension implementation can only be registered
+once for a given extension context and its parent contexts.
 register a duplicate extension implementation will be ignored.
 
 [[extensions-conditions]]
