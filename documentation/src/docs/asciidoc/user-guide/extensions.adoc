@@ -185,67 +185,68 @@ JUnit Jupiterのグローバルな拡張機能 (例えば、`TestInfo` や `Test
 
 登録された拡張機能は、テストクラス階層の中で親から子に継承されます。
 同様に、クラスレベルで登録された拡張機能は、メソッドレベルに継承されます。
-Furthermore, a specific extension implementation can only be registered
-once for a given extension context and its parent contexts.
-register a duplicate extension implementation will be ignored.
+また、同一の拡張機能実装は、与えられた拡張コンテキストとその親の拡張コンテキストに対して
+一回だけしか登録することができません。
+結果として、重複して拡張機能実装を登録しようとしても無視されます。
 
 [[extensions-conditions]]
-=== Conditional Test Execution
+=== 条件付きテスト実行
 
-`{ExecutionCondition}` defines the `Extension` API for programmatic, _conditional test
-execution_.
+`{ExecutionCondition}` は、プログラムの _条件付きテスト実行_ のための拡張APIを定めています。
 
-An `ExecutionCondition` is _evaluated_ for each container (e.g., a test class) to
-determine if all the tests it contains should be executed based on the supplied
-`ExtensionContext`. Similarly, an `ExecutionCondition` is _evaluated_ for each test to
-determine if a given test method should be executed based on the supplied
-`ExtensionContext`.
+`ExecutionCondition` は、コンテナ (例えば、テストクラス) がもつテストを与えられた
+`ExtensionContext` で実行すべきか判断するためにコンテナ毎に評価されます。
+同様に、`ExecutionCondition` は、個々のテストメソッドを与えられた `ExtensionContext`
+で実行すべきか判断するためにテスト毎に評価されます。
 
-When multiple `ExecutionCondition` extensions are registered, a container or test is
-disabled as soon as one of the conditions returns _disabled_. Thus, there is no guarantee
-that a condition is evaluated because another extension might have already caused a
-container or test to be disabled. In other words, the evaluation works like the
-short-circuiting boolean OR operator.
+複数の `ExecutionCondition` 拡張が登録された場合、_無効_ と判定する拡張機能が1つでもあれば、
+コンテナやテストはただちに無効化されます。別の拡張機能がすでにコンテナやテストを無効化していることがあるので、
+ある拡張機能が必ず評価されるという保証はありません。言い換えると、論理OR演算子の短絡評価のように評価されます。
 
-See the source code of `{DisabledCondition}` and `{Disabled}` for concrete examples.
+具体的な例は、`{DisabledCondition}` と `{Disabled}` のソースコードを参照してください。
 
 [[extensions-conditions-deactivation]]
-==== Deactivating Conditions
+==== 条件を非アクティブにする
 
-Sometimes it can be useful to run a test suite _without_ certain conditions being active.
-For example, you may wish to run tests even if they are annotated with `@Disabled` in
-order to see if they are still _broken_. To do this, simply provide a pattern for the
-`junit.jupiter.conditions.deactivate` _configuration parameter_ to specify which
-conditions should be deactivated (i.e., not evaluated) for the current test run. The
-pattern can be supplied as a JVM system property, as a _configuration parameter_ in the
-`LauncherDiscoveryRequest` that is passed to the `Launcher`, or via the JUnit Platform
-configuration file (see <<running-tests-config-params>> for details).
+[TIP]
+====
+訳注：テストの条件 (`ExecutionCondition`) が成立し、該当テストが実行される状態を
+_有効_、逆に実行されない状態を _無効_ と訳している。これに対して、
+テストの条件自体が評価される状態であることを _アクティブ_、
+評価されない状態であることを _非アクティブ_ と区別して訳す。
+====
 
-For example, to deactivate JUnit's `@Disabled` condition, you can start your JVM with the
-following system property.
+ときには、特定の条件をアクティブにせずにテストスイートを実行できると有用な場合があります。
+例えば、`@Disabled` アノテーションが付与されているテストであっても、今もまだ _壊れた_
+ままかを確認するために実行したいと思うことがあるかもしれません。そのためには、
+_設定パラメーター_ `junit.jupiter.conditions.deactivate` を使って、
+現在のテスト実行に対してどの条件を非アクティブ (つまり、評価されない) にするか
+パターンを指定するだけです。パターンは、JVMのシステムプロパティか、 `Launcher` に渡される
+`LauncherDiscoveryRequest` の _設定パラメーター_、あるいはJUnit Platform
+設定ファイルで指定することができます (詳細は、<<running-tests-config-params>> を参照)。
+
+例えば、JUnitの `@Disabled` 条件を非アクティブにするには、
+JVMを次のシステムプロパティ付きで起動します。
 
 `-Djunit.jupiter.conditions.deactivate=org.junit.*DisabledCondition`
 
 [[extensions-conditions-deactivation-patterns]]
-===== Pattern Matching Syntax
+===== パターンマッチング構文
 
-If the `junit.jupiter.conditions.deactivate` pattern consists solely of an asterisk
-(`+*+`), all conditions will be deactivated. Otherwise, the pattern will be used to match
-against the fully qualified class name (_FQCN_) of each registered condition. Any dot
-(`.`) in the pattern will match against a dot (`.`) or a dollar sign (`$`) in the FQCN.
-Any asterisk (`+*+`) will match against one or more characters in the FQCN. All other
-characters in the pattern will be matched one-to-one against the FQCN.
+`junit.jupiter.conditions.deactivate` のパターンがアスタリスク (`+*+`)
+のみからなる場合、すべての条件が非アクティブになります。一方、
+登録された条件の完全修飾クラス名 (_FQCN_) に対するパターンマッチも使えます。
+パターン中のドット (`.`) は、FQCN中のドット (`.`) またはドル記号 (`$`) にマッチします。
+アスタリスク (`+*+`) は、FQCN中の1つ以上の文字にマッチします。
+ほかのすべての文字は、FQCN中の文字に1対1でマッチします。
 
-Examples:
+例:
 
-- `+*+`: deactivates all conditions.
-- `+org.junit.*+`: deactivates every condition under the `org.junit` base package and any
-  of its subpackages.
-- `+*.MyCondition+`: deactivates every condition whose simple class name is exactly
-  `MyCondition`.
-- `+*System*+`: deactivates every condition whose simple class name contains `System`.
-- `org.example.MyCondition`: deactivates the condition whose FQCN is exactly
-  `org.example.MyCondition`.
+- `+*+`: すべての条件を非アクティブにします。
+- `+org.junit.*+`: `org.junit` パッケージおよびすべてのサブパッケージにある条件を非アクティブにします。
+- `+*.MyCondition+`: 単純クラス名が `MyCondition` である条件をすべて非アクティブにします。
+- `+*System*+`: 単純クラス名に `System` を含む条件をすべて非アクティブにします。
+- `org.example.MyCondition`: FQCNが `org.example.MyCondition` である条件を非アクティブにします。
 
 [[extensions-test-instance-post-processing]]
 === Test Instance Post-processing
