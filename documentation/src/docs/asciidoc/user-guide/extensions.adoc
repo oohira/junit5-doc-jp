@@ -6,7 +6,7 @@
 
 JUnit 4の `Runner`, `@Rule`, `@ClassRule` などの拡張ポイントとは異なり、
 JUnit Jupiterの拡張モデルは、単一の一貫したコンセプトである `Extension` API
-で構成されます。ただし、`Extension` 自身はただのマーカーインタフェースである点に
+で構成されます。ただし、`Extension` 自身はただのマーカーインターフェースである点に
 注意してください。
 
 [[extensions-registration]]
@@ -192,7 +192,7 @@ JUnit Jupiterのグローバルな拡張機能 (例えば、`TestInfo` や `Test
 [[extensions-conditions]]
 === 条件付きテスト実行
 
-`{ExecutionCondition}` は、プログラムの _条件付きテスト実行_ のための拡張APIを定めています。
+`{ExecutionCondition}` は、プログラムの _条件付きテスト実行_ のための `Extension` APIを定めています。
 
 `ExecutionCondition` は、コンテナ (例えば、テストクラス) がもつテストを与えられた
 `ExtensionContext` で実行すべきか判断するためにコンテナ毎に評価されます。
@@ -290,11 +290,11 @@ JDK 9以前の `javac` が生成するバイトコードのバグのせいで、
 ====
 
 [[extensions-lifecycle-callbacks]]
-=== Test Lifecycle Callbacks
+=== テストライフサイクルコールバック
 
-The following interfaces define the APIs for extending tests at various points in the
-test execution lifecycle. Consult the following sections for examples and the Javadoc for
-each of these interfaces in the `{extension-api-package}` package for further details.
+以下のインターフェースは、テスト実行のライフサイクルにおける様々なタイミングでテストを拡張するための
+APIを定めています。詳細は、以降の節にあるサンプルと、`{extension-api-package}` パッケージにある
+これらのインターフェースのJavadocを参照してください。
 
 * `{BeforeAllCallback}`
 ** `{BeforeEachCallback}`
@@ -303,42 +303,40 @@ each of these interfaces in the `{extension-api-package}` package for further de
 ** `{AfterEachCallback}`
 * `{AfterAllCallback}`
 
-.Implementing Multiple Extension APIs
-NOTE: Extension developers may choose to implement any number of these interfaces
-within a single extension. Consult the source code of the `{SpringExtension}` for a
-concrete example.
+.複数のExtension APIを実装する
+NOTE: 拡張機能の開発者は、1つの拡張機能でこれらのインターフェースをいくつでも実装することができます。
+具体例は、`{SpringExtension}` のソースコードを参照してください。
 
 [[extensions-lifecycle-callbacks-before-after-execution]]
-==== Before and After Test Execution Callbacks
+==== テスト実行前後のコールバック
 
-`{BeforeTestExecutionCallback}` and `{AfterTestExecutionCallback}` define the APIs for
-`Extensions` that wish to add behavior that will be executed _immediately before_ and
-_immediately after_ a test method is executed, respectively. As such, these callbacks are
-well suited for timing, tracing, and similar use cases. If you need to implement
-callbacks that are invoked _around_ `@BeforeEach` and `@AfterEach` methods, implement
-`BeforeEachCallback` and `AfterEachCallback` instead.
+`{BeforeTestExecutionCallback}` と `{AfterTestExecutionCallback}` は、
+テストメソッドが実行される _直前_ と _直後_ に実行されるような振る舞いを追加したい場合の
+`Extension` API を定めています。実行時間の計測や、処理のトレースなどのユースケースに適しています。
+もしも `@BeforeEach` メソッドや `@AfterEach` メソッドの _前後_ に呼び出されるコールバックが
+必要な場合は、代わりに `BeforeEachCallback` や `AfterEachCallback` を実装してください。
 
-The following example shows how to use these callbacks to calculate and log the execution
-time of a test method. `TimingExtension` implements both `BeforeTestExecutionCallback`
-and `AfterTestExecutionCallback` in order to time and log the test execution.
+次の例は、テストメソッドの実行時間を計測してログ出力するために、
+これらのコールバックを利用する方法を示しています。`TimingExtension` は、
+`BeforeTestExecutionCallback` と `AfterTestExecutionCallback` の両方を実装しています。
 
 [[extensions-lifecycle-callbacks-timing-extension]]
 [source,java,indent=0]
-.An extension that times and logs the execution of test methods
+.テストメソッドの実行時間を計測してログ出力する拡張機能
 ----
 include::{testDir}/example/timing/TimingExtension.java[tags=user_guide]
 ----
 
-Since the `TimingExtensionTests` class registers the `TimingExtension` via `@ExtendWith`,
-its tests will have this timing applied when they execute.
+`TimingExtensionTests` クラスは `@ExtendWith` を使って `TimingExtension`
+を登録しているので、テストを実行すると時間計測が有効になります。
 
 [source,java,indent=0]
-.A test class that uses the example TimingExtension
+.TimingExtensionを使うテストクラス
 ----
 include::{testDir}/example/timing/TimingExtensionTests.java[tags=user_guide]
 ----
 
-The following is an example of the logging produced when `TimingExtensionTests` is run.
+以下は、`TimingExtensionTests` が実行されたときに出力されるログの例です。
 
 ....
 INFO: Method [sleep20ms] took 24 ms.
