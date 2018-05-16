@@ -344,16 +344,16 @@ INFO: Method [sleep50ms] took 53 ms.
 ....
 
 [[extensions-exception-handling]]
-=== Exception Handling
+=== 例外ハンドリング
 
-`{TestExecutionExceptionHandler}` defines the API for `Extensions` that wish to handle
-exceptions thrown during test execution.
+`{TestExecutionExceptionHandler}` は、テスト実行中に投げられた例外を扱うための
+`Extension` API を定めています。
 
-The following example shows an extension which will swallow all instances of `IOException`
-but rethrow any other type of exception.
+次の例は、`IOException` のすべてのインスタンスをもみ消し、
+それ以外の例外は再スローするような拡張機能を示しています。
 
 [source,java,indent=0]
-.An exception handling extension
+.例外をハンドリングする拡張機能
 ----
 include::{testDir}/example/exception/IgnoreIOExceptionExtension.java[tags=user_guide]
 ----
