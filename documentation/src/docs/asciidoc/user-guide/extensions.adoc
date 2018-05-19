@@ -394,24 +394,26 @@ include::{testDir}/example/TestTemplateDemo.java[tags=user_guide]
 その機能を実現するためにこの拡張ポイントをどのように使っているか参考にしてください。
 
 [[extensions-keeping-state]]
-=== Keeping State in Extensions
+=== 拡張機能の状態を保持する
 
-Usually, an extension is instantiated only once. So the question becomes relevant: How do
-you keep the state from one invocation of an extension to the next? The
-`ExtensionContext` API provides a `Store` exactly for this purpose. Extensions may put
-values into a store for later retrieval. See the
-`<<extensions-lifecycle-callbacks-timing-extension, TimingExtension>>` for an example of
-using the `Store` with a method-level scope. It is important to remember that values
-stored in an `ExtensionContext` during test execution will not be available in the
-surrounding `ExtensionContext`. Since `ExtensionContexts` may be nested, the scope of
-inner contexts may also be limited. Consult the corresponding JavaDoc for details on the
-methods available for storing and retrieving values via the `{ExtensionContext_Store}`.
+通常、拡張機能は一度だけしかインスタンス化されません。そのため、
+拡張機能のある実行から次の実行までどのように状態を保持するのか？が問題となります。
+`ExtensionContext` APIは、まさにこの目的のために `Store` を提供しています。
+拡張機能は、値を `Store` に保存しておいて、あとで取得することができます。
+メソッドレベルのスコープで `Store` を使用する例については、
+`<<extensions-lifecycle-callbacks-timing-extension, TimingExtension>>`
+を参照してください。
+テスト実行の間に `ExtensionContext` に保存された値は、その外側の `ExtensionContext`
+では利用できないことを覚えておくのは重要です。`ExtensionContext` はネストされうるので、
+内側の拡張コンテキストのスコープも制限されることがあります。
+`{ExtensionContext_Store}` 経由で保存・取得するために使えるメソッドの詳細については、
+関連する JavaDoc を参照してください。
 
 .`ExtensionContext.Store.CloseableResource`
-NOTE: An extension context store is bound to its extension context lifecycle. When an
-extension context lifecycle ends it closes its associated store. All stored values
-that are instances of `CloseableResource` are notified by
-an invocation of their `close()` method.
+NOTE: 拡張コンテキストのストアは、その拡張コンテキストのライフサイクルに束縛されています。
+拡張コンテキストのライフサイクルが終了すると、関連するストアもクローズされます。
+保存されている値が `CloseableResource` のインスタンスである場合は、その `close()`
+メソッドが呼び出されて通知されます。
 
 [[extensions-supported-utilities]]
 === Supported Utilities in Extensions
