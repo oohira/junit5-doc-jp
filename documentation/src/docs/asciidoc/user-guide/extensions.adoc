@@ -416,40 +416,43 @@ NOTE: 拡張コンテキストのストアは、その拡張コンテキスト�
 メソッドが呼び出されて通知されます。
 
 [[extensions-supported-utilities]]
-=== Supported Utilities in Extensions
+=== 拡張機能でサポートされるユーティリティ
 
-The `junit-platform-commons` artifact exposes a package named
-`{junit-platform-support-package}` that contains _maintained_ utility methods for working
-with annotations, classes, reflection, and classpath scanning tasks. `TestEngine` and
-`Extension` authors are encouraged to use these supported methods in order to align with
-the behavior of the JUnit Platform.
+`junit-platform-commons` は、アノテーションやクラス、リフレクション、
+クラスパスの探索処理に使える _メンテナンスされた_ ユーティリティメソッドを含む
+`{junit-platform-support-package}` というパッケージを提供しています。
+`TestEngine` や `Extension` の作者は、JUnit Platformの振る舞いに合わせるために、
+これらのメソッドを利用することが推奨されます。
 
 [[extensions-supported-utilities-annotations]]
-==== Annotation Support
+==== アノテーションサポート
 
-`AnnotationSupport` provides static utility methods that operate on annotated elements
-(e.g., packages, annotations, classes, interfaces, constructors, methods, and fields).
-These include methods to check whether an element is annotated or meta-annotated with a
-particular annotation, to search for specific annotations, and to find annotated methods
-and fields in a class or interface. Some of these methods search on implemented
-interfaces and within class hierarchies to find annotations. Consult the JavaDoc for
-`{AnnotationSupport}` for further details.
+`AnnotationSupport` は、アノテーションが付与された要素（例えば、パッケージやアノテーション、
+クラス、インターフェース、コンストラクタ、メソッド、フィールド）を操作するstatic
+なユーティリティメソッドを提供します。その中には、
+ある要素に特定のアノテーションやメタアノテーションが付与されているかチェックしたり、
+特定のアノテーションを探したり、クラスやフィールドからアノテーションの付与されたメソッドを
+探したりするメソッドが含まれます。これらのメソッドのいくつかは、
+アノテーションを探すために実装インターフェースやクラス階層を探索します。
+さらなる詳細は、`{AnnotationSupport}` のJavaDocを確認してください。
 
 [[extensions-supported-utilities-classes]]
-==== Class Support
+==== クラスサポート
 
-`ClassSupport` provides static utility methods for working with classes (i.e., instances
-of `java.lang.Class`). Consult the JavaDoc for `{ClassSupport}` for further details.
+`ClassSupport` は、クラス（つまり、`java.lang.Class` のインスタンス）を操作する
+staticなユーティリティメソッドを提供します。詳細は、`{ClassSupport}` のJavaDoc
+を参照してください。
 
 [[extensions-supported-utilities-reflection]]
-==== Reflection Support
+==== リフレクションサポート
 
-`ReflectionSupport` provides static utility methods that augment the standard JDK
-reflection and class-loading mechanisms. These include methods to scan the classpath in
-search of classes matching specified predicates, to load and create new instances of a
-class, and to find and invoke methods. Some of these methods traverse class hierarchies
-to locate matching methods. Consult the JavaDoc for `{ReflectionSupport}` for further
-details.
+`ReflectionSupport` は、標準JDKのリフレクションとクラスロードの仕組みを強化する
+staticなユーティリティメソッドを提供します。
+その中には、指定された述語にマッチするクラスを求めてクラスパスを探索したり、
+あるクラスをロードして新しいインスタンスを作成したり、メソッドを探して実行したりする
+メソッドが含まれます。
+これらのメソッドのいくつかは、マッチするメソッドを特定するためにクラス階層を探索します。
+さらなる詳細は、`{ReflectionSupport}` のJavaDocを確認してください。
 
 [[extensions-execution-order]]
 === Relative Execution Order of User Code and Extensions
