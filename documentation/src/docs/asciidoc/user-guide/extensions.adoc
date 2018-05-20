@@ -455,79 +455,78 @@ staticなユーティリティメソッドを提供します。
 さらなる詳細は、`{ReflectionSupport}` のJavaDocを確認してください。
 
 [[extensions-execution-order]]
-=== Relative Execution Order of User Code and Extensions
+=== ユーザーコードと拡張機能の相対的な実行順序
 
-When executing a test class that contains one or more test methods, a number of extension
-callbacks are called in addition to the user-provided test and lifecycle methods. The
-following diagram illustrates the relative order of user-provided code and extension code.
+1つ以上のテストメソッドを含むテストクラスを実行する場合、ユーザーが指定するテストメソッドと
+ライフサイクルメソッドに加えて、多くの拡張機能コールバックが呼び出されます。次の図は、
+ユーザーコードと拡張機能コードの相対的な実行順序を示しています。
 
-:figure-caption: User code and extension code
+:figure-caption: ユーザーコードと拡張機能コード
 
 [#extensions-execution-order-diagram,reftext='{figure-caption}']
 image::extensions_lifecycle.png[caption='',title='{figure-caption}']
 
-User-provided test and lifecycle methods are shown in orange, with callback code provided
-by extensions shown in blue. The grey box denotes the execution of a single test method
-and will be repeated for every test method in the test class.
+ユーザーが提供するテストメソッドとライフサイクルメソッドはオレンジ色、
+拡張機能が提供するコールバックコードは青色で示されています。灰色のボックスは、
+単一のテストメソッドの実行を表し、テストクラス内のテストメソッド毎に繰り返されます。
 
-The following table further explains the twelve steps in the
-<<extensions-execution-order-diagram>> diagram.
+次の表は、<<extensions-execution-order-diagram>> の図の12ステップをさらに説明しています。
 
 [cols="5,15,80"]
 |===
-| Step | Interface/Annotation | Description
+| ステップ | インターフェース／アノテーション | 説明
 
 | 1
-| interface `org.junit.jupiter.api.extension.BeforeAllCallback`
-| extension code executed before all tests of the container are executed
+| `org.junit.jupiter.api.extension.BeforeAllCallback` インターフェース
+| コンテナのすべてのテストが実行される前に実行される拡張機能のコード
 
 | 2
-| annotation `org.junit.jupiter.api.BeforeAll`
-| user code executed before all tests of the container are executed
+| `org.junit.jupiter.api.BeforeAll` アノテーション
+| コンテナのすべてのテストが実行される前に実行されるユーザーコード
 
 | 3
-| interface `org.junit.jupiter.api.extension.BeforeEachCallback`
-| extension code executed before each test is executed
+| `org.junit.jupiter.api.extension.BeforeEachCallback` インターフェース
+| 各テストが実行される前に実行される拡張機能のコード
 
 | 4
-| annotation `org.junit.jupiter.api.BeforeEach`
-| user code executed before each test is executed
+| `org.junit.jupiter.api.BeforeEach` アノテーション
+| 各テストが実行される前に実行されるユーザーコード
 
 | 5
-| interface `org.junit.jupiter.api.extension.BeforeTestExecutionCallback`
-| extension code executed immediately before a test is executed
+| `org.junit.jupiter.api.extension.BeforeTestExecutionCallback` インターフェース
+| テストが実行される直前に実行される拡張機能のコード
 
 | 6
-| annotation `org.junit.jupiter.api.Test`
-| user code of the actual test method
+| `org.junit.jupiter.api.Test` アノテーション
+| 実際のテストメソッドとなるユーザーコード
 
 | 7
-| interface `org.junit.jupiter.api.extension.TestExecutionExceptionHandler`
-| extension code for handling exceptions thrown during a test
+| `org.junit.jupiter.api.extension.TestExecutionExceptionHandler` インターフェース
+| テストの間に投げられた例外をハンドリングするための拡張機能のコード
 
 | 8
-| interface `org.junit.jupiter.api.extension.AfterTestExecutionCallback`
-| extension code executed immediately after test execution and its corresponding exception handlers
+| `org.junit.jupiter.api.extension.AfterTestExecutionCallback` インターフェース
+| テストが実行され、その例外ハンドラが処理された直後に実行される拡張機能のコード
 
 | 9
-| annotation `org.junit.jupiter.api.AfterEach`
-| user code executed after each test is executed
+| `org.junit.jupiter.api.AfterEach` アノテーション
+| 各テストが実行された後に実行されるユーザーコード
 
 | 10
-| interface `org.junit.jupiter.api.extension.AfterEachCallback`
-| extension code executed after each test is executed
+| `org.junit.jupiter.api.extension.AfterEachCallback` インターフェース
+| 各テストが実行された後に実行される拡張機能のコード
 
 | 11
-| annotation `org.junit.jupiter.api.AfterAll`
-| user code executed after all tests of the container are executed
+| `org.junit.jupiter.api.AfterAll` アノテーション
+| コンテナのすべてのテストが実行された後に実行されるユーザーコード
 
 | 12
-| interface `org.junit.jupiter.api.extension.AfterAllCallback`
-| extension code executed after all tests of the container are executed
+| `org.junit.jupiter.api.extension.AfterAllCallback` インターフェース
+| コンテナのすべてのテストが実行された後に実行される拡張機能のコード
 
 |===
 
-In the simplest case only the actual test method will be executed (step 6); all other
-steps are optional depending on the presence of user code or extension support for the
-corresponding lifecycle callback. For further details on the various lifecycle callbacks
-please consult the respective JavaDoc for each annotation and extension.
+最も単純な場合は、実際のテストメソッドだけが実行されます (ステップ 6)。
+ほかのすべてのステップは、ライフサイクルコールバックに対するユーザーコードや拡張機能コードの
+有無によって省略可能です。様々なライフサイクルコールバックに関する詳細については、
+各アノテーションや拡張機能に対する JavaDoc を参照してください。
