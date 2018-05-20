@@ -589,19 +589,19 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#running-tests-tag-expressions">4.6. タグ式</a></li>
 </ul>
 </li>
-<li><a href="#extensions">5. Extension Model</a>
+<li><a href="#extensions">5. 拡張モデル</a>
 <ul class="sectlevel2">
-<li><a href="#extensions-overview">5.1. Overview</a></li>
-<li><a href="#extensions-registration">5.2. Registering Extensions</a></li>
-<li><a href="#extensions-conditions">5.3. Conditional Test Execution</a></li>
-<li><a href="#extensions-test-instance-post-processing">5.4. Test Instance Post-processing</a></li>
-<li><a href="#extensions-parameter-resolution">5.5. Parameter Resolution</a></li>
-<li><a href="#extensions-lifecycle-callbacks">5.6. Test Lifecycle Callbacks</a></li>
-<li><a href="#extensions-exception-handling">5.7. Exception Handling</a></li>
-<li><a href="#extensions-test-templates">5.8. Providing Invocation Contexts for Test Templates</a></li>
-<li><a href="#extensions-keeping-state">5.9. Keeping State in Extensions</a></li>
-<li><a href="#extensions-supported-utilities">5.10. Supported Utilities in Extensions</a></li>
-<li><a href="#extensions-execution-order">5.11. Relative Execution Order of User Code and Extensions</a></li>
+<li><a href="#extensions-overview">5.1. 概要</a></li>
+<li><a href="#extensions-registration">5.2. 拡張機能の登録</a></li>
+<li><a href="#extensions-conditions">5.3. 条件付きテスト実行</a></li>
+<li><a href="#extensions-test-instance-post-processing">5.4. テストインスタンスの後処理</a></li>
+<li><a href="#extensions-parameter-resolution">5.5. 引数の解決</a></li>
+<li><a href="#extensions-lifecycle-callbacks">5.6. テストライフサイクルコールバック</a></li>
+<li><a href="#extensions-exception-handling">5.7. 例外ハンドリング</a></li>
+<li><a href="#extensions-test-templates">5.8. テストテンプレートに実行コンテキストを与える</a></li>
+<li><a href="#extensions-keeping-state">5.9. 拡張機能の状態を保持する</a></li>
+<li><a href="#extensions-supported-utilities">5.10. 拡張機能でサポートされるユーティリティ</a></li>
+<li><a href="#extensions-execution-order">5.11. ユーザーコードと拡張機能の相対的な実行順序</a></li>
 </ul>
 </li>
 <li><a href="#migrating-from-junit4">6. Migrating from JUnit 4</a>
@@ -2337,7 +2337,7 @@ APIを定義しています。もしテストコンストラクタや <code>@Tes
 <div class="paragraph">
 <p><code>@ExtendWith</code> と <code>@Tag</code> はテストインターフェースに宣言することで、
 そのインタフェースを実装したクラスにタグと拡張機能を自動的に継承させることができます。
-<a href="#extensions-lifecycle-callbacks-before-after-execution">Before and After Test Execution Callbacks</a> にある
+<a href="#extensions-lifecycle-callbacks-before-after-execution">テスト実行前後のコールバック</a> にある
 <a href="#extensions-lifecycle-callbacks-timing-extension">TimingExtension</a>
 のソースコードを参照してください。</p>
 </div>
@@ -3660,7 +3660,7 @@ IDEのテストツリーの中に1つずつ表示されます。同じテスト�
 と一緒に使う必要があります。
 テストテンプレートメソッドの各呼び出しは、ライフサイクルコールバックや拡張機能など、
 通常の <code>@Test</code> メソッドの実行と同じように振る舞います。使用例については、
-<a href="#extensions-test-templates">Providing Invocation Contexts for Test Templates</a> を参照してください。</p>
+<a href="#extensions-test-templates">テストテンプレートに実行コンテキストを与える</a> を参照してください。</p>
 </div>
 </div>
 <div class="sect2">
@@ -4862,10 +4862,10 @@ Mavenのようなビルドツールが <code>JUnitPlatform</code> ランナー�
 <p><a href="#writing-tests-test-instance-lifecycle-changing-default">テストインスタンスのデフォルトのライフサイクルの変更</a></p>
 </li>
 <li>
-<p><a href="#extensions-registration-automatic-enabling">Enabling Automatic Extension Detection</a></p>
+<p><a href="#extensions-registration-automatic-enabling">拡張機能の自動検出を有効にする</a></p>
 </li>
 <li>
-<p><a href="#extensions-conditions-deactivation">Deactivating Conditions</a></p>
+<p><a href="#extensions-conditions-deactivation">条件を非アクティブにする</a></p>
 </li>
 </ul>
 </div>
@@ -5003,35 +5003,39 @@ Mavenのようなビルドツールが <code>JUnitPlatform</code> ランナー�
 </div>
 </div>
 <div class="sect1">
-<h2 id="extensions"><a class="anchor" href="#extensions"></a>5. Extension Model</h2>
+<h2 id="extensions"><a class="anchor" href="#extensions"></a>5. 拡張モデル</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="extensions-overview"><a class="anchor" href="#extensions-overview"></a>5.1. Overview</h3>
+<h3 id="extensions-overview"><a class="anchor" href="#extensions-overview"></a>5.1. 概要</h3>
 <div class="paragraph">
-<p>In contrast to the competing <code>Runner</code>, <code>@Rule</code>, and <code>@ClassRule</code> extension points in
-JUnit 4, the JUnit Jupiter extension model consists of a single, coherent concept: the
-<code>Extension</code> API. Note, however, that <code>Extension</code> itself is just a marker interface.</p>
+<p>JUnit 4の <code>Runner</code>, <code>@Rule</code>, <code>@ClassRule</code> などの拡張ポイントとは異なり、
+JUnit Jupiterの拡張モデルは、単一の一貫したコンセプトである <code>Extension</code> API
+で構成されます。ただし、<code>Extension</code> 自身はただのマーカーインターフェースである点に
+注意してください。</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-registration"><a class="anchor" href="#extensions-registration"></a>5.2. Registering Extensions</h3>
+<h3 id="extensions-registration"><a class="anchor" href="#extensions-registration"></a>5.2. 拡張機能の登録</h3>
 <div class="paragraph">
-<p>Extensions can be registered <em>declaratively</em> via
-<a href="#extensions-registration-declarative"><code>@ExtendWith</code></a>, <em>programmatically</em> via
-<a href="#extensions-registration-programmatic"><code>@RegisterExtension</code></a>, or <em>automatically</em> via
-Java&#8217;s <a href="#extensions-registration-automatic"><code>ServiceLoader</code></a> mechanism.</p>
+<p>拡張機能は、 <a href="#extensions-registration-declarative"><code>@ExtendWith</code></a>
+を使って <em>宣言的に</em> 登録するか、
+<a href="#extensions-registration-programmatic"><code>@RegisterExtension</code></a>
+を使って <em>手続き的に</em> 登録するか、あるいは
+Javaの <a href="#extensions-registration-automatic"><code>ServiceLoader</code></a>
+の仕組みを使って <em>自動的に</em> 登録することができます。</p>
 </div>
 <div class="sect3">
-<h4 id="extensions-registration-declarative"><a class="anchor" href="#extensions-registration-declarative"></a>5.2.1. Declarative Extension Registration</h4>
+<h4 id="extensions-registration-declarative"><a class="anchor" href="#extensions-registration-declarative"></a>5.2.1. 宣言的な登録</h4>
 <div class="paragraph">
-<p>Developers can register one or more extensions <em>declaratively</em> by annotating a test
-interface, test class, test method, or custom <em><a href="#writing-tests-meta-annotations">composed
-annotation</a></em> with <code>@ExtendWith(&#8230;&#8203;)</code> and supplying class references for the extensions
-to register.</p>
+<p>開発者は、テストインターフェースやテストクラス、テストメソッド、
+<em><a href="#writing-tests-meta-annotations">合成アノテーション</a></em> に
+<code>@ExtendWith(&#8230;&#8203;)</code> アノテーションを付与し、
+拡張機能として登録したいクラスの参照を指定することで
+1つ以上の拡張機能を <em>宣言的に</em> 登録することができます。</p>
 </div>
 <div class="paragraph">
-<p>For example, to register a custom <code>RandomParametersExtension</code> for a particular test method, you
-would annotate the test method as follows.</p>
+<p>例えば、特定のテストメソッドに <code>RandomParametersExtension</code> を登録したい場合は、
+テストメソッドに次のようにアノテーションを付与します。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5043,8 +5047,8 @@ would annotate the test method as follows.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>To register a custom <code>RandomParametersExtension</code> for all tests in a particular class and its
-subclasses, you would annotate the test class as follows.</p>
+<p>特定のクラスとそのサブクラスのすべてのテストに <code>RandomParametersExtension</code>
+を登録したい場合は、テストクラスに次のようにアノテーションを付与します。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5055,7 +5059,7 @@ subclasses, you would annotate the test class as follows.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>Multiple extensions can be registered together like this:</p>
+<p>複数の拡張機能は、次のように同時に登録することができます。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5066,7 +5070,7 @@ subclasses, you would annotate the test class as follows.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>As an alternative, multiple extensions can be registered separately like this:</p>
+<p>別の方法としては、次のように個別に登録することができます。</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -5084,28 +5088,28 @@ subclasses, you would annotate the test class as follows.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<div class="title">Extension Registration Order</div>
-Extensions registered declaratively via <code>@ExtendWith</code> will be executed in the order
-in which they are declared in the source code. For example, the execution of tests in
-both <code>MyFirstTests</code> and <code>MySecondTests</code> will be extended by the <code>FooExtension</code> and
-<code>BarExtension</code>, <strong>in exactly that order</strong>.
+<div class="title">拡張機能の登録順序</div>
+<code>@ExtendWith</code> で宣言的に登録された拡張機能は、ソースコード上での宣言順で実行されます。
+例えば、<code>MyFirstTests</code> と <code>MySecondTests</code> のテスト実行は、<code>FooExtension</code> と
+<code>BarExtension</code> によって <strong>まさにこの順序で</strong> 拡張されます。
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect3">
-<h4 id="extensions-registration-programmatic"><a class="anchor" href="#extensions-registration-programmatic"></a>5.2.2. Programmatic Extension Registration</h4>
+<h4 id="extensions-registration-programmatic"><a class="anchor" href="#extensions-registration-programmatic"></a>5.2.2. 手続き的な登録</h4>
 <div class="paragraph">
-<p>Developers can register extensions <em>programmatically</em> by annotating fields in test
-classes with <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/RegisterExtension.html">@RegisterExtension</a></code>.</p>
+<p>開発者は、テストクラスのフィールドに
+<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/RegisterExtension.html">@RegisterExtension</a></code> アノテーションを付与することで、
+拡張機能を <em>手続き的に</em> 登録することができます。</p>
 </div>
 <div class="paragraph">
-<p>When an extension is registered <em>declaratively</em> via
-<a href="#extensions-registration-declarative"><code>@ExtendWith</code></a>, it can typically only be
-configured via annotations. In contrast, when an extension is registered via
-<code>@RegisterExtension</code>, it can be configured <em>programmatically</em> – for example, in order to
-pass arguments to the extension&#8217;s constructor, a static factory method, or a builder API.</p>
+<p>拡張機能を <a href="#extensions-registration-declarative"><code>@ExtendWith</code></a> で
+<em>宣言的に</em> 登録する場合、拡張機能の設定はアノテーション経由でしか行なえません。
+しかし、拡張機能を <code>@RegisterExtension</code> で登録する場合は、
+拡張機能のコンストラクタやstaticファクトリメソッド、
+ビルダーAPIに引数を渡して <em>手続き的に</em> 設定することができます。</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -5114,35 +5118,35 @@ pass arguments to the extension&#8217;s constructor, a static factory method, or
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<code>@RegisterExtension</code> fields must not be <code>private</code> or <code>null</code> (at evaluation time)
-but may be either <code>static</code> or non-static.
+<code>@RegisterExtension</code> フィールドは、<code>private</code> または <code>null</code> (評価時)
+であってはなりませんが、<code>static</code> か非 <code>static</code> はどちらでもかまいません。
 </td>
 </tr>
 </table>
 </div>
 <div class="sect4">
-<h5 id="extensions-registration-programmatic-static-fields"><a class="anchor" href="#extensions-registration-programmatic-static-fields"></a>Static Fields</h5>
+<h5 id="extensions-registration-programmatic-static-fields"><a class="anchor" href="#extensions-registration-programmatic-static-fields"></a>staticフィールド</h5>
 <div class="paragraph">
-<p>If a <code>@RegisterExtension</code> field is <code>static</code>, the extension will be registered after
-extensions that are registered at the class level via <code>@ExtendWith</code>. Such <em>static
-extensions</em> are not limited in which extension APIs they can implement. Extensions
-registered via static fields may therefore implement class-level and instance-level
-extension APIs such as <code>BeforeAllCallback</code>, <code>AfterAllCallback</code>, and
-<code>TestInstancePostProcessor</code> as well as method-level extension APIs such as
-<code>BeforeEachCallback</code>, etc.</p>
+<p><code>@RegisterExtension</code> フィールドが <code>static</code> の場合、その拡張機能は
+<code>@ExtendWith</code> でクラスレベルに登録される拡張機能の後で登録されます。
+そのような <em>staticな拡張機能</em> は、実装する拡張APIに制限がありません。
+そのため、staticフィールドとして登録される拡張機能は、
+<code>BeforeAllCallback</code>, <code>AfterAllCallback</code>, <code>TestInstancePostProcessor</code>
+のようなクラスレベルやインスタンスレベルの拡張APIだけでなく、
+<code>BeforeEachCallback</code> などのようなメソッドレベルの拡張APIも実装できます。</p>
 </div>
 <div class="paragraph">
-<p>In the following example, the <code>server</code> field in the test class is initialized
-programmatically by using a builder pattern supported by the <code>WebServerExtension</code>. The
-configured <code>WebServerExtension</code> will be automatically registered as an extension at the
-class level – for example, in order to start the server before all tests in the class and
-then stop the server after all tests in the class have completed. In addition, static
-lifecycle methods annotated with <code>@BeforeAll</code> or <code>@AfterAll</code> as well as <code>@BeforeEach</code>,
-<code>@AfterEach</code>, and <code>@Test</code> methods can access the instance of the extension via the
-<code>server</code> field if necessary.</p>
+<p>次の例では、テストクラスの <code>server</code> フィールドは <code>WebServerExtension</code>
+がサポートするビルダーパターンを使って手続き的に初期化されます。設定された
+<code>WebServerExtension</code> は、クラスレベルの拡張機能として自動的に登録され、
+例えば、すべてのテストを開始する前にサーバーを起動したり、
+すべてのテストが完了した後でサーバーを停止したりすることができます。
+加えて、<code>@BeforeEach</code>, <code>@AfterEach</code>, <code>@Test</code> メソッドだけでなく、
+<code>@BeforeAll</code> や <code>@AfterAll</code> のようなstaticなライフサイクルメソッドも
+必要であれば <code>server</code> フィールド経由でこの拡張機能のインスタンスにアクセスできます。</p>
 </div>
 <div class="listingblock">
-<div class="title">An extension registered via a static field</div>
+<div class="title">staticフィールド経由で登録される拡張機能</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">class</span> <span class="class">WebServerDemo</span> {
 
@@ -5163,30 +5167,30 @@ lifecycle methods annotated with <code>@BeforeAll</code> or <code>@AfterAll</cod
 </div>
 </div>
 <div class="sect4">
-<h5 id="extensions-registration-programmatic-instance-fields"><a class="anchor" href="#extensions-registration-programmatic-instance-fields"></a>Instance Fields</h5>
+<h5 id="extensions-registration-programmatic-instance-fields"><a class="anchor" href="#extensions-registration-programmatic-instance-fields"></a>インスタンスフィールド</h5>
 <div class="paragraph">
-<p>If a <code>@RegisterExtension</code> field is non-static (i.e., an instance field), the extension
-will be registered after the test class has been instantiated and after each registered
-<code>TestInstancePostProcessor</code> has been given a chance to post-process the test instance
-(potentially injecting the instance of the extension to be used into the annotated
-field). Thus, if such an <em>instance extension</em> implements class-level or instance-level
-extension APIs such as <code>BeforeAllCallback</code>, <code>AfterAllCallback</code>, or
-<code>TestInstancePostProcessor</code>, those APIs will not be honored. By default, an instance
-extension will be registered <em>after</em> extensions that are registered at the method level
-via <code>@ExtendWith</code>; however, if the test class is configured with
-<code>@TestInstance(Lifecycle.PER_CLASS)</code> semantics, an instance extension will be registered
-<em>before</em> extensions that are registered at the method level via <code>@ExtendWith</code>.</p>
+<p><code>@RegisterExtension</code> フィールドが非static (つまり、インスタンスフィールド)
+の場合、その拡張機能はテストクラスがインスタンス化され、登録済みの各
+<code>TestInstancePostProcessor</code> がテストインスタンスの事後処理
+(拡張機能のインスタンスをアノテーションの付与されたフィールドに注入するなど)
+をした後で登録されます。そのため、<em>インスタンスフィールドの拡張機能</em> が
+<code>BeforeAllCallback</code>, <code>AfterAllCallback</code>, <code>TestInstancePostProcessor</code>
+のようなクラスレベルやインスタンスレベルの拡張APIを実装しても意味がありません。
+デフォルトでは、インスタンスフィールドの拡張機能は <code>@ExtendWith</code>
+でメソッドレベルに登録される拡張機能より <em>後で</em> 登録されます。しかし、
+テストクラスが <code>@TestInstance(Lifecycle.PER_CLASS)</code> モードに設定されている場合は、
+<code>@ExtendWith</code> でメソッドレベルに登録される拡張機能の <em>前に</em> 登録されます。</p>
 </div>
 <div class="paragraph">
-<p>In the following example, the <code>docs</code> field in the test class is initialized
-programmatically by invoking a custom <code>lookUpDocsDir()</code> method and supplying the result
-to the static <code>forPath()</code> factory method in the <code>DocumentationExtension</code>. The configured
-<code>DocumentationExtension</code> will be automatically registered as an extension at the method
-level. In addition, <code>@BeforeEach</code>, <code>@AfterEach</code>, and <code>@Test</code> methods can access the
-instance of the extension via the <code>docs</code> field if necessary.</p>
+<p>次の例では、テストクラスの <code>docs</code> フィールドは <code>lookUpDocsDir()</code>
+メソッドを呼び出した結果を <code>DocumentationExtension</code> のstaticファクトリメソッド
+<code>forPath()</code> に渡すことで、手続き的に初期化されます。設定された
+<code>DocumentationExtension</code> は、メソッドレベルの拡張機能として自動的に登録されます。
+加えて、<code>@BeforeEach</code>, <code>@AfterEach</code>, <code>@Test</code> メソッドは
+必要であれば <code>docs</code> フィールド経由でこの拡張機能のインスタンスにアクセスできます。</p>
 </div>
 <div class="listingblock">
-<div class="title">An extension registered via an instance field</div>
+<div class="title">インスタンスフィールド経由で登録される拡張機能</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">class</span> <span class="class">DocumentationDemo</span> {
 
@@ -5207,127 +5211,139 @@ instance of the extension via the <code>docs</code> field if necessary.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="extensions-registration-automatic"><a class="anchor" href="#extensions-registration-automatic"></a>5.2.3. Automatic Extension Registration</h4>
+<h4 id="extensions-registration-automatic"><a class="anchor" href="#extensions-registration-automatic"></a>5.2.3. 自動的な登録</h4>
 <div class="paragraph">
-<p>In addition to <a href="#extensions-registration-declarative">declarative extension registration</a>
-and <a href="#extensions-registration-programmatic">programmatic extension registration</a> support
-using annotations, JUnit Jupiter also supports <em>global extension registration</em> via Java&#8217;s
-<code>java.util.ServiceLoader</code> mechanism, allowing third-party extensions to be auto-detected
-and automatically registered based on what is available in the classpath.</p>
+<p>アノテーションを使った拡張機能の
+<a href="#extensions-registration-declarative">宣言的な登録</a> と
+<a href="#extensions-registration-programmatic">手続き的な登録</a> に加えて、
+JUnit JupiterはJavaの <code>java.util.ServiceLoader</code> の仕組みを使った拡張機能の
+<em>グローバルな登録</em> もサポートしています。
+これにより、クラスパスから利用可能なサードパーティの拡張機能を自動検出し、
+自動的に登録させることができます。</p>
 </div>
 <div class="paragraph">
-<p>Specifically, a custom extension can be registered by supplying its fully qualified class
-name in a file named <code>org.junit.jupiter.api.extension.Extension</code> within the
-<code>/META-INF/services</code> folder in its enclosing JAR file.</p>
+<p>具体的には、JARファイルの <code>/META-INF/services</code> フォルダの中に
+<code>org.junit.jupiter.api.extension.Extension</code> という名前のファイルを作成し、
+クラスの完全修飾名を指定することで拡張機能を登録できます。</p>
 </div>
 <div class="sect4">
-<h5 id="extensions-registration-automatic-enabling"><a class="anchor" href="#extensions-registration-automatic-enabling"></a>Enabling Automatic Extension Detection</h5>
+<h5 id="extensions-registration-automatic-enabling"><a class="anchor" href="#extensions-registration-automatic-enabling"></a>拡張機能の自動検出を有効にする</h5>
 <div class="paragraph">
-<p>Auto-detection is an advanced feature and is therefore not enabled by default. To enable
-it, simply set the <code>junit.jupiter.extensions.autodetection.enabled</code> <em>configuration
-parameter</em> to <code>true</code>. This can be supplied as a JVM system property, as a <em>configuration
-parameter</em> in the <code>LauncherDiscoveryRequest</code> that is passed to the <code>Launcher</code>, or via the
-JUnit Platform configuration file (see <a href="#running-tests-config-params">設定パラメーター</a> for details).</p>
+<p>自動検出は高度な機能なので、デフォルトでは有効になっていません。有効化するには、
+<em>設定パラメーター</em> <code>junit.jupiter.extensions.autodetection.enabled</code>
+に <code>true</code> を指定します。これは、JVMのシステムプロパティか、
+<code>Launcher</code> に渡される <code>LauncherDiscoveryRequest</code> の <em>設定パラメーター</em>、
+あるいはJUnit Platform 設定ファイルで指定することができます
+(詳細は、<a href="#running-tests-config-params">設定パラメーター</a> を参照)。</p>
 </div>
 <div class="paragraph">
-<p>For example, to enable auto-detection of extensions, you can start your JVM with the
-following system property.</p>
+<p>例えば、拡張機能の自動検出を有効化するには、JVMを次のシステムプロパティ付きで起動します。</p>
 </div>
 <div class="paragraph">
 <p><code>-Djunit.jupiter.extensions.autodetection.enabled=true</code></p>
 </div>
 <div class="paragraph">
-<p>When auto-detection is enabled, extensions discovered via the <code>ServiceLoader</code> mechanism
-will be added to the extension registry after JUnit Jupiter&#8217;s global extensions (e.g.,
-support for <code>TestInfo</code>, <code>TestReporter</code>, etc.).</p>
+<p>自動検出が有効化されると、<code>ServiceLoader</code> の仕組みで検知された拡張機能は、
+JUnit Jupiterのグローバルな拡張機能 (例えば、<code>TestInfo</code> や <code>TestReporter</code>
+のサポート) の後で拡張機能レジストリに登録されます。</p>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="extensions-registration-inheritance"><a class="anchor" href="#extensions-registration-inheritance"></a>5.2.4. Extension Inheritance</h4>
+<h4 id="extensions-registration-inheritance"><a class="anchor" href="#extensions-registration-inheritance"></a>5.2.4. 拡張機能の継承</h4>
 <div class="paragraph">
-<p>Registered extensions are inherited within test class hierarchies with top-down
-semantics. Similarly, extensions registered at the class-level are inherited at the
-method-level. Furthermore, a specific extension implementation can only be registered
-once for a given extension context and its parent contexts. Consequently, any attempt to
-register a duplicate extension implementation will be ignored.</p>
+<p>登録された拡張機能は、テストクラス階層の中で親から子に継承されます。
+同様に、クラスレベルで登録された拡張機能は、メソッドレベルに継承されます。
+また、同一の拡張機能実装は、与えられた拡張コンテキストとその親の拡張コンテキストに対して
+一回だけしか登録することができません。
+結果として、重複して拡張機能実装を登録しようとしても無視されます。</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-conditions"><a class="anchor" href="#extensions-conditions"></a>5.3. Conditional Test Execution</h3>
+<h3 id="extensions-conditions"><a class="anchor" href="#extensions-conditions"></a>5.3. 条件付きテスト実行</h3>
 <div class="paragraph">
-<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ExecutionCondition.html">ExecutionCondition</a></code> defines the <code>Extension</code> API for programmatic, <em>conditional test
-execution</em>.</p>
+<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ExecutionCondition.html">ExecutionCondition</a></code> は、プログラムの <em>条件付きテスト実行</em> のための <code>Extension</code> APIを定めています。</p>
 </div>
 <div class="paragraph">
-<p>An <code>ExecutionCondition</code> is <em>evaluated</em> for each container (e.g., a test class) to
-determine if all the tests it contains should be executed based on the supplied
-<code>ExtensionContext</code>. Similarly, an <code>ExecutionCondition</code> is <em>evaluated</em> for each test to
-determine if a given test method should be executed based on the supplied
-<code>ExtensionContext</code>.</p>
+<p><code>ExecutionCondition</code> は、コンテナ (例えば、テストクラス) がもつテストを与えられた
+<code>ExtensionContext</code> で実行すべきか判断するためにコンテナ毎に評価されます。
+同様に、<code>ExecutionCondition</code> は、個々のテストメソッドを与えられた <code>ExtensionContext</code>
+で実行すべきか判断するためにテスト毎に評価されます。</p>
 </div>
 <div class="paragraph">
-<p>When multiple <code>ExecutionCondition</code> extensions are registered, a container or test is
-disabled as soon as one of the conditions returns <em>disabled</em>. Thus, there is no guarantee
-that a condition is evaluated because another extension might have already caused a
-container or test to be disabled. In other words, the evaluation works like the
-short-circuiting boolean OR operator.</p>
+<p>複数の <code>ExecutionCondition</code> 拡張が登録された場合、<em>無効</em> と判定する拡張機能が1つでもあれば、
+コンテナやテストはただちに無効化されます。別の拡張機能がすでにコンテナやテストを無効化していることがあるので、
+ある拡張機能が必ず評価されるという保証はありません。言い換えると、論理OR演算子の短絡評価のように評価されます。</p>
 </div>
 <div class="paragraph">
-<p>See the source code of <code><a href="https://github.com/junit-team/junit5/tree/master/junit-jupiter-engine/src/main/java/org/junit/jupiter/engine/extension/DisabledCondition.java">DisabledCondition</a></code> and <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/Disabled.html">@Disabled</a></code> for concrete examples.</p>
+<p>具体的な例は、<code><a href="https://github.com/junit-team/junit5/tree/master/junit-jupiter-engine/src/main/java/org/junit/jupiter/engine/extension/DisabledCondition.java">DisabledCondition</a></code> と <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/Disabled.html">@Disabled</a></code> のソースコードを参照してください。</p>
 </div>
 <div class="sect3">
-<h4 id="extensions-conditions-deactivation"><a class="anchor" href="#extensions-conditions-deactivation"></a>5.3.1. Deactivating Conditions</h4>
+<h4 id="extensions-conditions-deactivation"><a class="anchor" href="#extensions-conditions-deactivation"></a>5.3.1. 条件を非アクティブにする</h4>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
 <div class="paragraph">
-<p>Sometimes it can be useful to run a test suite <em>without</em> certain conditions being active.
-For example, you may wish to run tests even if they are annotated with <code>@Disabled</code> in
-order to see if they are still <em>broken</em>. To do this, simply provide a pattern for the
-<code>junit.jupiter.conditions.deactivate</code> <em>configuration parameter</em> to specify which
-conditions should be deactivated (i.e., not evaluated) for the current test run. The
-pattern can be supplied as a JVM system property, as a <em>configuration parameter</em> in the
-<code>LauncherDiscoveryRequest</code> that is passed to the <code>Launcher</code>, or via the JUnit Platform
-configuration file (see <a href="#running-tests-config-params">設定パラメーター</a> for details).</p>
+<p>訳注：テストの条件 (<code>ExecutionCondition</code>) が成立し、該当テストが実行される状態を
+<em>有効</em>、逆に実行されない状態を <em>無効</em> と訳している。これに対して、
+テストの条件自体が評価される状態であることを <em>アクティブ</em>、
+評価されない状態であることを <em>非アクティブ</em> と区別して訳す。</p>
+</div>
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>For example, to deactivate JUnit&#8217;s <code>@Disabled</code> condition, you can start your JVM with the
-following system property.</p>
+<p>ときには、特定の条件をアクティブにせずにテストスイートを実行できると有用な場合があります。
+例えば、<code>@Disabled</code> アノテーションが付与されているテストであっても、今もまだ <em>壊れた</em>
+ままかを確認するために実行したいと思うことがあるかもしれません。そのためには、
+<em>設定パラメーター</em> <code>junit.jupiter.conditions.deactivate</code> を使って、
+現在のテスト実行に対してどの条件を非アクティブ (つまり、評価されない) にするか
+パターンを指定するだけです。パターンは、JVMのシステムプロパティか、 <code>Launcher</code> に渡される
+<code>LauncherDiscoveryRequest</code> の <em>設定パラメーター</em>、あるいはJUnit Platform
+設定ファイルで指定することができます (詳細は、<a href="#running-tests-config-params">設定パラメーター</a> を参照)。</p>
+</div>
+<div class="paragraph">
+<p>例えば、JUnitの <code>@Disabled</code> 条件を非アクティブにするには、
+JVMを次のシステムプロパティ付きで起動します。</p>
 </div>
 <div class="paragraph">
 <p><code>-Djunit.jupiter.conditions.deactivate=org.junit.*DisabledCondition</code></p>
 </div>
 <div class="sect4">
-<h5 id="extensions-conditions-deactivation-patterns"><a class="anchor" href="#extensions-conditions-deactivation-patterns"></a>Pattern Matching Syntax</h5>
+<h5 id="extensions-conditions-deactivation-patterns"><a class="anchor" href="#extensions-conditions-deactivation-patterns"></a>パターンマッチング構文</h5>
 <div class="paragraph">
-<p>If the <code>junit.jupiter.conditions.deactivate</code> pattern consists solely of an asterisk
-(<code>*</code>), all conditions will be deactivated. Otherwise, the pattern will be used to match
-against the fully qualified class name (<em>FQCN</em>) of each registered condition. Any dot
-(<code>.</code>) in the pattern will match against a dot (<code>.</code>) or a dollar sign (<code>$</code>) in the FQCN.
-Any asterisk (<code>*</code>) will match against one or more characters in the FQCN. All other
-characters in the pattern will be matched one-to-one against the FQCN.</p>
+<p><code>junit.jupiter.conditions.deactivate</code> のパターンがアスタリスク (<code>*</code>)
+のみからなる場合、すべての条件が非アクティブになります。一方、
+登録された条件の完全修飾クラス名 (<em>FQCN</em>) に対するパターンマッチも使えます。
+パターン中のドット (<code>.</code>) は、FQCN中のドット (<code>.</code>) またはドル記号 (<code>$</code>) にマッチします。
+アスタリスク (<code>*</code>) は、FQCN中の1つ以上の文字にマッチします。
+ほかのすべての文字は、FQCN中の文字に1対1でマッチします。</p>
 </div>
 <div class="paragraph">
-<p>Examples:</p>
+<p>例:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>*</code>: deactivates all conditions.</p>
+<p><code>*</code>: すべての条件を非アクティブにします。</p>
 </li>
 <li>
-<p><code>org.junit.*</code>: deactivates every condition under the <code>org.junit</code> base package and any
-of its subpackages.</p>
+<p><code>org.junit.*</code>: <code>org.junit</code> パッケージおよびすべてのサブパッケージにある条件を非アクティブにします。</p>
 </li>
 <li>
-<p><code>*.MyCondition</code>: deactivates every condition whose simple class name is exactly
-<code>MyCondition</code>.</p>
+<p><code>*.MyCondition</code>: 単純クラス名が <code>MyCondition</code> である条件をすべて非アクティブにします。</p>
 </li>
 <li>
-<p><code>*System*</code>: deactivates every condition whose simple class name contains <code>System</code>.</p>
+<p><code>*System*</code>: 単純クラス名に <code>System</code> を含む条件をすべて非アクティブにします。</p>
 </li>
 <li>
-<p><code>org.example.MyCondition</code>: deactivates the condition whose FQCN is exactly
-<code>org.example.MyCondition</code>.</p>
+<p><code>org.example.MyCondition</code>: FQCNが <code>org.example.MyCondition</code> である条件を非アクティブにします。</p>
 </li>
 </ul>
 </div>
@@ -5335,35 +5351,33 @@ of its subpackages.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-test-instance-post-processing"><a class="anchor" href="#extensions-test-instance-post-processing"></a>5.4. Test Instance Post-processing</h3>
+<h3 id="extensions-test-instance-post-processing"><a class="anchor" href="#extensions-test-instance-post-processing"></a>5.4. テストインスタンスの後処理</h3>
 <div class="paragraph">
-<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestInstancePostProcessor.html">TestInstancePostProcessor</a></code> defines the API for <code>Extensions</code> that wish to <em>post
-process</em> test instances.</p>
+<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestInstancePostProcessor.html">TestInstancePostProcessor</a></code> は、テストインスタンスの <em>後処理</em> をするための <code>Extension</code>
+APIを定めています。</p>
 </div>
 <div class="paragraph">
-<p>Common use cases include injecting dependencies into the test instance, invoking custom
-initialization methods on the test instance, etc.</p>
+<p>よくあるユースケースは、テストインスタンスへの依存性注入や、テストインスタンスのカスタムの
+初期化メソッド呼び出しなどがあります。</p>
 </div>
 <div class="paragraph">
-<p>For a concrete example, consult the source code for the <code><a href="https://github.com/mockito/mockito/blob/release/2.x/subprojects/junit-jupiter/src/main/java/org/mockito/junit/jupiter/MockitoExtension.java">MockitoExtension</a></code> and the
-<code><a href="https://github.com/spring-projects/spring-framework/tree/master/spring-test/src/main/java/org/springframework/test/context/junit/jupiter/SpringExtension.java">SpringExtension</a></code>.</p>
+<p>具体例は、<code><a href="https://github.com/mockito/mockito/blob/release/2.x/subprojects/junit-jupiter/src/main/java/org/mockito/junit/jupiter/MockitoExtension.java">MockitoExtension</a></code> や <code><a href="https://github.com/spring-projects/spring-framework/tree/master/spring-test/src/main/java/org/springframework/test/context/junit/jupiter/SpringExtension.java">SpringExtension</a></code> のソースコードを参照してください。</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-parameter-resolution"><a class="anchor" href="#extensions-parameter-resolution"></a>5.5. Parameter Resolution</h3>
+<h3 id="extensions-parameter-resolution"><a class="anchor" href="#extensions-parameter-resolution"></a>5.5. 引数の解決</h3>
 <div class="paragraph">
-<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ParameterResolver.html">ParameterResolver</a></code> defines the <code>Extension</code> API for dynamically resolving parameters at
-runtime.</p>
+<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ParameterResolver.html">ParameterResolver</a></code> は、実行時に動的に引数を解決するための <code>Extension</code> APIを定めています。</p>
 </div>
 <div class="paragraph">
-<p>If a test constructor or a <code>@Test</code>, <code>@RepeatedTest</code>, <code>@ParameterizedTest</code>,
-<code>@TestFactory</code>, <code>@BeforeEach</code>, <code>@AfterEach</code>, <code>@BeforeAll</code>, or <code>@AfterAll</code> method accepts
-a parameter, the parameter must be <em>resolved</em> at runtime by a <code>ParameterResolver</code>. A
-<code>ParameterResolver</code> can either be built-in (see <code><a href="https://github.com/junit-team/junit5/tree/master/junit-jupiter-engine/src/main/java/org/junit/jupiter/engine/extension/TestInfoParameterResolver.java">TestInfoParameterResolver</a></code>) or
-<a href="#extensions-registration">registered by the user</a>. Generally speaking, parameters may be
-resolved by <em>name</em>, <em>type</em>, <em>annotation</em>, or any combination thereof. For concrete
-examples, consult the source code for <code><a href="https://github.com/junit-team/junit5/tree/master/junit-jupiter-engine/src/test/java/org/junit/jupiter/engine/execution/injection/sample/CustomTypeParameterResolver.java">CustomTypeParameterResolver</a></code> and
-<code><a href="https://github.com/junit-team/junit5/tree/master/junit-jupiter-engine/src/test/java/org/junit/jupiter/engine/execution/injection/sample/CustomAnnotationParameterResolver.java">CustomAnnotationParameterResolver</a></code>.</p>
+<p>テストコンストラクタや <code>@Test</code>, <code>@RepeatedTest</code>, <code>@ParameterizedTest</code>, <code>@TestFactory</code>,
+<code>@BeforeEach</code>, <code>@AfterEach</code>, <code>@BeforeAll</code>, <code>@AfterAll</code> メソッドが引数をもつ場合、
+その引数は <code>ParameterResolver</code> によって実行時に <em>解決</em> されなければいけません。
+<code>ParameterResolver</code> は、ビルトインのもの (<code><a href="https://github.com/junit-team/junit5/tree/master/junit-jupiter-engine/src/main/java/org/junit/jupiter/engine/extension/TestInfoParameterResolver.java">TestInfoParameterResolver</a></code> 参照) または
+<a href="#extensions-registration">ユーザーが登録したもの</a> のどちらかです。一般的に言うと、
+引数は <em>名前</em>、<em>型</em>、<em>アノテーション</em>、あるいはその組み合わせで解決されます。
+具体例は、<code><a href="https://github.com/junit-team/junit5/tree/master/junit-jupiter-engine/src/test/java/org/junit/jupiter/engine/execution/injection/sample/CustomTypeParameterResolver.java">CustomTypeParameterResolver</a></code> や <code><a href="https://github.com/junit-team/junit5/tree/master/junit-jupiter-engine/src/test/java/org/junit/jupiter/engine/execution/injection/sample/CustomAnnotationParameterResolver.java">CustomAnnotationParameterResolver</a></code>
+のソースコードを参照してください。</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -5373,16 +5387,15 @@ examples, consult the source code for <code><a href="https://github.com/junit-te
 </td>
 <td class="content">
 <div class="paragraph">
-<p>Due to a bug in the byte code generated by <code>javac</code> on JDK versions prior to JDK 9,
-looking up annotations on parameters directly via the core <code>java.lang.reflect.Parameter</code>
-API will always fail for <em>inner class</em> constructors (e.g., a constructor in a <code>@Nested</code>
-test class).</p>
+<p>JDK 9以前の <code>javac</code> が生成するバイトコードのバグのせいで、<em>内部クラス</em> のコンストラクタ
+(例えば、<code>@Nested</code> テストクラスのコンストラクタ) に対して引数のアノテーションを
+<code>java.lang.reflect.Parameter</code> API経由で直接探そうとすると、常に失敗します。</p>
 </div>
 <div class="paragraph">
-<p>The <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ParameterContext.html">ParameterContext</a></code> API supplied to <code>ParameterResolver</code> implementations therefore
-includes the following convenience methods for correctly looking up annotations on
-parameters. Extension authors are strongly encouraged to use these methods instead of
-those provided in <code>java.lang.reflect.Parameter</code> in order to avoid this bug in the JDK.</p>
+<p>そのため、<code>ParameterResolver</code> 実装に与えられる <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ParameterContext.html">ParameterContext</a></code> APIは、
+引数のアノテーションを正しく検索するための以下の便利メソッドを含んでいます。
+拡張機能の作者は、JDKのバグを回避するために <code>java.lang.reflect.Parameter</code> ではなく、
+これらのメソッドを使用することが強く推奨されます。</p>
 </div>
 <div class="ulist">
 <ul>
@@ -5403,11 +5416,11 @@ those provided in <code>java.lang.reflect.Parameter</code> in order to avoid thi
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-lifecycle-callbacks"><a class="anchor" href="#extensions-lifecycle-callbacks"></a>5.6. Test Lifecycle Callbacks</h3>
+<h3 id="extensions-lifecycle-callbacks"><a class="anchor" href="#extensions-lifecycle-callbacks"></a>5.6. テストライフサイクルコールバック</h3>
 <div class="paragraph">
-<p>The following interfaces define the APIs for extending tests at various points in the
-test execution lifecycle. Consult the following sections for examples and the Javadoc for
-each of these interfaces in the <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/package-summary.html">org.junit.jupiter.api.extension</a></code> package for further details.</p>
+<p>以下のインターフェースは、テスト実行のライフサイクルにおける様々なタイミングでテストを拡張するための
+APIを定めています。詳細は、以降の節にあるサンプルと、<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/package-summary.html">org.junit.jupiter.api.extension</a></code> パッケージにある
+これらのインターフェースのJavadocを参照してください。</p>
 </div>
 <div class="ulist">
 <ul>
@@ -5446,31 +5459,29 @@ each of these interfaces in the <code><a href="https://junit.org/junit5/docs/5.2
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<div class="title">Implementing Multiple Extension APIs</div>
-Extension developers may choose to implement any number of these interfaces
-within a single extension. Consult the source code of the <code><a href="https://github.com/spring-projects/spring-framework/tree/master/spring-test/src/main/java/org/springframework/test/context/junit/jupiter/SpringExtension.java">SpringExtension</a></code> for a
-concrete example.
+<div class="title">複数のExtension APIを実装する</div>
+拡張機能の開発者は、1つの拡張機能でこれらのインターフェースをいくつでも実装することができます。
+具体例は、<code><a href="https://github.com/spring-projects/spring-framework/tree/master/spring-test/src/main/java/org/springframework/test/context/junit/jupiter/SpringExtension.java">SpringExtension</a></code> のソースコードを参照してください。
 </td>
 </tr>
 </table>
 </div>
 <div class="sect3">
-<h4 id="extensions-lifecycle-callbacks-before-after-execution"><a class="anchor" href="#extensions-lifecycle-callbacks-before-after-execution"></a>5.6.1. Before and After Test Execution Callbacks</h4>
+<h4 id="extensions-lifecycle-callbacks-before-after-execution"><a class="anchor" href="#extensions-lifecycle-callbacks-before-after-execution"></a>5.6.1. テスト実行前後のコールバック</h4>
 <div class="paragraph">
-<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/BeforeTestExecutionCallback.html">BeforeTestExecutionCallback</a></code> and <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/AfterTestExecutionCallback.html">AfterTestExecutionCallback</a></code> define the APIs for
-<code>Extensions</code> that wish to add behavior that will be executed <em>immediately before</em> and
-<em>immediately after</em> a test method is executed, respectively. As such, these callbacks are
-well suited for timing, tracing, and similar use cases. If you need to implement
-callbacks that are invoked <em>around</em> <code>@BeforeEach</code> and <code>@AfterEach</code> methods, implement
-<code>BeforeEachCallback</code> and <code>AfterEachCallback</code> instead.</p>
+<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/BeforeTestExecutionCallback.html">BeforeTestExecutionCallback</a></code> と <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/AfterTestExecutionCallback.html">AfterTestExecutionCallback</a></code> は、
+テストメソッドが実行される <em>直前</em> と <em>直後</em> に実行されるような振る舞いを追加したい場合の
+<code>Extension</code> API を定めています。実行時間の計測や、処理のトレースなどのユースケースに適しています。
+もしも <code>@BeforeEach</code> メソッドや <code>@AfterEach</code> メソッドの <em>前後</em> に呼び出されるコールバックが
+必要な場合は、代わりに <code>BeforeEachCallback</code> や <code>AfterEachCallback</code> を実装してください。</p>
 </div>
 <div class="paragraph">
-<p>The following example shows how to use these callbacks to calculate and log the execution
-time of a test method. <code>TimingExtension</code> implements both <code>BeforeTestExecutionCallback</code>
-and <code>AfterTestExecutionCallback</code> in order to time and log the test execution.</p>
+<p>次の例は、テストメソッドの実行時間を計測してログ出力するために、
+これらのコールバックを利用する方法を示しています。<code>TimingExtension</code> は、
+<code>BeforeTestExecutionCallback</code> と <code>AfterTestExecutionCallback</code> の両方を実装しています。</p>
 </div>
 <div id="extensions-lifecycle-callbacks-timing-extension" class="listingblock">
-<div class="title">An extension that times and logs the execution of test methods</div>
+<div class="title">テストメソッドの実行時間を計測してログ出力する拡張機能</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">java.lang.reflect.Method</span>;
 <span class="keyword">import</span> <span class="include">java.util.logging.Logger</span>;
@@ -5509,11 +5520,11 @@ and <code>AfterTestExecutionCallback</code> in order to time and log the test ex
 </div>
 </div>
 <div class="paragraph">
-<p>Since the <code>TimingExtensionTests</code> class registers the <code>TimingExtension</code> via <code>@ExtendWith</code>,
-its tests will have this timing applied when they execute.</p>
+<p><code>TimingExtensionTests</code> クラスは <code>@ExtendWith</code> を使って <code>TimingExtension</code>
+を登録しているので、テストを実行すると時間計測が有効になります。</p>
 </div>
 <div class="listingblock">
-<div class="title">A test class that uses the example TimingExtension</div>
+<div class="title">TimingExtensionを使うテストクラス</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@ExtendWith</span>(TimingExtension.class)
 <span class="type">class</span> <span class="class">TimingExtensionTests</span> {
@@ -5532,7 +5543,7 @@ its tests will have this timing applied when they execute.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The following is an example of the logging produced when <code>TimingExtensionTests</code> is run.</p>
+<p>以下は、<code>TimingExtensionTests</code> が実行されたときに出力されるログの例です。</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -5543,17 +5554,17 @@ INFO: Method [sleep50ms] took 53 ms.</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-exception-handling"><a class="anchor" href="#extensions-exception-handling"></a>5.7. Exception Handling</h3>
+<h3 id="extensions-exception-handling"><a class="anchor" href="#extensions-exception-handling"></a>5.7. 例外ハンドリング</h3>
 <div class="paragraph">
-<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestExecutionExceptionHandler.html">TestExecutionExceptionHandler</a></code> defines the API for <code>Extensions</code> that wish to handle
-exceptions thrown during test execution.</p>
+<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestExecutionExceptionHandler.html">TestExecutionExceptionHandler</a></code> は、テスト実行中に投げられた例外を扱うための
+<code>Extension</code> API を定めています。</p>
 </div>
 <div class="paragraph">
-<p>The following example shows an extension which will swallow all instances of <code>IOException</code>
-but rethrow any other type of exception.</p>
+<p>次の例は、<code>IOException</code> のすべてのインスタンスをもみ消し、
+それ以外の例外は再スローするような拡張機能を示しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">An exception handling extension</div>
+<div class="title">例外をハンドリングする拡張機能</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">IgnoreIOExceptionExtension</span> <span class="directive">implements</span> TestExecutionExceptionHandler {
 
@@ -5571,20 +5582,20 @@ but rethrow any other type of exception.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-test-templates"><a class="anchor" href="#extensions-test-templates"></a>5.8. Providing Invocation Contexts for Test Templates</h3>
+<h3 id="extensions-test-templates"><a class="anchor" href="#extensions-test-templates"></a>5.8. テストテンプレートに実行コンテキストを与える</h3>
 <div class="paragraph">
-<p>A <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/TestTemplate.html">@TestTemplate</a></code> method can only be executed when at least one
-<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestTemplateInvocationContextProvider.html">TestTemplateInvocationContextProvider</a></code> is registered. Each such provider is responsible
-for providing a <code>Stream</code> of <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestTemplateInvocationContext.html">TestTemplateInvocationContext</a></code> instances. Each context may
-specify a custom display name and a list of additional extensions that will only be used
-for the next invocation of the <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/TestTemplate.html">@TestTemplate</a></code> method.</p>
+<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/TestTemplate.html">@TestTemplate</a></code> メソッドは、<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestTemplateInvocationContextProvider.html">TestTemplateInvocationContextProvider</a></code>
+が少なくとも1つ登録されている場合のみ実行されます。これらのプロバイダは、
+<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestTemplateInvocationContext.html">TestTemplateInvocationContext</a></code> インスタンスの <code>Stream</code> を返す責任をもちます。
+各コンテキストは、カスタム表示名と <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/TestTemplate.html">@TestTemplate</a></code> メソッドの次の呼び出しだけで使われる
+追加の拡張機能のリストを指定します。</p>
 </div>
 <div class="paragraph">
-<p>The following example shows how to write a test template as well as how to register and
-implement a <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestTemplateInvocationContextProvider.html">TestTemplateInvocationContextProvider</a></code>.</p>
+<p>次の例は、<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestTemplateInvocationContextProvider.html">TestTemplateInvocationContextProvider</a></code> を実装して登録する方法と、
+テストテンプレートを記述する方法を示しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">A test template with accompanying extension</div>
+<div class="title">テストテンプレートと拡張機能</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@TestTemplate</span>
 <span class="annotation">@ExtendWith</span>(MyTestTemplateInvocationContextProvider.class)
@@ -5632,10 +5643,9 @@ implement a <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jup
 </div>
 </div>
 <div class="paragraph">
-<p>In this example, the test template will be invoked twice. The display names of the
-invocations will be &#8220;foo&#8221; and &#8220;bar&#8221; as specified by the invocation context. Each
-invocation registers a custom <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ParameterResolver.html">ParameterResolver</a></code> which is used to resolve the method
-parameter. The output when using the <code>ConsoleLauncher</code> is as follows.</p>
+<p>この例では、テストテンプレートは2回実行されます。各実行の表示名は、実行コンテキストで指定された通り、
+&#8220;foo&#8221; と &#8220;bar&#8221; になります。各実行では、メソッド引数を解決するために使われるカスタムの
+<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ParameterResolver.html">ParameterResolver</a></code> を登録しています。 <code>ConsoleLauncher</code> を使ったときの出力は、次のようになります。</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -5645,28 +5655,29 @@ parameter. The output when using the <code>ConsoleLauncher</code> is as follows.
 </div>
 </div>
 <div class="paragraph">
-<p>The <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestTemplateInvocationContextProvider.html">TestTemplateInvocationContextProvider</a></code> extension API is primarily intended for
-implementing different kinds of tests that rely on repetitive invocation of a test-like
-method albeit in different contexts — for example, with different parameters, by preparing
-the test class instance differently, or multiple times without modifying the context.
-Please refer to the implementations of <a href="#writing-tests-repeated-tests">繰り返しテスト</a> or
-<a href="#writing-tests-parameterized-tests">パラメーター化テスト</a> which use this extension point to provide their
-functionality.</p>
+<p><code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/TestTemplateInvocationContextProvider.html">TestTemplateInvocationContextProvider</a></code> 拡張APIは、
+テストクラスのインスタンスを異なるコンテキスト（例えば、異なる引数）で準備したり、
+同じコンテキストで何回も呼び出したりするような、メソッドを繰り返し実行する様々なテストを
+実装することを主目的としています。
+<a href="#writing-tests-repeated-tests">繰り返しテスト</a> や <a href="#writing-tests-parameterized-tests">パラメーター化テスト</a> が、
+その機能を実現するためにこの拡張ポイントをどのように使っているか参考にしてください。</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-keeping-state"><a class="anchor" href="#extensions-keeping-state"></a>5.9. Keeping State in Extensions</h3>
+<h3 id="extensions-keeping-state"><a class="anchor" href="#extensions-keeping-state"></a>5.9. 拡張機能の状態を保持する</h3>
 <div class="paragraph">
-<p>Usually, an extension is instantiated only once. So the question becomes relevant: How do
-you keep the state from one invocation of an extension to the next? The
-<code>ExtensionContext</code> API provides a <code>Store</code> exactly for this purpose. Extensions may put
-values into a store for later retrieval. See the
-<code><a href="#extensions-lifecycle-callbacks-timing-extension">TimingExtension</a></code> for an example of
-using the <code>Store</code> with a method-level scope. It is important to remember that values
-stored in an <code>ExtensionContext</code> during test execution will not be available in the
-surrounding <code>ExtensionContext</code>. Since <code>ExtensionContexts</code> may be nested, the scope of
-inner contexts may also be limited. Consult the corresponding JavaDoc for details on the
-methods available for storing and retrieving values via the <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ExtensionContext.Store.html">Store</a></code>.</p>
+<p>通常、拡張機能は一度だけしかインスタンス化されません。そのため、
+拡張機能のある実行から次の実行までどのように状態を保持するのか？が問題となります。
+<code>ExtensionContext</code> APIは、まさにこの目的のために <code>Store</code> を提供しています。
+拡張機能は、値を <code>Store</code> に保存しておいて、あとで取得することができます。
+メソッドレベルのスコープで <code>Store</code> を使用する例については、
+<code><a href="#extensions-lifecycle-callbacks-timing-extension">TimingExtension</a></code>
+を参照してください。
+テスト実行の間に <code>ExtensionContext</code> に保存された値は、その外側の <code>ExtensionContext</code>
+では利用できないことを覚えておくのは重要です。<code>ExtensionContext</code> はネストされうるので、
+内側の拡張コンテキストのスコープも制限されることがあります。
+<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/extension/ExtensionContext.Store.html">Store</a></code> 経由で保存・取得するために使えるメソッドの詳細については、
+関連する JavaDoc を参照してください。</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -5676,76 +5687,78 @@ methods available for storing and retrieving values via the <code><a href="https
 </td>
 <td class="content">
 <div class="title"><code>ExtensionContext.Store.CloseableResource</code></div>
-An extension context store is bound to its extension context lifecycle. When an
-extension context lifecycle ends it closes its associated store. All stored values
-that are instances of <code>CloseableResource</code> are notified by
-an invocation of their <code>close()</code> method.
+拡張コンテキストのストアは、その拡張コンテキストのライフサイクルに束縛されています。
+拡張コンテキストのライフサイクルが終了すると、関連するストアもクローズされます。
+保存されている値が <code>CloseableResource</code> のインスタンスである場合は、その <code>close()</code>
+メソッドが呼び出されて通知されます。
 </td>
 </tr>
 </table>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-supported-utilities"><a class="anchor" href="#extensions-supported-utilities"></a>5.10. Supported Utilities in Extensions</h3>
+<h3 id="extensions-supported-utilities"><a class="anchor" href="#extensions-supported-utilities"></a>5.10. 拡張機能でサポートされるユーティリティ</h3>
 <div class="paragraph">
-<p>The <code>junit-platform-commons</code> artifact exposes a package named
-<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/platform/commons/support/package-summary.html">org.junit.platform.commons.support</a></code> that contains <em>maintained</em> utility methods for working
-with annotations, classes, reflection, and classpath scanning tasks. <code>TestEngine</code> and
-<code>Extension</code> authors are encouraged to use these supported methods in order to align with
-the behavior of the JUnit Platform.</p>
+<p><code>junit-platform-commons</code> は、アノテーションやクラス、リフレクション、
+クラスパスの探索処理に使える <em>メンテナンスされた</em> ユーティリティメソッドを含む
+<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/platform/commons/support/package-summary.html">org.junit.platform.commons.support</a></code> というパッケージを提供しています。
+<code>TestEngine</code> や <code>Extension</code> の作者は、JUnit Platformの振る舞いに合わせるために、
+これらのメソッドを利用することが推奨されます。</p>
 </div>
 <div class="sect3">
-<h4 id="extensions-supported-utilities-annotations"><a class="anchor" href="#extensions-supported-utilities-annotations"></a>5.10.1. Annotation Support</h4>
+<h4 id="extensions-supported-utilities-annotations"><a class="anchor" href="#extensions-supported-utilities-annotations"></a>5.10.1. アノテーションサポート</h4>
 <div class="paragraph">
-<p><code>AnnotationSupport</code> provides static utility methods that operate on annotated elements
-(e.g., packages, annotations, classes, interfaces, constructors, methods, and fields).
-These include methods to check whether an element is annotated or meta-annotated with a
-particular annotation, to search for specific annotations, and to find annotated methods
-and fields in a class or interface. Some of these methods search on implemented
-interfaces and within class hierarchies to find annotations. Consult the JavaDoc for
-<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/platform/commons/support/AnnotationSupport.html">AnnotationSupport</a></code> for further details.</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="extensions-supported-utilities-classes"><a class="anchor" href="#extensions-supported-utilities-classes"></a>5.10.2. Class Support</h4>
-<div class="paragraph">
-<p><code>ClassSupport</code> provides static utility methods for working with classes (i.e., instances
-of <code>java.lang.Class</code>). Consult the JavaDoc for <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/platform/commons/support/ClassSupport.html">ClassSupport</a></code> for further details.</p>
+<p><code>AnnotationSupport</code> は、アノテーションが付与された要素（例えば、パッケージやアノテーション、
+クラス、インターフェース、コンストラクタ、メソッド、フィールド）を操作するstatic
+なユーティリティメソッドを提供します。その中には、
+ある要素に特定のアノテーションやメタアノテーションが付与されているかチェックしたり、
+特定のアノテーションを探したり、クラスやフィールドからアノテーションの付与されたメソッドを
+探したりするメソッドが含まれます。これらのメソッドのいくつかは、
+アノテーションを探すために実装インターフェースやクラス階層を探索します。
+さらなる詳細は、<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/platform/commons/support/AnnotationSupport.html">AnnotationSupport</a></code> のJavaDocを確認してください。</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="extensions-supported-utilities-reflection"><a class="anchor" href="#extensions-supported-utilities-reflection"></a>5.10.3. Reflection Support</h4>
+<h4 id="extensions-supported-utilities-classes"><a class="anchor" href="#extensions-supported-utilities-classes"></a>5.10.2. クラスサポート</h4>
 <div class="paragraph">
-<p><code>ReflectionSupport</code> provides static utility methods that augment the standard JDK
-reflection and class-loading mechanisms. These include methods to scan the classpath in
-search of classes matching specified predicates, to load and create new instances of a
-class, and to find and invoke methods. Some of these methods traverse class hierarchies
-to locate matching methods. Consult the JavaDoc for <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/platform/commons/support/ReflectionSupport.html">ReflectionSupport</a></code> for further
-details.</p>
+<p><code>ClassSupport</code> は、クラス（つまり、<code>java.lang.Class</code> のインスタンス）を操作する
+staticなユーティリティメソッドを提供します。詳細は、<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/platform/commons/support/ClassSupport.html">ClassSupport</a></code> のJavaDoc
+を参照してください。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="extensions-supported-utilities-reflection"><a class="anchor" href="#extensions-supported-utilities-reflection"></a>5.10.3. リフレクションサポート</h4>
+<div class="paragraph">
+<p><code>ReflectionSupport</code> は、標準JDKのリフレクションとクラスロードの仕組みを強化する
+staticなユーティリティメソッドを提供します。
+その中には、指定された述語にマッチするクラスを求めてクラスパスを探索したり、
+あるクラスをロードして新しいインスタンスを作成したり、メソッドを探して実行したりする
+メソッドが含まれます。
+これらのメソッドのいくつかは、マッチするメソッドを特定するためにクラス階層を探索します。
+さらなる詳細は、<code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/platform/commons/support/ReflectionSupport.html">ReflectionSupport</a></code> のJavaDocを確認してください。</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="extensions-execution-order"><a class="anchor" href="#extensions-execution-order"></a>5.11. Relative Execution Order of User Code and Extensions</h3>
+<h3 id="extensions-execution-order"><a class="anchor" href="#extensions-execution-order"></a>5.11. ユーザーコードと拡張機能の相対的な実行順序</h3>
 <div class="paragraph">
-<p>When executing a test class that contains one or more test methods, a number of extension
-callbacks are called in addition to the user-provided test and lifecycle methods. The
-following diagram illustrates the relative order of user-provided code and extension code.</p>
+<p>1つ以上のテストメソッドを含むテストクラスを実行する場合、ユーザーが指定するテストメソッドと
+ライフサイクルメソッドに加えて、多くの拡張機能コールバックが呼び出されます。次の図は、
+ユーザーコードと拡張機能コードの相対的な実行順序を示しています。</p>
 </div>
 <div id="extensions-execution-order-diagram" class="imageblock">
 <div class="content">
 <img src="images/extensions_lifecycle.png" alt="extensions lifecycle">
 </div>
-<div class="title">User code and extension code</div>
+<div class="title">ユーザーコードと拡張機能コード</div>
 </div>
 <div class="paragraph">
-<p>User-provided test and lifecycle methods are shown in orange, with callback code provided
-by extensions shown in blue. The grey box denotes the execution of a single test method
-and will be repeated for every test method in the test class.</p>
+<p>ユーザーが提供するテストメソッドとライフサイクルメソッドはオレンジ色、
+拡張機能が提供するコールバックコードは青色で示されています。灰色のボックスは、
+単一のテストメソッドの実行を表し、テストクラス内のテストメソッド毎に繰り返されます。</p>
 </div>
 <div class="paragraph">
-<p>The following table further explains the twelve steps in the
-<a href="#extensions-execution-order-diagram">User code and extension code</a> diagram.</p>
+<p>次の表は、<a href="#extensions-execution-order-diagram">ユーザーコードと拡張機能コード</a> の図の12ステップをさらに説明しています。</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -5755,79 +5768,79 @@ and will be repeated for every test method in the test class.</p>
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Step</th>
-<th class="tableblock halign-left valign-top">Interface/Annotation</th>
-<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">ステップ</th>
+<th class="tableblock halign-left valign-top">インターフェース／アノテーション</th>
+<th class="tableblock halign-left valign-top">説明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">interface <code>org.junit.jupiter.api.extension.BeforeAllCallback</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">extension code executed before all tests of the container are executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.extension.BeforeAllCallback</code> インターフェース</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンテナのすべてのテストが実行される前に実行される拡張機能のコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">annotation <code>org.junit.jupiter.api.BeforeAll</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">user code executed before all tests of the container are executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.BeforeAll</code> アノテーション</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンテナのすべてのテストが実行される前に実行されるユーザーコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">interface <code>org.junit.jupiter.api.extension.BeforeEachCallback</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">extension code executed before each test is executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.extension.BeforeEachCallback</code> インターフェース</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">各テストが実行される前に実行される拡張機能のコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">annotation <code>org.junit.jupiter.api.BeforeEach</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">user code executed before each test is executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.BeforeEach</code> アノテーション</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">各テストが実行される前に実行されるユーザーコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">interface <code>org.junit.jupiter.api.extension.BeforeTestExecutionCallback</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">extension code executed immediately before a test is executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.extension.BeforeTestExecutionCallback</code> インターフェース</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">テストが実行される直前に実行される拡張機能のコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">6</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">annotation <code>org.junit.jupiter.api.Test</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">user code of the actual test method</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.Test</code> アノテーション</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">実際のテストメソッドとなるユーザーコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">7</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">interface <code>org.junit.jupiter.api.extension.TestExecutionExceptionHandler</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">extension code for handling exceptions thrown during a test</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.extension.TestExecutionExceptionHandler</code> インターフェース</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">テストの間に投げられた例外をハンドリングするための拡張機能のコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">interface <code>org.junit.jupiter.api.extension.AfterTestExecutionCallback</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">extension code executed immediately after test execution and its corresponding exception handlers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.extension.AfterTestExecutionCallback</code> インターフェース</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">テストが実行され、その例外ハンドラが処理された直後に実行される拡張機能のコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">9</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">annotation <code>org.junit.jupiter.api.AfterEach</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">user code executed after each test is executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.AfterEach</code> アノテーション</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">各テストが実行された後に実行されるユーザーコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">interface <code>org.junit.jupiter.api.extension.AfterEachCallback</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">extension code executed after each test is executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.extension.AfterEachCallback</code> インターフェース</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">各テストが実行された後に実行される拡張機能のコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">annotation <code>org.junit.jupiter.api.AfterAll</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">user code executed after all tests of the container are executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.AfterAll</code> アノテーション</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンテナのすべてのテストが実行された後に実行されるユーザーコード</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">12</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">interface <code>org.junit.jupiter.api.extension.AfterAllCallback</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">extension code executed after all tests of the container are executed</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>org.junit.jupiter.api.extension.AfterAllCallback</code> インターフェース</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">コンテナのすべてのテストが実行された後に実行される拡張機能のコード</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>In the simplest case only the actual test method will be executed (step 6); all other
-steps are optional depending on the presence of user code or extension support for the
-corresponding lifecycle callback. For further details on the various lifecycle callbacks
-please consult the respective JavaDoc for each annotation and extension.</p>
+<p>最も単純な場合は、実際のテストメソッドだけが実行されます (ステップ 6)。
+ほかのすべてのステップは、ライフサイクルコールバックに対するユーザーコードや拡張機能コードの
+有無によって省略可能です。様々なライフサイクルコールバックに関する詳細については、
+各アノテーションや拡張機能に対する JavaDoc を参照してください。</p>
 </div>
 </div>
 </div>
@@ -6397,7 +6410,7 @@ declarations.</p>
 <div id="footer">
 <div id="footer-text">
 Version 5.2.0<br>
-Last updated 2018-04-30 06:01:23 JST
+Last updated 2018-05-06 21:00:29 JST
 </div>
 </div>
 </body>
