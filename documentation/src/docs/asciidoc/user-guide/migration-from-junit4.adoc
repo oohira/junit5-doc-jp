@@ -1,39 +1,38 @@
 [[migrating-from-junit4]]
-== Migrating from JUnit 4
+== JUnit 4からの移行
 
-Although the JUnit Jupiter programming model and extension model will not support JUnit 4
-features such as `Rules` and `Runners` natively, it is not expected that source code
-maintainers will need to update all of their existing tests, test extensions, and custom
-build test infrastructure to migrate to JUnit Jupiter.
+JUnit Jupiterのプログラミングモデルと拡張モデルは、`Rule` や `Runner`
+のようなJUnit 4の機能をネイティブにはサポートしていません。しかし、
+ソースコードのメンテナがJUnit Jupiterへ移行するためにすべての既存テストやテスト拡張、
+カスタムビルド基盤を書き換えることを求めているわけではありません。
 
-Instead, JUnit provides a gentle migration path via a _JUnit Vintage test engine_ which
-allows existing tests based on JUnit 3 and JUnit 4 to be executed using the JUnit
-Platform infrastructure. Since all classes and annotations specific to JUnit Jupiter
-reside under a new `org.junit.jupiter` base package, having both JUnit 4 and JUnit
-Jupiter in the classpath does not lead to any conflicts. It is therefore safe to maintain
-existing JUnit 4 tests alongside JUnit Jupiter tests. Furthermore, since the JUnit team
-will continue to provide maintenance and bug fix releases for the JUnit 4.x baseline,
-developers have plenty of time to migrate to JUnit Jupiter on their own schedule.
+代わりに、JUnit Platform上でJUnit 3またはJUnit 4ベースの既存テストを実行できる
+ようにする _JUnit Vintageテストエンジン_ を通して、なだらかな移行パスを提供しています。
+JUnit Jupiter固有のクラスやアノテーションはすべて新設された `org.junit.jupiter`
+パッケージ配下にあるため、JUnit 4とJUnit Jupiterが同時にクラスパスに含まれていても
+コンフリクトは発生しません。そのため、既存のJUnit 4テストをJUnit Jupiter
+テストと並行してメンテナンスしても安全です。さらに、JUnitチームはJUnit 4.x
+系のメンテナンスとバグフィックスリリースを継続しているため、
+開発者は自身のスケジュールに合わせてJUnit Jupiterに移行する十分な時間があります。
 
 [[migrating-from-junit4-running]]
-=== Running JUnit 4 Tests on the JUnit Platform
+=== JUnit Platform上でJUnit 4テストを実行する
 
-Just make sure that the `junit-vintage-engine` artifact is in your test runtime path. In
-that case JUnit 3 and JUnit 4 tests will automatically be picked up by the JUnit Platform
-launcher.
+`junit-vintage-engine` がテストランタイムパスに含まれていることを確認してください。
+そうすれば、JUnit Platformランチャーが、JUnit 3およびJUnit 4のテストを自動的に
+ピックアップしてくれます。
 
-See the example projects in the {junit5-samples-repo}[`junit5-samples`] repository to
-find out how this is done with Gradle and Maven.
+{junit5-samples-repo}[`junit5-samples`] リポジトリにあるサンプルプロジェクトを
+参照して、GradleやMavenでどのように実現するか確認してください。
 
 [[migrating-from-junit4-categories-support]]
-==== Categories Support
+==== カテゴリのサポート
 
-For test classes or methods that are annotated with `@Category`, the
-_JUnit Vintage test engine_ exposes the category's fully qualified class name as a tag
-of the corresponding test identifier. For example, if a test method is annotated with
-`@Category(Example.class)`, it will be tagged with `"com.acme.Example"`. Similar to the
-`Categories` runner in JUnit 4, this information can be used to filter the discovered
-tests before executing them (see <<running-tests>> for details).
+`@Category` アノテーションの付与されたテストクラスやテストメソッドに対しては、
+_JUnit Vintageテストエンジン_ はカテゴリの完全修飾クラス名を該当テストのタグとみなします。
+例えば、テストメソッドに `@Category(Example.class)` アノテーションが付与されている場合、
+`"com.acme.Example"` でタグ付けされます。JUnit 4の `Categories` ランナーと同様に、
+この情報は実行するテストのフィルタリングに使われます (詳細は、<<running-tests>> 参照)。
 
 [[migrating-from-junit4-tips]]
 === Migration Tips
