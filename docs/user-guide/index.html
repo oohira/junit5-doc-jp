@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.6.1">
 <meta name="author" content="Stefan Bechtold, Sam Brannen, Johannes Link, Matthias Merdes, Marc Philipp, Christian Stein">
-<title>WIP: JUnit 5 ユーザーガイド</title>
+<title>JUnit 5 ユーザーガイド</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -531,7 +531,7 @@ table.CodeRay td.code>pre{padding:0}
 </head>
 <body id="user-guide" class="article toc2 toc-left">
 <div id="header">
-<h1>WIP: JUnit 5 ユーザーガイド</h1>
+<h1>JUnit 5 ユーザーガイド</h1>
 <div class="details">
 <span id="author" class="author">Stefan Bechtold</span><br>
 <span id="author2" class="author">Sam Brannen</span><br>
@@ -604,11 +604,11 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#extensions-execution-order">5.11. ユーザーコードと拡張機能の相対的な実行順序</a></li>
 </ul>
 </li>
-<li><a href="#migrating-from-junit4">6. Migrating from JUnit 4</a>
+<li><a href="#migrating-from-junit4">6. JUnit 4からの移行</a>
 <ul class="sectlevel2">
-<li><a href="#migrating-from-junit4-running">6.1. Running JUnit 4 Tests on the JUnit Platform</a></li>
-<li><a href="#migrating-from-junit4-tips">6.2. Migration Tips</a></li>
-<li><a href="#migrating-from-junit4-rule-support">6.3. Limited JUnit 4 Rule Support</a></li>
+<li><a href="#migrating-from-junit4-running">6.1. JUnit Platform上でJUnit 4テストを実行する</a></li>
+<li><a href="#migrating-from-junit4-tips">6.2. 移行のヒント</a></li>
+<li><a href="#migrating-from-junit4-rule-support">6.3. JUnit 4のルールの限定的なサポート</a></li>
 </ul>
 </li>
 <li><a href="#advanced-topics">7. Advanced Topics</a>
@@ -5846,109 +5846,108 @@ staticなユーティリティメソッドを提供します。
 </div>
 </div>
 <div class="sect1">
-<h2 id="migrating-from-junit4"><a class="anchor" href="#migrating-from-junit4"></a>6. Migrating from JUnit 4</h2>
+<h2 id="migrating-from-junit4"><a class="anchor" href="#migrating-from-junit4"></a>6. JUnit 4からの移行</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Although the JUnit Jupiter programming model and extension model will not support JUnit 4
-features such as <code>Rules</code> and <code>Runners</code> natively, it is not expected that source code
-maintainers will need to update all of their existing tests, test extensions, and custom
-build test infrastructure to migrate to JUnit Jupiter.</p>
+<p>JUnit Jupiterのプログラミングモデルと拡張モデルは、<code>Rule</code> や <code>Runner</code>
+のようなJUnit 4の機能をネイティブにはサポートしていません。しかし、
+ソースコードのメンテナがJUnit Jupiterへ移行するためにすべての既存テストやテスト拡張、
+カスタムビルド基盤を書き換えることを求めているわけではありません。</p>
 </div>
 <div class="paragraph">
-<p>Instead, JUnit provides a gentle migration path via a <em>JUnit Vintage test engine</em> which
-allows existing tests based on JUnit 3 and JUnit 4 to be executed using the JUnit
-Platform infrastructure. Since all classes and annotations specific to JUnit Jupiter
-reside under a new <code>org.junit.jupiter</code> base package, having both JUnit 4 and JUnit
-Jupiter in the classpath does not lead to any conflicts. It is therefore safe to maintain
-existing JUnit 4 tests alongside JUnit Jupiter tests. Furthermore, since the JUnit team
-will continue to provide maintenance and bug fix releases for the JUnit 4.x baseline,
-developers have plenty of time to migrate to JUnit Jupiter on their own schedule.</p>
+<p>代わりに、JUnit Platform上でJUnit 3またはJUnit 4ベースの既存テストを実行できる
+ようにする <em>JUnit Vintageテストエンジン</em> を通して、なだらかな移行パスを提供しています。
+JUnit Jupiter固有のクラスやアノテーションはすべて新設された <code>org.junit.jupiter</code>
+パッケージ配下にあるため、JUnit 4とJUnit Jupiterが同時にクラスパスに含まれていても
+コンフリクトは発生しません。そのため、既存のJUnit 4テストをJUnit Jupiter
+テストと並行してメンテナンスしても安全です。さらに、JUnitチームはJUnit 4.x
+系のメンテナンスとバグフィックスリリースを継続しているため、
+開発者は自身のスケジュールに合わせてJUnit Jupiterに移行する十分な時間があります。</p>
 </div>
 <div class="sect2">
-<h3 id="migrating-from-junit4-running"><a class="anchor" href="#migrating-from-junit4-running"></a>6.1. Running JUnit 4 Tests on the JUnit Platform</h3>
+<h3 id="migrating-from-junit4-running"><a class="anchor" href="#migrating-from-junit4-running"></a>6.1. JUnit Platform上でJUnit 4テストを実行する</h3>
 <div class="paragraph">
-<p>Just make sure that the <code>junit-vintage-engine</code> artifact is in your test runtime path. In
-that case JUnit 3 and JUnit 4 tests will automatically be picked up by the JUnit Platform
-launcher.</p>
+<p><code>junit-vintage-engine</code> がテストランタイムパスに含まれていることを確認してください。
+そうすれば、JUnit Platformランチャーが、JUnit 3およびJUnit 4のテストを自動的に
+ピックアップしてくれます。</p>
 </div>
 <div class="paragraph">
-<p>See the example projects in the <a href="https://github.com/junit-team/junit5-samples"><code>junit5-samples</code></a> repository to
-find out how this is done with Gradle and Maven.</p>
+<p><a href="https://github.com/junit-team/junit5-samples"><code>junit5-samples</code></a> リポジトリにあるサンプルプロジェクトを
+参照して、GradleやMavenでどのように実現するか確認してください。</p>
 </div>
 <div class="sect3">
-<h4 id="migrating-from-junit4-categories-support"><a class="anchor" href="#migrating-from-junit4-categories-support"></a>6.1.1. Categories Support</h4>
+<h4 id="migrating-from-junit4-categories-support"><a class="anchor" href="#migrating-from-junit4-categories-support"></a>6.1.1. カテゴリのサポート</h4>
 <div class="paragraph">
-<p>For test classes or methods that are annotated with <code>@Category</code>, the
-<em>JUnit Vintage test engine</em> exposes the category&#8217;s fully qualified class name as a tag
-of the corresponding test identifier. For example, if a test method is annotated with
-<code>@Category(Example.class)</code>, it will be tagged with <code>"com.acme.Example"</code>. Similar to the
-<code>Categories</code> runner in JUnit 4, this information can be used to filter the discovered
-tests before executing them (see <a href="#running-tests">テストを実行する</a> for details).</p>
+<p><code>@Category</code> アノテーションの付与されたテストクラスやテストメソッドに対しては、
+<em>JUnit Vintageテストエンジン</em> はカテゴリの完全修飾クラス名を該当テストのタグとみなします。
+例えば、テストメソッドに <code>@Category(Example.class)</code> アノテーションが付与されている場合、
+<code>"com.acme.Example"</code> でタグ付けされます。JUnit 4の <code>Categories</code> ランナーと同様に、
+この情報は実行するテストのフィルタリングに使われます (詳細は、<a href="#running-tests">テストを実行する</a> 参照)。</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="migrating-from-junit4-tips"><a class="anchor" href="#migrating-from-junit4-tips"></a>6.2. Migration Tips</h3>
+<h3 id="migrating-from-junit4-tips"><a class="anchor" href="#migrating-from-junit4-tips"></a>6.2. 移行のヒント</h3>
 <div class="paragraph">
-<p>The following are things you have to watch out for when migrating existing JUnit 4 tests
-to JUnit Jupiter.</p>
+<p>既存のJUnit 4テストをJUnit Jupiterに移行するときに気をつけなければいけないことは、
+次の通りです。</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Annotations reside in the <code>org.junit.jupiter.api</code> package.</p>
+<p>アノテーションは、<code>org.junit.jupiter.api</code> パッケージにあります。</p>
 </li>
 <li>
-<p>Assertions reside in <code>org.junit.jupiter.api.Assertions</code>.</p>
+<p>アサーションは、<code>org.junit.jupiter.api.Assertions</code> にあります。</p>
 </li>
 <li>
-<p>Assumptions reside in <code>org.junit.jupiter.api.Assumptions</code>.</p>
+<p>前提条件は、<code>org.junit.jupiter.api.Assumptions</code> にあります。</p>
 </li>
 <li>
-<p><code>@Before</code> and <code>@After</code> no longer exist; use <code>@BeforeEach</code> and <code>@AfterEach</code> instead.</p>
+<p><code>@Before</code> と <code>@After</code> は、なくなりました。代わりに、<code>@BeforeEach</code> と <code>@AfterEach</code> を使ってください。</p>
 </li>
 <li>
-<p><code>@BeforeClass</code> and <code>@AfterClass</code> no longer exist; use <code>@BeforeAll</code> and <code>@AfterAll</code> instead.</p>
+<p><code>@BeforeClass</code> と <code>@AfterClass</code> は、なくなりました。代わりに、<code>@BeforeAll</code> と <code>@AfterAll</code> を使ってください。</p>
 </li>
 <li>
-<p><code>@Ignore</code> no longer exists: use <code>@Disabled</code> instead.</p>
+<p><code>@Ignore</code> は、なくなりました。代わりに、<code>@Disabled</code> を使ってください。</p>
 </li>
 <li>
-<p><code>@Category</code> no longer exists; use <code>@Tag</code> instead.</p>
+<p><code>@Category</code> は、なくなりました。代わりに、<code>@Tag</code> を使ってください。</p>
 </li>
 <li>
-<p><code>@RunWith</code> no longer exists; superseded by <code>@ExtendWith</code>.</p>
+<p><code>@RunWith</code> は、なくなりました。<code>@ExtendWith</code> に置き換えられました。</p>
 </li>
 <li>
-<p><code>@Rule</code> and <code>@ClassRule</code> no longer exist; superseded by <code>@ExtendWith</code>;
-see the following section for partial rule support.</p>
+<p><code>@Rule</code> と <code>@ClassRule</code> は、なくなりました。<code>@ExtendWith</code> に置き換えられました。
+部分的なルールのサポートについては、次節を参照してください。</p>
 </li>
 </ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="migrating-from-junit4-rule-support"><a class="anchor" href="#migrating-from-junit4-rule-support"></a>6.3. Limited JUnit 4 Rule Support</h3>
+<h3 id="migrating-from-junit4-rule-support"><a class="anchor" href="#migrating-from-junit4-rule-support"></a>6.3. JUnit 4のルールの限定的なサポート</h3>
 <div class="paragraph">
-<p>As stated above, JUnit Jupiter does not and will not support JUnit 4 rules natively. The
-JUnit team realizes, however, that many organizations, especially large ones, are likely
-to have large JUnit 4 code bases that make use of custom rules. To serve these
-organizations and enable a gradual migration path the JUnit team has decided to support a
-selection of JUnit 4 rules verbatim within JUnit Jupiter. This support is based on
-adapters and is limited to those rules that are semantically compatible to the JUnit
-Jupiter extension model, i.e. those that do not completely change the overall execution
-flow of the test.</p>
+<p>前述したように、JUnit JupiterはJUnit 4のルールをサポートしていませんし、
+その予定もありません。しかし、JUnitチームは、多くの組織が（特に大きな組織ほど）
+カスタムルールを使ったJUnit 4のコードベースを保持していることを理解しています。
+このような組織に段階的な移行パスを用意するため、JUnitチームはJUnit Jupiter
+でJUnit 4のルールをサポートすることを決めました。
+このサポートはアダプタをベースにしており、JUnit Jupiterの拡張モデルと意味的に
+互換性があるルールに限定されています。
+例えば、テストの実行フローを完全に変えてしまうようなことがないものです。</p>
 </div>
 <div class="paragraph">
-<p>The <code>junit-jupiter-migrationsupport</code> module from JUnit Jupiter currently supports the
-following three <code>Rule</code> types including subclasses of those types:</p>
+<p>JUnit Jupiterの <code>junit-jupiter-migrationsupport</code> モジュールは、
+今のところ次の3つの <code>Rule</code> とそのサブクラスをサポートしています。</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><code>org.junit.rules.ExternalResource</code> (including <code>org.junit.rules.TemporaryFolder</code>)</p>
+<p><code>org.junit.rules.ExternalResource</code> (<code>org.junit.rules.TemporaryFolder</code> も含む)</p>
 </li>
 <li>
-<p><code>org.junit.rules.Verifier</code> (including <code>org.junit.rules.ErrorCollector</code>)</p>
+<p><code>org.junit.rules.Verifier</code> (<code>org.junit.rules.ErrorCollector</code> も含む)</p>
 </li>
 <li>
 <p><code>org.junit.rules.ExpectedException</code></p>
@@ -5956,19 +5955,20 @@ following three <code>Rule</code> types including subclasses of those types:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>As in JUnit 4, Rule-annotated fields as well as methods are supported. By using these
-class-level extensions on a test class such <code>Rule</code> implementations in legacy code bases
-can be <em>left unchanged</em> including the JUnit 4 rule import statements.</p>
+<p>JUnit 4と同様に、Ruleアノテーションが付与されたフィールドとメソッドをサポートします。
+これらのクラスレベルの拡張機能を使うことで、レガシーコードがもつ <code>Rule</code>
+実装をJUnit 4のimport文も含めて <em>変更せずにそのままにしておく</em> ことができます。</p>
 </div>
 <div class="paragraph">
-<p>This limited form of <code>Rule</code> support can be switched on by the class-level annotation
-<code>org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport</code>. This annotation is
-a <em>composed annotation</em> which enables all migration support extensions:
-<code>VerifierSupport</code>, <code>ExternalResourceSupport</code>, and <code>ExpectedExceptionSupport</code>.</p>
+<p>この限定的な形での <code>Rule</code> サポートは、クラスレベルのアノテーション
+<code>org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport</code>
+を使って有効にすることができます。このアノテーションは、
+<code>VerifierSupport</code>, <code>ExternalResourceSupport</code>, <code>ExpectedExceptionSupport</code>
+のすべての移行サポート拡張を有効にするための <em>合成アノテーション</em> になっています。</p>
 </div>
 <div class="paragraph">
-<p>However, if you intend to develop a new extension for JUnit 5 please use the new
-extension model of JUnit Jupiter instead of the rule-based model of JUnit 4.</p>
+<p>なお、JUnit 5に対する新しい拡張機能を開発するときには、JUnit 4
+のルールベースのモデルではなく、JUnit Jupiterの拡張モデルを使ってください。</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -5977,8 +5977,9 @@ extension model of JUnit Jupiter instead of the rule-based model of JUnit 4.</p>
 <i class="fa icon-warning" title="Warning"></i>
 </td>
 <td class="content">
-JUnit 4 <code>Rule</code> support in JUnit Jupiter is currently an <em>experimental</em> feature.
-Consult the table in <a href="#api-evolution-experimental-apis">Experimental APIs</a> for detail.
+JUnit JupiterにおけるJUnit 4の <code>Rule</code> サポートは、今のところ
+<em>実験的な</em> 機能です。詳細は、<a href="#api-evolution-experimental-apis">Experimental APIs</a>
+の表を確認してください。
 </td>
 </tr>
 </table>
@@ -6410,7 +6411,7 @@ declarations.</p>
 <div id="footer">
 <div id="footer-text">
 Version 5.2.0<br>
-Last updated 2018-05-06 21:00:29 JST
+Last updated 2018-05-26 00:03:16 JST
 </div>
 </div>
 </body>
