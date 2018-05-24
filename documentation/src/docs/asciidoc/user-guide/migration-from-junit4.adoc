@@ -35,21 +35,21 @@ _JUnit Vintageテストエンジン_ はカテゴリの完全修飾クラス名�
 この情報は実行するテストのフィルタリングに使われます (詳細は、<<running-tests>> 参照)。
 
 [[migrating-from-junit4-tips]]
-=== Migration Tips
+=== 移行のヒント
 
-The following are things you have to watch out for when migrating existing JUnit 4 tests
-to JUnit Jupiter.
+既存のJUnit 4テストをJUnit Jupiterに移行するときに気をつけなければいけないことは、
+次の通りです。
 
-* Annotations reside in the `org.junit.jupiter.api` package.
-* Assertions reside in `org.junit.jupiter.api.Assertions`.
-* Assumptions reside in `org.junit.jupiter.api.Assumptions`.
-* `@Before` and `@After` no longer exist; use `@BeforeEach` and `@AfterEach` instead.
-* `@BeforeClass` and `@AfterClass` no longer exist; use `@BeforeAll` and `@AfterAll` instead.
-* `@Ignore` no longer exists: use `@Disabled` instead.
-* `@Category` no longer exists; use `@Tag` instead.
-* `@RunWith` no longer exists; superseded by `@ExtendWith`.
-* `@Rule` and `@ClassRule` no longer exist; superseded by `@ExtendWith`;
-   see the following section for partial rule support.
+* アノテーションは、`org.junit.jupiter.api` パッケージにあります。
+* アサーションは、`org.junit.jupiter.api.Assertions` にあります。
+* 前提条件は、`org.junit.jupiter.api.Assumptions` にあります。
+* `@Before` と `@After` は、なくなりました。代わりに、`@BeforeEach` と `@AfterEach` を使ってください。
+* `@BeforeClass` と `@AfterClass` は、なくなりました。代わりに、`@BeforeAll` と `@AfterAll` を使ってください。
+* `@Ignore` は、なくなりました。代わりに、`@Disabled` を使ってください。
+* `@Category` は、なくなりました。代わりに、`@Tag` を使ってください。
+* `@RunWith` は、なくなりました。`@ExtendWith` に置き換えられました。
+* `@Rule` と `@ClassRule` は、なくなりました。`@ExtendWith` に置き換えられました。
+   部分的なルールのサポートについては、次節を参照してください。
 
 [[migrating-from-junit4-rule-support]]
 === Limited JUnit 4 Rule Support
