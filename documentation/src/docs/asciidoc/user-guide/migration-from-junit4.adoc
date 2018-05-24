@@ -52,35 +52,37 @@ _JUnit Vintageテストエンジン_ はカテゴリの完全修飾クラス名�
    部分的なルールのサポートについては、次節を参照してください。
 
 [[migrating-from-junit4-rule-support]]
-=== Limited JUnit 4 Rule Support
+=== JUnit 4のルールの限定的なサポート
 
-As stated above, JUnit Jupiter does not and will not support JUnit 4 rules natively. The
-JUnit team realizes, however, that many organizations, especially large ones, are likely
-to have large JUnit 4 code bases that make use of custom rules. To serve these
-organizations and enable a gradual migration path the JUnit team has decided to support a
-selection of JUnit 4 rules verbatim within JUnit Jupiter. This support is based on
-adapters and is limited to those rules that are semantically compatible to the JUnit
-Jupiter extension model, i.e. those that do not completely change the overall execution
-flow of the test.
+前述したように、JUnit JupiterはJUnit 4のルールをサポートしていませんし、
+その予定もありません。しかし、JUnitチームは、多くの組織が（特に大きな組織ほど）
+カスタムルールを使ったJUnit 4のコードベースを保持していることを理解しています。
+このような組織に段階的な移行パスを用意するため、JUnitチームはJUnit Jupiter
+でJUnit 4のルールをサポートすることを決めました。
+このサポートはアダプタをベースにしており、JUnit Jupiterの拡張モデルと意味的に
+互換性があるルールに限定されています。
+例えば、テストの実行フローを完全に変えてしまうようなことがないものです。
 
-The `junit-jupiter-migrationsupport` module from JUnit Jupiter currently supports the
-following three `Rule` types including subclasses of those types:
+JUnit Jupiterの `junit-jupiter-migrationsupport` モジュールは、
+今のところ次の3つの `Rule` とそのサブクラスをサポートしています。
 
-* `org.junit.rules.ExternalResource` (including `org.junit.rules.TemporaryFolder`)
-* `org.junit.rules.Verifier` (including `org.junit.rules.ErrorCollector`)
+* `org.junit.rules.ExternalResource` (`org.junit.rules.TemporaryFolder` も含む)
+* `org.junit.rules.Verifier` (`org.junit.rules.ErrorCollector` も含む)
 * `org.junit.rules.ExpectedException`
 
-As in JUnit 4, Rule-annotated fields as well as methods are supported. By using these
-class-level extensions on a test class such `Rule` implementations in legacy code bases
-can be _left unchanged_ including the JUnit 4 rule import statements.
+JUnit 4と同様に、Ruleアノテーションが付与されたフィールドとメソッドをサポートします。
+これらのクラスレベルの拡張機能を使うことで、レガシーコードがもつ `Rule`
+実装をJUnit 4のimport文も含めて _変更せずにそのままにしておく_ ことができます。
 
-This limited form of `Rule` support can be switched on by the class-level annotation
-`org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport`. This annotation is
-a _composed annotation_ which enables all migration support extensions:
-`VerifierSupport`, `ExternalResourceSupport`, and `ExpectedExceptionSupport`.
+この限定的な形での `Rule` サポートは、クラスレベルのアノテーション
+`org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport`
+を使って有効にすることができます。このアノテーションは、
+`VerifierSupport`, `ExternalResourceSupport`, `ExpectedExceptionSupport`
+のすべての移行サポート拡張を有効にするための _合成アノテーション_ になっています。
 
-However, if you intend to develop a new extension for JUnit 5 please use the new
-extension model of JUnit Jupiter instead of the rule-based model of JUnit 4.
+なお、JUnit 5に対する新しい拡張機能を開発するときには、JUnit 4
+のルールベースのモデルではなく、JUnit Jupiterの拡張モデルを使ってください。
 
-WARNING: JUnit 4 `Rule` support in JUnit Jupiter is currently an _experimental_ feature.
-Consult the table in <<api-evolution-experimental-apis>> for detail.
+WARNING: JUnit JupiterにおけるJUnit 4の `Rule` サポートは、今のところ
+_実験的な_ 機能です。詳細は、<<api-evolution-experimental-apis>>
+の表を確認してください。
