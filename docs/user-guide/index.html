@@ -616,14 +616,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#launcher-api">7.1. JUnit Platform Launcher API</a></li>
 </ul>
 </li>
-<li><a href="#api-evolution">8. API Evolution</a>
+<li><a href="#api-evolution">8. APIの進化</a>
 <ul class="sectlevel2">
-<li><a href="#api-evolution-version-and-status">8.1. API Version and Status</a></li>
-<li><a href="#api-evolution-experimental-apis">8.2. Experimental APIs</a></li>
-<li><a href="#api-evolution-tooling">8.3. @API Tooling Support</a></li>
+<li><a href="#api-evolution-version-and-status">8.1. APIバージョンとステータス</a></li>
+<li><a href="#api-evolution-experimental-apis">8.2. 実験的なAPI</a></li>
+<li><a href="#api-evolution-tooling">8.3. @APIツールサポート</a></li>
 </ul>
 </li>
-<li><a href="#contributors">9. Contributors</a></li>
+<li><a href="#contributors">9. コントリビューター</a></li>
 <li><a href="#release-notes">10. リリースノート</a></li>
 </ul>
 </div>
@@ -1043,7 +1043,7 @@ JUnit JupiterベースとJUnit Vintageベースのプロジェクトの様々な
 </td>
 <td class="content">
 いくつかのアノテーションは現在 <em>実験中</em> です。詳細は、
-<a href="#api-evolution-experimental-apis">Experimental APIs</a> のテーブルを参照してください。
+<a href="#api-evolution-experimental-apis">実験的なAPI</a> のテーブルを参照してください。
 </td>
 </tr>
 </table>
@@ -1687,7 +1687,7 @@ JUnit Jupiterの前提条件メソッドは、すべて <code><a href="https://j
 </td>
 <td class="content">
 <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/condition/EnabledIf.html">@EnabledIf</a></code> および <code><a href="https://junit.org/junit5/docs/5.2.0/api/org/junit/jupiter/api/condition/DisabledIf.html">@DisabledIf</a></code> を使った条件付きテスト実行は、
-現在 <em>試験的な</em> 機能です。詳細は、<a href="#api-evolution-experimental-apis">Experimental APIs</a>
+現在 <em>試験的な</em> 機能です。詳細は、<a href="#api-evolution-experimental-apis">実験的なAPI</a>
 のテーブルを参考にしてください。
 </td>
 </tr>
@@ -2776,7 +2776,7 @@ Gradle プラグインで <code>RepeatedTestsDemo</code> を実行すると、�
 </td>
 <td class="content">
 パラーメーター化テストは、現在 <em>実験中</em> の機能です。
-詳細は、<a href="#api-evolution-experimental-apis">Experimental APIs</a> の表を確認してください。
+詳細は、<a href="#api-evolution-experimental-apis">実験的なAPI</a> の表を確認してください。
 </td>
 </tr>
 </table>
@@ -3738,7 +3738,7 @@ IDEのテストツリーの中に1つずつ表示されます。同じテスト�
 </td>
 <td class="content">
 動的テストは現在 <em>実験中</em> の機能です。詳細は、
-<a href="#api-evolution-experimental-apis">Experimental APIs</a> の表を参照してください。
+<a href="#api-evolution-experimental-apis">実験的なAPI</a> の表を参照してください。
 </td>
 </tr>
 </table>
@@ -5978,7 +5978,7 @@ JUnit Jupiter固有のクラスやアノテーションはすべて新設され�
 </td>
 <td class="content">
 JUnit JupiterにおけるJUnit 4の <code>Rule</code> サポートは、今のところ
-<em>実験的な</em> 機能です。詳細は、<a href="#api-evolution-experimental-apis">Experimental APIs</a>
+<em>実験的な</em> 機能です。詳細は、<a href="#api-evolution-experimental-apis">実験的なAPI</a>
 の表を確認してください。
 </td>
 </tr>
@@ -6142,25 +6142,26 @@ and registered automatically.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="api-evolution"><a class="anchor" href="#api-evolution"></a>8. API Evolution</h2>
+<h2 id="api-evolution"><a class="anchor" href="#api-evolution"></a>8. APIの進化</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>One of the major goals of JUnit 5 is to improve maintainers' capabilities to evolve JUnit
-despite its being used in many projects. With JUnit 4 a lot of stuff that was originally
-added as an internal construct only got used by external extension writers and tool
-builders. That made changing JUnit 4 especially difficult and sometimes impossible.</p>
+<p>JUnit 5の主要な目的の1つは、JUnitが多くのプロジェクトで使われていたとしても、
+メンテナがJUnitを進化させられるようにすることです。
+JUnit 4では多くの部品が元々は内部用途で追加されましたが、
+外部の拡張機能やツールの作者から使われることになりました。
+そのせいで、JUnit 4の変更はとりわけ難しく、ときには不可能になりました。</p>
 </div>
 <div class="paragraph">
-<p>That&#8217;s why JUnit 5 introduces a defined lifecycle for all publicly available interfaces,
-classes, and methods.</p>
+<p>JUnit 5がすべての公開インターフェースやクラス、メソッドに対して明確に定義された
+ライフサイクルを導入したのはこのためです。</p>
 </div>
 <div class="sect2">
-<h3 id="api-evolution-version-and-status"><a class="anchor" href="#api-evolution-version-and-status"></a>8.1. API Version and Status</h3>
+<h3 id="api-evolution-version-and-status"><a class="anchor" href="#api-evolution-version-and-status"></a>8.1. APIバージョンとステータス</h3>
 <div class="paragraph">
-<p>Every published artifact has a version number <code>&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</code>, and all publicly
-available interfaces, classes, and methods are annotated with <a href="https://apiguardian-team.github.io/apiguardian/docs/current/api/">@API</a> from the
-<a href="https://github.com/apiguardian-team/apiguardian">@API Guardian</a> project. The annotation&#8217;s <code>status</code> attribute can be assigned one of the
-following values.</p>
+<p>公開されているモジュールは <code>&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</code> というバージョン番号をもち、
+すべての公開インターフェース、クラス、メソッドには <a href="https://github.com/apiguardian-team/apiguardian">@API Guardian</a> プロジェクトの
+<a href="https://apiguardian-team.github.io/apiguardian/docs/current/api/">@API</a> アノテーションが付与されています。このアノテーションの <code>status</code> 属性には、
+次のいずれかの値が設定されています。</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -6169,49 +6170,48 @@ following values.</p>
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Status</th>
-<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">ステータス</th>
+<th class="tableblock halign-left valign-top">説明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>INTERNAL</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Must not be used by any code other than JUnit itself. Might be removed without prior notice.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JUnit自身以外のコードで使ってはならない。事前予告なしに削除されうる。</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>DEPRECATED</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Should no longer be used; might disappear in the next minor release.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">もう使うべきではない。次のマイナー (minor) リリースで削除されうる。</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>EXPERIMENTAL</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Intended for new, experimental features where we are looking for feedback.<br>
-                     Use this element with caution; it might be promoted to <code>MAINTAINED</code> or
-                     <code>STABLE</code> in the future, but might also be removed without prior notice, even in a patch.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">フィードバックがほしい実験的な新機能を意味する。注意して使うべき。<br>
+                     将来 <code>MAINTAINED</code> または <code>STABLE</code> に昇格される可能性がある一方で、
+                     パッチ (patch) リリースでも事前予告なしに削除されうる。</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>MAINTAINED</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Intended for features that will not be changed in a backwards-
-                     incompatible way for <strong>at least</strong> the next minor release of the current
-                     major version. If scheduled for removal, it will be demoted to <code>DEPRECATED</code> first.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のメジャー (major) バージョンの <strong>少なくとも</strong> 次のマイナー (minor)
+                     リリースでは、後方互換性がない方法で変更されることがない機能を意味する。
+                     削除予定になった場合は、まず最初に <code>DEPRECATED</code> に降格される。</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>STABLE</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Intended for features that will not be changed in a backwards-
-                     incompatible way in the current major version (<code>5.*</code>).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">現在のメジャーバージョン (<code>5.*</code>) の間は、
+                     後方互換性がない方法で変更されることがない機能を意味する。</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>If the <code>@API</code> annotation is present on a type, it is considered to be applicable for all
-public members of that type as well. A member is allowed to declare a different <code>status</code>
-value of lower stability.</p>
+<p><code>@API</code> アノテーションが型に付与された場合、その型のすべての公開メンバーに適用されているとみなします。
+個々のメンバーは、より低い安定度をもつ異なる <code>status</code> 属性を宣言することができます。</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="api-evolution-experimental-apis"><a class="anchor" href="#api-evolution-experimental-apis"></a>8.2. Experimental APIs</h3>
+<h3 id="api-evolution-experimental-apis"><a class="anchor" href="#api-evolution-experimental-apis"></a>8.2. 実験的なAPI</h3>
 <div class="paragraph">
-<p>The following table lists which APIs are currently designated as <em>experimental</em> (via
-<code>@API(status = EXPERIMENTAL)</code>). Caution should be taken when relying on such APIs.</p>
+<p>次の表は、現在 <em>実験的</em> (<code>@API(status = EXPERIMENTAL)</code>) と指定されたAPIを一覧しています。
+これらのAPIを使う場合は注意してください。</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -6381,21 +6381,20 @@ value of lower stability.</p>
 </table>
 </div>
 <div class="sect2">
-<h3 id="api-evolution-tooling"><a class="anchor" href="#api-evolution-tooling"></a>8.3. @API Tooling Support</h3>
+<h3 id="api-evolution-tooling"><a class="anchor" href="#api-evolution-tooling"></a>8.3. @APIツールサポート</h3>
 <div class="paragraph">
-<p>The <a href="https://github.com/apiguardian-team/apiguardian">@API Guardian</a> project plans to provide tooling support for publishers and consumers
-of APIs annotated with <a href="https://apiguardian-team.github.io/apiguardian/docs/current/api/">@API</a>. For example, the tooling support will likely provide a
-means to check if JUnit APIs are being used in accordance with <code>@API</code> annotation
-declarations.</p>
+<p><a href="https://github.com/apiguardian-team/apiguardian">@API Guardian</a> プロジェクトは、 <a href="https://apiguardian-team.github.io/apiguardian/docs/current/api/">@API</a> アノテーションが付与されたAPIの提供者や利用者のために、
+ツールによるサポートを計画しています。例えば、JUnitのAPIが <code>@API</code>
+アノテーションの宣言にしたがって使われているかをチェックする手段を提供するなどです。</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="contributors"><a class="anchor" href="#contributors"></a>9. Contributors</h2>
+<h2 id="contributors"><a class="anchor" href="#contributors"></a>9. コントリビューター</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Browse the <a href="https://github.com/junit-team/junit5/graphs/contributors">current list of contributors</a> directly on GitHub.</p>
+<p>GitHubで直接 <a href="https://github.com/junit-team/junit5/graphs/contributors">現在のコントリビューター</a> を参照してください。</p>
 </div>
 </div>
 </div>
@@ -6411,7 +6410,7 @@ declarations.</p>
 <div id="footer">
 <div id="footer-text">
 Version 5.2.0<br>
-Last updated 2018-05-26 00:03:16 JST
+Last updated 2018-06-08 23:12:27 JST
 </div>
 </div>
 </body>
