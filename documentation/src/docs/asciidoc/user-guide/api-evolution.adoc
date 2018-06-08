@@ -1,54 +1,53 @@
 [[api-evolution]]
-== API Evolution
+== APIの進化
 
-One of the major goals of JUnit 5 is to improve maintainers' capabilities to evolve JUnit
-despite its being used in many projects. With JUnit 4 a lot of stuff that was originally
-added as an internal construct only got used by external extension writers and tool
-builders. That made changing JUnit 4 especially difficult and sometimes impossible.
+JUnit 5の主要な目的の1つは、JUnitが多くのプロジェクトで使われていたとしても、
+メンテナがJUnitを進化させられるようにすることです。
+JUnit 4では多くの部品が元々は内部用途で追加されましたが、
+外部の拡張機能やツールの作者から使われることになりました。
+そのせいで、JUnit 4の変更はとりわけ難しく、ときには不可能になりました。
 
-That's why JUnit 5 introduces a defined lifecycle for all publicly available interfaces,
-classes, and methods.
+JUnit 5がすべての公開インターフェースやクラス、メソッドに対して明確に定義された
+ライフサイクルを導入したのはこのためです。
 
 [[api-evolution-version-and-status]]
-=== API Version and Status
+=== APIバージョンとステータス
 
-Every published artifact has a version number `<major>.<minor>.<patch>`, and all publicly
-available interfaces, classes, and methods are annotated with {API} from the
-{API_Guardian} project. The annotation's `status` attribute can be assigned one of the
-following values.
+公開されているモジュールは `<major>.<minor>.<patch>` というバージョン番号をもち、
+すべての公開インターフェース、クラス、メソッドには {API_Guardian} プロジェクトの
+{API} アノテーションが付与されています。このアノテーションの `status` 属性には、
+次のいずれかの値が設定されています。
 
 [cols="20,80"]
 |===
-| Status           | Description
+| ステータス           | 説明
 
-| `INTERNAL`       | Must not be used by any code other than JUnit itself. Might be removed without prior notice.
-| `DEPRECATED`     | Should no longer be used; might disappear in the next minor release.
-| `EXPERIMENTAL`   | Intended for new, experimental features where we are looking for feedback. +
-                     Use this element with caution; it might be promoted to `MAINTAINED` or
-                     `STABLE` in the future, but might also be removed without prior notice, even in a patch.
-| `MAINTAINED`     | Intended for features that will not be changed in a backwards-
-                     incompatible way for *at least* the next minor release of the current
-                     major version. If scheduled for removal, it will be demoted to `DEPRECATED` first.
-| `STABLE`         | Intended for features that will not be changed in a backwards-
-                     incompatible way in the current major version (`5.*`).
+| `INTERNAL`       | JUnit自身以外のコードで使ってはならない。事前予告なしに削除されうる。
+| `DEPRECATED`     | もう使うべきではない。次のマイナー (minor) リリースで削除されうる。
+| `EXPERIMENTAL`   | フィードバックがほしい実験的な新機能を意味する。注意して使うべき。 +
+                     将来 `MAINTAINED` または `STABLE` に昇格される可能性がある一方で、
+                     パッチ (patch) リリースでも事前予告なしに削除されうる。
+| `MAINTAINED`     | 現在のメジャー (major) バージョンの *少なくとも* 次のマイナー (minor)
+                     リリースでは、後方互換性がない方法で変更されることがない機能を意味する。
+                     削除予定になった場合は、まず最初に `DEPRECATED` に降格される。
+| `STABLE`         | 現在のメジャーバージョン (`5.*`) の間は、
+                     後方互換性がない方法で変更されることがない機能を意味する。
 |===
 
-If the `@API` annotation is present on a type, it is considered to be applicable for all
-public members of that type as well. A member is allowed to declare a different `status`
-value of lower stability.
+`@API` アノテーションが型に付与された場合、その型のすべての公開メンバーに適用されているとみなします。
+個々のメンバーは、より低い安定度をもつ異なる `status` 属性を宣言することができます。
 
 [[api-evolution-experimental-apis]]
-=== Experimental APIs
+=== 実験的なAPI
 
-The following table lists which APIs are currently designated as _experimental_ (via
-`@API(status = EXPERIMENTAL)`). Caution should be taken when relying on such APIs.
+次の表は、現在 _実験的_ (`@API(status = EXPERIMENTAL)`) と指定されたAPIを一覧しています。
+これらのAPIを使う場合は注意してください。
 
 include::{experimentalApisTableFile}[]
 
 [[api-evolution-tooling]]
-=== @API Tooling Support
+=== @APIツールサポート
 
-The {API_Guardian} project plans to provide tooling support for publishers and consumers
-of APIs annotated with {API}. For example, the tooling support will likely provide a
-means to check if JUnit APIs are being used in accordance with `@API` annotation
-declarations.
+{API_Guardian} プロジェクトは、 {API} アノテーションが付与されたAPIの提供者や利用者のために、
+ツールによるサポートを計画しています。例えば、JUnitのAPIが `@API`
+アノテーションの宣言にしたがって使われているかをチェックする手段を提供するなどです。
