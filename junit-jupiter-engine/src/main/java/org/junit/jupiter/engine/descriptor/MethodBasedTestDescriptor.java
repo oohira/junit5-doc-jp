@@ -12,6 +12,7 @@ package org.junit.jupiter.engine.descriptor;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.platform.commons.util.ClassUtils;
@@ -20,6 +21,7 @@ import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.MethodSource;
+import org.junit.platform.engine.support.hierarchical.ExclusiveResource;
 
 /**
  * Base class for {@link TestDescriptor TestDescriptors} based on Java methods.
@@ -41,7 +43,7 @@ abstract class MethodBasedTestDescriptor extends JupiterTestDescriptor {
 	}
 
 	MethodBasedTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Method testMethod) {
-		super(uniqueId, displayName, MethodSource.from(Preconditions.notNull(testMethod, "Method must not be null")));
+		super(uniqueId, displayName, MethodSource.from(testClass, testMethod));
 
 		this.testClass = Preconditions.notNull(testClass, "Class must not be null");
 		this.testMethod = testMethod;
@@ -51,9 +53,18 @@ abstract class MethodBasedTestDescriptor extends JupiterTestDescriptor {
 	@Override
 	public final Set<TestTag> getTags() {
 		// return modifiable copy
-		Set<TestTag> allTags = new LinkedHashSet<TestTag>(this.tags);
+		Set<TestTag> allTags = new LinkedHashSet<>(this.tags);
 		getParent().ifPresent(parentDescriptor -> allTags.addAll(parentDescriptor.getTags()));
 		return allTags;
+	}
+
+	@Override
+	public Set<ExclusiveResource> getExclusiveResources() {
+		return getExclusiveResourcesFromAnnotation(getTestMethod());
+	}
+
+	protected Optional<ExecutionMode> getExplicitExecutionMode() {
+		return getExecutionModeFromAnnotation(getTestMethod());
 	}
 
 	public final Class<?> getTestClass() {

@@ -21,6 +21,7 @@ import org.junit.platform.commons.logging.LoggerFactory;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.support.hierarchical.EngineExecutionContext;
+import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /**
  * @since 5.0
@@ -33,6 +34,7 @@ public class JupiterEngineExecutionContext implements EngineExecutionContext {
 	private final State state;
 
 	// The following is not "cloneable" State.
+	private boolean beforeAllCallbacksExecuted = false;
 	private boolean beforeAllMethodsExecuted = false;
 
 	public JupiterEngineExecutionContext(EngineExecutionListener executionListener,
@@ -81,10 +83,35 @@ public class JupiterEngineExecutionContext implements EngineExecutionContext {
 		return this.state.throwableCollector;
 	}
 
+	/**
+	 * Track that an attempt was made to execute {@code BeforeAllCallback} extensions.
+	 *
+	 * @since 5.3
+	 */
+	public void beforeAllCallbacksExecuted(boolean beforeAllCallbacksExecuted) {
+		this.beforeAllCallbacksExecuted = beforeAllCallbacksExecuted;
+	}
+
+	/**
+	 * @return {@code true} if an attempt was made to execute {@code BeforeAllCallback}
+	 * extensions
+	 * @since 5.3
+	 */
+	public boolean beforeAllCallbacksExecuted() {
+		return beforeAllCallbacksExecuted;
+	}
+
+	/**
+	 * Track that an attempt was made to execute {@code @BeforeAll} methods.
+	 */
 	public void beforeAllMethodsExecuted(boolean beforeAllMethodsExecuted) {
 		this.beforeAllMethodsExecuted = beforeAllMethodsExecuted;
 	}
 
+	/**
+	 * @return {@code true} if an attempt was made to execute {@code @BeforeAll}
+	 * methods
+	 */
 	public boolean beforeAllMethodsExecuted() {
 		return this.beforeAllMethodsExecuted;
 	}

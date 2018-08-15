@@ -87,6 +87,20 @@ class DynamicTestsDemo {
 	}
 
 	@TestFactory
+	DynamicTest[] dynamicTestsFromArray() {
+		// end::user_guide[]
+		// @formatter:off
+		// tag::user_guide[]
+		return new DynamicTest[] {
+			dynamicTest("7th dynamic test", () -> assertTrue(true)),
+			dynamicTest("8th dynamic test", () -> assertEquals(4, 2 * 2))
+		};
+		// end::user_guide[]
+		// @formatter:on
+		// tag::user_guide[]
+	}
+
+	@TestFactory
 	Stream<DynamicTest> dynamicTestsFromStream() {
 		// end::user_guide[]
 		// @formatter:off
@@ -116,7 +130,7 @@ class DynamicTestsDemo {
 
 		// Generates random positive integers between 0 and 100 until
 		// a number evenly divisible by 7 is encountered.
-		Iterator<Integer> inputGenerator = new Iterator<Integer>() {
+		Iterator<Integer> inputGenerator = new Iterator<>() {
 
 			Random random = new Random();
 			// end::user_guide[]

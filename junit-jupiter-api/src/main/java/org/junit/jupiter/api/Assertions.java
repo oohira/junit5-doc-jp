@@ -37,18 +37,25 @@ import org.opentest4j.MultipleFailuresError;
  * <p>Unless otherwise noted, a <em>failed</em> assertion will throw an
  * {@link org.opentest4j.AssertionFailedError} or a subclass thereof.
  *
+ * <p>Although it is technically possible to extend this class, extension is
+ * strongly discouraged. The JUnit Team highly recommends that the methods
+ * defined in this class be used via <em>static imports</em>.
+ *
  * @since 5.0
  * @see org.opentest4j.AssertionFailedError
  * @see Assumptions
  */
 @API(status = STABLE, since = "5.0")
-public final class Assertions {
+public class Assertions {
 
-	///CLOVER:OFF
-	private Assertions() {
+	/**
+	 * Protected constructor allowing subclassing but not direct instantiation.
+	 *
+	 * @since 5.3
+	 */
+	protected Assertions() {
 		/* no-op */
 	}
-	///CLOVER:ON
 
 	// --- fail ----------------------------------------------------------------
 
@@ -1155,6 +1162,8 @@ public final class Assertions {
 
 	// --- assert exceptions ---------------------------------------------------
 
+	// --- executable ---
+
 	/**
 	 * <em>Asserts</em> that execution of the supplied {@code executable} throws
 	 * an exception of the {@code expectedType} and returns the exception.
@@ -1199,6 +1208,72 @@ public final class Assertions {
 	public static <T extends Throwable> T assertThrows(Class<T> expectedType, Executable executable,
 			Supplier<String> messageSupplier) {
 		return AssertThrows.assertThrows(expectedType, executable, messageSupplier);
+	}
+
+	// --- supplier ---
+
+	/**
+	 * <em>Asserts</em> that execution of the given {@code supplier} throws
+	 * an exception of the {@code expectedType} and returns the exception.
+	 *
+	 * <p>If no exception is thrown, or if an exception of a different type is
+	 * thrown, this method will fail.
+	 *
+	 * <p>If the given {@link ThrowingSupplier} returns a result instead of
+	 * throwing an exception, the result will be included in the failure message.
+	 *
+	 * <p>If you do not want to perform additional checks on the exception instance,
+	 * simply ignore the return value.
+	 *
+	 * @since 5.3
+	 */
+	public static <T extends Throwable> T assertThrows(Class<T> expectedType, ThrowingSupplier<?> supplier) {
+		return AssertThrows.assertThrows(expectedType, supplier);
+	}
+
+	/**
+	 * <em>Asserts</em> that execution of the given {@code supplier} throws
+	 * an exception of the {@code expectedType} and returns the exception.
+	 *
+	 * <p>If no exception is thrown, or if an exception of a different type is
+	 * thrown, this method will fail.
+	 *
+	 * <p>If the given {@link ThrowingSupplier} returns a result instead of
+	 * throwing an exception, the result will be included in the failure message.
+	 *
+	 * <p>If you do not want to perform additional checks on the exception instance,
+	 * simply ignore the return value.
+	 *
+	 * @since 5.3
+	 */
+	public static <T extends Throwable> T assertThrows(Class<T> expectedType, ThrowingSupplier<?> supplier,
+			String message) {
+
+		return AssertThrows.assertThrows(expectedType, supplier, message);
+	}
+
+	/**
+	 * <em>Asserts</em> that execution of the given {@code supplier} throws
+	 * an exception of the {@code expectedType} and returns the exception.
+	 *
+	 * <p>If no exception is thrown, or if an exception of a different type is
+	 * thrown, this method will fail.
+	 *
+	 * <p>If necessary, the failure message will be retrieved lazily from the
+	 * supplied {@code messageSupplier}.
+	 *
+	 * <p>If the given {@link ThrowingSupplier} returns a result instead of
+	 * throwing an exception, the result will be included in the failure message.
+	 *
+	 * <p>If you do not want to perform additional checks on the exception instance,
+	 * simply ignore the return value.
+	 *
+	 * @since 5.3
+	 */
+	public static <T extends Throwable> T assertThrows(Class<T> expectedType, ThrowingSupplier<?> supplier,
+			Supplier<String> messageSupplier) {
+
+		return AssertThrows.assertThrows(expectedType, supplier, messageSupplier);
 	}
 
 	// --- executable ---

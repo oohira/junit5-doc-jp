@@ -32,11 +32,26 @@ import org.apiguardian.api.API;
 @API(status = INTERNAL, since = "1.0")
 public final class ClassUtils {
 
-	///CLOVER:OFF
 	private ClassUtils() {
 		/* no-op */
 	}
-	///CLOVER:ON
+
+	/**
+	 * Get the fully qualified name of the supplied class.
+	 *
+	 * <p>This is a null-safe variant of {@link Class#getName()}.
+	 *
+	 * @param clazz the class whose name should be retrieved, potentially
+	 * {@code null}
+	 * @return the fully qualified class name or {@code "null"} if the supplied
+	 * class reference is {@code null}
+	 * @since 1.3
+	 * @see #nullSafeToString(Class...)
+	 * @see StringUtils#nullSafeToString(Object)
+	 */
+	public static String nullSafeToString(Class<?> clazz) {
+		return clazz == null ? "null" : clazz.getName();
+	}
 
 	/**
 	 * Generate a comma-separated list of fully qualified class names for the
@@ -72,7 +87,7 @@ public final class ClassUtils {
 		if (classes == null || classes.length == 0) {
 			return "";
 		}
-		return stream(classes).map(v -> v == null ? "null" : mapper.apply(v)).collect(joining(", "));
+		return stream(classes).map(clazz -> clazz == null ? "null" : mapper.apply(clazz)).collect(joining(", "));
 	}
 
 }

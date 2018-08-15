@@ -13,6 +13,7 @@ package org.junit.jupiter.engine.descriptor;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,6 +22,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -31,8 +33,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.engine.descriptor.JupiterTestDescriptorTests.StaticTestCase.StaticTestCaseLevel2;
+import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.MethodSource;
 
 /**
  * Unit tests for {@link ClassTestDescriptor}, {@link NestedClassTestDescriptor},
@@ -46,9 +51,11 @@ class JupiterTestDescriptorTests {
 
 	private static final UniqueId uniqueId = UniqueId.root("enigma", "foo");
 
+	private final ConfigurationParameters configParams = mock(ConfigurationParameters.class);
+
 	@Test
 	void constructFromClass() {
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCase.class);
+		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCase.class, configParams);
 
 		assertEquals(TestCase.class, descriptor.getTestClass());
 		assertThat(descriptor.getTags()).containsExactly(TestTag.create("inherited-class-level-tag"),
@@ -59,7 +66,8 @@ class JupiterTestDescriptorTests {
 	void constructFromClassWithInvalidBeforeAllDeclaration() {
 		// Note: if we can instantiate the descriptor, then the invalid configuration
 		// will not be reported during the test engine discovery phase.
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidBeforeAllMethod.class);
+		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidBeforeAllMethod.class,
+			configParams);
 
 		assertEquals(TestCaseWithInvalidBeforeAllMethod.class, descriptor.getTestClass());
 	}
@@ -68,7 +76,8 @@ class JupiterTestDescriptorTests {
 	void constructFromClassWithInvalidAfterAllDeclaration() {
 		// Note: if we can instantiate the descriptor, then the invalid configuration
 		// will not be reported during the test engine discovery phase.
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidAfterAllMethod.class);
+		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidAfterAllMethod.class,
+			configParams);
 
 		assertEquals(TestCaseWithInvalidAfterAllMethod.class, descriptor.getTestClass());
 	}
@@ -77,7 +86,8 @@ class JupiterTestDescriptorTests {
 	void constructFromClassWithInvalidBeforeEachDeclaration() {
 		// Note: if we can instantiate the descriptor, then the invalid configuration
 		// will not be reported during the test engine discovery phase.
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidBeforeEachMethod.class);
+		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidBeforeEachMethod.class,
+			configParams);
 
 		assertEquals(TestCaseWithInvalidBeforeEachMethod.class, descriptor.getTestClass());
 	}
@@ -86,7 +96,8 @@ class JupiterTestDescriptorTests {
 	void constructFromClassWithInvalidAfterEachDeclaration() {
 		// Note: if we can instantiate the descriptor, then the invalid configuration
 		// will not be reported during the test engine discovery phase.
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidAfterEachMethod.class);
+		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidAfterEachMethod.class,
+			configParams);
 
 		assertEquals(TestCaseWithInvalidAfterEachMethod.class, descriptor.getTestClass());
 	}
@@ -104,7 +115,7 @@ class JupiterTestDescriptorTests {
 
 	@Test
 	void constructFromMethodWithAnnotations() throws Exception {
-		JupiterTestDescriptor classDescriptor = new ClassTestDescriptor(uniqueId, TestCase.class);
+		JupiterTestDescriptor classDescriptor = new ClassTestDescriptor(uniqueId, TestCase.class, configParams);
 		Method testMethod = TestCase.class.getDeclaredMethod("foo");
 		TestMethodTestDescriptor methodDescriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod);
 		classDescriptor.addChild(methodDescriptor);
@@ -173,18 +184,33 @@ class JupiterTestDescriptorTests {
 	}
 
 	@Test
+	void constructFromInheritedMethod() throws Exception {
+		Method testMethod = ConcreteTest.class.getMethod("theTest");
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, ConcreteTest.class, testMethod);
+
+		assertEquals(testMethod, descriptor.getTestMethod());
+
+		Optional<TestSource> sourceOptional = descriptor.getSource();
+		assertThat(sourceOptional).containsInstanceOf(MethodSource.class);
+
+		MethodSource methodSource = (MethodSource) sourceOptional.get();
+		assertEquals(ConcreteTest.class.getName(), methodSource.getClassName());
+		assertEquals("theTest", methodSource.getMethodName());
+	}
+
+	@Test
 	void defaultDisplayNamesForTestClasses() {
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, getClass());
+		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, getClass(), configParams);
 		assertEquals(getClass().getSimpleName(), descriptor.getDisplayName());
 
-		descriptor = new NestedClassTestDescriptor(uniqueId, NestedTestCase.class);
+		descriptor = new NestedClassTestDescriptor(uniqueId, NestedTestCase.class, configParams);
 		assertEquals(NestedTestCase.class.getSimpleName(), descriptor.getDisplayName());
 
-		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCase.class);
+		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCase.class, configParams);
 		String staticDisplayName = getClass().getSimpleName() + "$" + StaticTestCase.class.getSimpleName();
 		assertEquals(staticDisplayName, descriptor.getDisplayName());
 
-		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCaseLevel2.class);
+		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCaseLevel2.class, configParams);
 		staticDisplayName += "$" + StaticTestCaseLevel2.class.getSimpleName();
 		assertEquals(staticDisplayName, descriptor.getDisplayName());
 	}
@@ -301,6 +327,16 @@ class JupiterTestDescriptorTests {
 
 		static class StaticTestCaseLevel2 {
 		}
+	}
+
+	private abstract static class AbstractTestBase {
+
+		@Test
+		public void theTest() {
+		}
+	}
+
+	private static class ConcreteTest extends AbstractTestBase {
 	}
 
 }

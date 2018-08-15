@@ -30,12 +30,17 @@ import org.apiguardian.api.API;
  * an argument for the parameter must be resolved at runtime by a
  * {@code ParameterResolver}.
  *
- * <p>Implementations must provide a no-args constructor.
+ * <h3>Constructor Requirements</h3>
+ *
+ * <p>Consult the documentation in {@link Extension} for details on
+ * constructor requirements.
  *
  * @since 5.0
  * @see #supportsParameter(ParameterContext, ExtensionContext)
  * @see #resolveParameter(ParameterContext, ExtensionContext)
  * @see ParameterContext
+ * @see TestInstanceFactory
+ * @see TestInstancePostProcessor
  */
 @API(status = STABLE, since = "5.0")
 public interface ParameterResolver extends Extension {

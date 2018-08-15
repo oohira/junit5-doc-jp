@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
-import static org.mockito.AdditionalMatchers.gt;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -46,6 +45,7 @@ import java.util.Set;
 
 import org.apache.maven.surefire.providerapi.ProviderParameters;
 import org.apache.maven.surefire.report.ConsoleOutputReceiver;
+import org.apache.maven.surefire.report.ConsoleStream;
 import org.apache.maven.surefire.report.ReportEntry;
 import org.apache.maven.surefire.report.ReporterFactory;
 import org.apache.maven.surefire.report.RunListener;
@@ -74,6 +74,7 @@ import org.mockito.InOrder;
  *
  * @since 1.0
  */
+@SuppressWarnings("deprecation")
 class JUnitPlatformProviderTests {
 
 	@Test
@@ -176,9 +177,9 @@ class JUnitPlatformProviderTests {
 		ArgumentCaptor<byte[]> captor = ArgumentCaptor.forClass(byte[].class);
 		// @formatter:off
 		verify((ConsoleOutputReceiver) runListener)
-				.writeTestOutput(captor.capture(), eq(0), gt(6), eq(true));
+				.writeTestOutput(captor.capture(), eq(0), eq(6), eq(true));
 		verify((ConsoleOutputReceiver) runListener)
-				.writeTestOutput(captor.capture(), eq(0), gt(6), eq(false));
+				.writeTestOutput(captor.capture(), eq(0), eq(6), eq(false));
 		assertThat(captor.getAllValues())
 				.extracting(bytes -> new String(bytes, 0, 6))
 				.containsExactly("stdout", "stderr");
@@ -453,6 +454,7 @@ class JUnitPlatformProviderTests {
 		when(providerParameters.getRunOrderCalculator()).thenReturn(runOrderCalculator);
 		when(providerParameters.getReporterFactory()).thenReturn(reporterFactory);
 		when(providerParameters.getTestRequest()).thenReturn(testRequest);
+		when(providerParameters.getConsoleLogger()).thenReturn(mock(ConsoleStream.class));
 
 		return providerParameters;
 	}
@@ -561,8 +563,8 @@ class JUnitPlatformProviderTests {
 	static class VerboseTestClass {
 		@Test
 		void test() {
-			System.out.println("stdout");
-			System.err.println("stderr");
+			System.out.print("stdout");
+			System.err.print("stderr");
 		}
 	}
 

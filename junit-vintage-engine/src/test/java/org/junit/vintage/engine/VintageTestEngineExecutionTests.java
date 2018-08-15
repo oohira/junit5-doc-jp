@@ -248,6 +248,20 @@ class VintageTestEngineExecutionTests {
 	}
 
 	@Test
+	void executesJUnit4TestCaseWithAssumptionFailureInBeforeClass() {
+		Class<?> testClass = JUnit4TestCaseWithAssumptionFailureInBeforeClass.class;
+
+		List<ExecutionEvent> executionEvents = execute(testClass);
+
+		assertRecordedExecutionEventsContainsExactly(executionEvents, //
+			event(engine(), started()), //
+			event(container(testClass), started()), //
+			event(container(testClass),
+				abortedWithReason(allOf(isA(AssumptionViolatedException.class), message("assumption violated")))), //
+			event(engine(), finishedSuccessfully()));
+	}
+
+	@Test
 	void executesJUnit4SuiteOfSuiteWithJUnit4TestCaseWithAssumptionFailureInBeforeClass() {
 		Class<?> suiteOfSuiteClass = JUnit4SuiteOfSuiteWithJUnit4TestCaseWithAssumptionFailureInBeforeClass.class;
 		Class<?> suiteClass = JUnit4SuiteWithJUnit4TestCaseWithAssumptionFailureInBeforeClass.class;
@@ -364,7 +378,7 @@ class VintageTestEngineExecutionTests {
 		// @formatter:off
 		assertThat(PlainJUnit4TestCaseWithLifecycleMethods.EVENTS).containsExactly(
 			"executionStarted:JUnit Vintage",
-				"executionStarted:" + testClass.getName(),
+				"executionStarted:" + testClass.getSimpleName(),
 					"beforeClass",
 						"executionStarted:failingTest",
 							"before",
@@ -378,7 +392,7 @@ class VintageTestEngineExecutionTests {
 							"after",
 						"executionFinished:succeedingTest",
 					"afterClass",
-				"executionFinished:" + testClass.getName(),
+				"executionFinished:" + testClass.getSimpleName(),
 			"executionFinished:JUnit Vintage"
 		);
 		// @formatter:on

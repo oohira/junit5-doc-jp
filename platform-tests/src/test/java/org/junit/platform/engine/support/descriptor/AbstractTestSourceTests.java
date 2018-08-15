@@ -11,12 +11,21 @@
 package org.junit.platform.engine.support.descriptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+import org.junit.platform.AbstractEqualsAndHashCodeTests;
 import org.junit.platform.engine.TestSource;
 
 /**
@@ -25,23 +34,52 @@ import org.junit.platform.engine.TestSource;
  *
  * @since 1.0
  */
-abstract class AbstractTestSourceTests {
+abstract class AbstractTestSourceTests extends AbstractEqualsAndHashCodeTests {
 
-	protected <T> void assertEqualsAndHashCode(T equal1, T equal2, T different) {
-		assertNotNull(equal1);
-		assertNotNull(equal2);
-		assertNotNull(different);
+	abstract Stream<? extends Serializable> createSerializableInstances() throws Exception;
 
-		assertNotSame(equal1, equal2);
-		assertFalse(equal1.equals(null));
-		assertFalse(equal1.equals(different));
-		assertFalse(different.equals(equal1));
-		assertNotEquals(equal1.hashCode(), different.hashCode());
+	@TestFactory
+	Stream<DynamicTest> assertToString() throws Exception {
+		return createSerializableInstances() //
+				.map(instance -> dynamicTest(instance.toString(), () -> assertToString(instance)));
+	}
 
-		assertTrue(equal1.equals(equal1));
-		assertTrue(equal1.equals(equal2));
-		assertTrue(equal2.equals(equal1));
-		assertEquals(equal1.hashCode(), equal2.hashCode());
+	private void assertToString(Object instance) {
+		assertNotNull(instance);
+		assertTrue(instance.toString().startsWith(instance.getClass().getSimpleName()));
+	}
+
+	@TestFactory
+	Stream<DynamicTest> assertSerializable() throws Exception {
+		return createSerializableInstances() //
+				.map(instance -> dynamicTest(instance.toString(), () -> assertSerializable(instance)));
+	}
+
+	private <T extends Serializable> void assertSerializable(T instance) {
+		try {
+			Class<?> type = instance.getClass();
+			byte[] serialized = serialize(instance);
+			Object deserialized = deserialize(serialized);
+
+			assertTrue(type.isAssignableFrom(deserialized.getClass()));
+			assertEquals(instance, deserialized);
+		}
+		catch (Exception e) {
+			fail("assertSerializable failed: " + instance, e);
+		}
+	}
+
+	private byte[] serialize(Object obj) throws Exception {
+		ByteArrayOutputStream b = new ByteArrayOutputStream();
+		ObjectOutputStream o = new ObjectOutputStream(b);
+		o.writeObject(obj);
+		return b.toByteArray();
+	}
+
+	private Object deserialize(byte[] bytes) throws Exception {
+		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+		ObjectInputStream o = new ObjectInputStream(b);
+		return o.readObject();
 	}
 
 }

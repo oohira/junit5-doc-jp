@@ -34,18 +34,25 @@ import org.opentest4j.TestAbortedException;
  * test depends on something that does not exist in the current runtime
  * environment.
  *
+ * <p>Although it is technically possible to extend this class, extension is
+ * strongly discouraged. The JUnit Team highly recommends that the methods
+ * defined in this class be used via <em>static imports</em>.
+ *
  * @since 5.0
  * @see TestAbortedException
  * @see Assertions
  */
 @API(status = STABLE, since = "5.0")
-public final class Assumptions {
+public class Assumptions {
 
-	///CLOVER:OFF
-	private Assumptions() {
+	/**
+	 * Protected constructor allowing subclassing but not direct instantiation.
+	 *
+	 * @since 5.3
+	 */
+	protected Assumptions() {
 		/* no-op */
 	}
-	///CLOVER:ON
 
 	// --- assumeTrue ----------------------------------------------------
 

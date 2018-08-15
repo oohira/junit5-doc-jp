@@ -11,8 +11,10 @@
 package org.junit.jupiter.engine.descriptor;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.junit.platform.engine.support.descriptor.ClasspathResourceSource.CLASSPATH_SCHEME;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -28,8 +30,11 @@ import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.platform.commons.JUnitException;
 import org.junit.platform.commons.util.CollectionUtils;
 import org.junit.platform.commons.util.PreconditionViolationException;
+import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.descriptor.ClasspathResourceSource;
+import org.junit.platform.engine.support.descriptor.UriSource;
 
 /**
  * {@link org.junit.platform.engine.TestDescriptor TestDescriptor} for
@@ -80,7 +85,7 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 			Object instance = extensionContext.getRequiredTestInstance();
 			Object testFactoryMethodResult = executableInvoker.invoke(getTestMethod(), instance, extensionContext,
 				context.getExtensionRegistry());
-			TestSource source = getSource().orElseThrow(
+			TestSource defaultTestSource = getSource().orElseThrow(
 				() -> new JUnitException("Illegal state: TestSource must be present"));
 			try (Stream<DynamicNode> dynamicNodeStream = toDynamicNodeStream(testFactoryMethodResult)) {
 				int index = 1;
@@ -88,7 +93,7 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 				while (iterator.hasNext()) {
 					DynamicNode dynamicNode = iterator.next();
 					Optional<JupiterTestDescriptor> descriptor = createDynamicDescriptor(this, dynamicNode, index++,
-						source, getDynamicDescendantFilter());
+						defaultTestSource, getDynamicDescendantFilter());
 					descriptor.ifPresent(dynamicTestExecutor::execute);
 				}
 			}
@@ -108,10 +113,21 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 		}
 	}
 
+	private JUnitException invalidReturnTypeException(Throwable cause) {
+		String message = String.format(
+			"@TestFactory method [%s] must return a Stream, Collection, Iterable, or Iterator of %s.",
+			getTestMethod().toGenericString(), DynamicNode.class.getName());
+		return new JUnitException(message, cause);
+	}
+
 	static Optional<JupiterTestDescriptor> createDynamicDescriptor(JupiterTestDescriptor parent, DynamicNode node,
-			int index, TestSource source, DynamicDescendantFilter dynamicDescendantFilter) {
+			int index, TestSource defaultTestSource, DynamicDescendantFilter dynamicDescendantFilter) {
+
 		UniqueId uniqueId;
 		Supplier<JupiterTestDescriptor> descriptorCreator;
+		Optional<TestSource> customTestSource = node.getTestSourceUri().map(TestFactoryTestDescriptor::fromUri);
+		TestSource source = customTestSource.orElse(defaultTestSource);
+
 		if (node instanceof DynamicTest) {
 			DynamicTest test = (DynamicTest) node;
 			uniqueId = parent.getUniqueId().append(DYNAMIC_TEST_SEGMENT_TYPE, "#" + index);
@@ -131,11 +147,12 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 		return Optional.empty();
 	}
 
-	private JUnitException invalidReturnTypeException(Throwable cause) {
-		String message = String.format(
-			"@TestFactory method [%s] must return a Stream, Collection, Iterable, or Iterator of %s.",
-			getTestMethod().toGenericString(), DynamicNode.class.getName());
-		return new JUnitException(message, cause);
+	/**
+	 * @since 5.3
+	 */
+	static TestSource fromUri(URI uri) {
+		Preconditions.notNull(uri, "URI must not be null");
+		return CLASSPATH_SCHEME.equals(uri.getScheme()) ? ClasspathResourceSource.from(uri) : UriSource.from(uri);
 	}
 
 }

@@ -1,52 +1,28 @@
-apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply from: "$rootDir/gradle/testing.gradle"
 
 description = 'JUnit Jupiter Params'
-
-buildscript {
-	repositories {
-		jcenter()
-	}
-	dependencies {
-		classpath("com.github.jengelman.gradle.plugins:shadow:${shadowVersion}")
-	}
-}
-
-junitPlatform {
-	filters {
-		engines {
-			include 'junit-jupiter'
-		}
-		includeClassNamePattern '.*Tests?'
-	}
-	logManager 'org.apache.logging.log4j.jul.LogManager'
-}
 
 afterEvaluate {
 	// Use classes modified by shadow plugin for test execution so JaCoCo
 	// finds same class files when creating its report
-	junitPlatformTest.classpath -= sourceSets.main.output
-	junitPlatformTest.classpath += files(shadowJar.archivePath)
-	junitPlatformTest.dependsOn(shadowJar)
+	test.classpath -= sourceSets.main.output
+	test.classpath += files(shadowJar.archivePath)
+	test.dependsOn(shadowJar)
 }
 
 dependencies {
 	api(project(':junit-jupiter-api'))
 
-	shadowed('com.univocity:univocity-parsers:2.6.3')
+	shadowed('com.univocity:univocity-parsers:2.7.2')
 
-	testImplementation("org.assertj:assertj-core:${assertJVersion}")
-	testImplementation("org.mockito:mockito-core:${mockitoVersion}")
 	testImplementation(project(path: ':junit-platform-engine', configuration: 'testArtifacts'))
 	testImplementation(project(':junit-jupiter-engine'))
 	testImplementation(project(':junit-platform-launcher'))
 	testImplementation(project(':junit-platform-runner'))
 
-	// Include junit-platform-console so that the JUnit Gradle plugin
-	// uses the local version of the ConsoleLauncher.
-	testRuntimeOnly(project(':junit-platform-console'))
-	testRuntimeOnly("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-	testRuntimeOnly("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
+	compileOnly('org.jetbrains.kotlin:kotlin-stdlib')
+	testImplementation('org.jetbrains.kotlin:kotlin-stdlib')
 }
 
 jar.enabled = false
@@ -74,8 +50,4 @@ shadowJar {
 		include 'LICENSE-univocity-parsers.md'
 		into 'META-INF'
 	}
-}
-
-artifacts {
-	archives shadowJar
 }

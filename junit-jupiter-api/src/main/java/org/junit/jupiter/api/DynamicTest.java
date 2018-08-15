@@ -14,6 +14,7 @@ import static java.util.Spliterator.ORDERED;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.net.URI;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -59,7 +60,25 @@ public class DynamicTest extends DynamicNode {
 	 * @see #stream(Iterator, Function, ThrowingConsumer)
 	 */
 	public static DynamicTest dynamicTest(String displayName, Executable executable) {
-		return new DynamicTest(displayName, executable);
+		return new DynamicTest(displayName, null, executable);
+	}
+
+	/**
+	 * Factory for creating a new {@code DynamicTest} for the supplied display
+	 * name, custom test source {@link URI}, and executable code block.
+	 *
+	 * @param displayName the display name for the dynamic test; never
+	 * {@code null} or blank
+	 * @param testSourceUri a custom test source URI for the dynamic test; may
+	 * be {@code null} if the framework should generate the test source based on
+	 * the {@code @TestFactory} method
+	 * @param executable the executable code block for the dynamic test;
+	 * never {@code null}
+	 * @since 5.3
+	 * @see #stream(Iterator, Function, ThrowingConsumer)
+	 */
+	public static DynamicTest dynamicTest(String displayName, URI testSourceUri, Executable executable) {
+		return new DynamicTest(displayName, testSourceUri, executable);
 	}
 
 	/**
@@ -101,8 +120,8 @@ public class DynamicTest extends DynamicNode {
 
 	private final Executable executable;
 
-	private DynamicTest(String displayName, Executable executable) {
-		super(displayName);
+	private DynamicTest(String displayName, URI testSourceUri, Executable executable) {
+		super(displayName, testSourceUri);
 		this.executable = Preconditions.notNull(executable, "executable must not be null");
 	}
 

@@ -6,33 +6,32 @@ buildscript {
 
 		// classpath('org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.16')
 		classpath('org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16')
-		classpath('org.asciidoctor:asciidoctorj-diagram:1.5.8')
+		classpath('org.asciidoctor:asciidoctorj-diagram:1.5.9')
 	}
 }
 
 plugins {
-	id 'org.asciidoctor.convert' version '1.5.7'
+	id 'org.asciidoctor.convert' version '1.5.8.1'
 }
 
-apply plugin: 'org.junit.platform.gradle.plugin'
-
-junitPlatform {
-	details 'tree'
-	filters {
-		includeClassNamePattern '.+(Tests|Demo)$'
-		tags {
-			exclude 'exclude'
-		}
-	}
-	logManager 'org.apache.logging.log4j.jul.LogManager'
+task consoleLauncherTest(type: JavaExec) {
+	dependsOn testClasses
+	def reportsDir = file("$buildDir/test-results")
+	outputs.dir reportsDir
+	classpath sourceSets.test.runtimeClasspath
+	main 'org.junit.platform.console.ConsoleLauncher'
+	args '--scan-classpath'
+	args '--details', 'tree'
+	args '--include-classname', '.*Tests'
+	args '--include-classname', '.*Demo'
+	args '--exclude-tag', 'exclude'
+	args '--reports-dir', reportsDir
+	systemProperty 'java.util.logging.manager', 'org.apache.logging.log4j.jul.LogManager'
 }
-
-/*
 test {
-	scanForTestClasses = false
-	include(['example/DocumentationTestSuite.class'])
+	dependsOn consoleLauncherTest
+	exclude '**/*'
 }
-*/
 
 dependencies {
 	asciidoctor('org.jruby:jruby-complete:9.1.17.0')
@@ -41,10 +40,9 @@ dependencies {
 	testImplementation(project(':junit-jupiter-params'))
 	testImplementation(project(':junit-platform-runner'))
 	testImplementation(project(':junit-platform-launcher'))
-	testImplementation("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
+	testImplementation("org.jetbrains.kotlin:kotlin-stdlib")
 
-	// Include junit-platform-console so that the JUnit Gradle plugin
-	// uses the local version of the ConsoleLauncher.
+	// Required by :consoleLauncherTest and :generateConsoleLauncherOptions
 	testRuntimeOnly(project(':junit-platform-console'))
 
 	testRuntimeOnly(project(':junit-vintage-engine'))
@@ -53,7 +51,7 @@ dependencies {
 	testRuntimeOnly("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
 
 	// for ApiReportGenerator
-	testImplementation("io.github.lukehutch:fast-classpath-scanner:2.18.2")
+	testImplementation('io.github.classgraph:classgraph:4.0.2')
 }
 
 asciidoctorj {

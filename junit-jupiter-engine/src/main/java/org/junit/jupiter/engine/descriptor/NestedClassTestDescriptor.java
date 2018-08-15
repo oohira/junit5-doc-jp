@@ -12,17 +12,15 @@ package org.junit.jupiter.engine.descriptor;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
-import java.lang.reflect.Constructor;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.engine.execution.ExecutableInvoker;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
-import org.junit.platform.commons.util.ReflectionUtils;
+import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
@@ -40,15 +38,14 @@ import org.junit.platform.engine.UniqueId;
 @API(status = INTERNAL, since = "5.0")
 public class NestedClassTestDescriptor extends ClassTestDescriptor {
 
-	private static final ExecutableInvoker executableInvoker = new ExecutableInvoker();
-
 	/**
 	 * Set of local class-level tags; does not contain tags from parent.
 	 */
 	private final Set<TestTag> tags;
 
-	public NestedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass) {
-		super(uniqueId, Class::getSimpleName, testClass);
+	public NestedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass,
+			ConfigurationParameters configurationParameters) {
+		super(uniqueId, Class::getSimpleName, testClass, configurationParameters);
 
 		this.tags = getTags(testClass);
 	}
@@ -58,7 +55,7 @@ public class NestedClassTestDescriptor extends ClassTestDescriptor {
 	@Override
 	public final Set<TestTag> getTags() {
 		// return modifiable copy
-		Set<TestTag> allTags = new LinkedHashSet<TestTag>(this.tags);
+		Set<TestTag> allTags = new LinkedHashSet<>(this.tags);
 		getParent().ifPresent(parentDescriptor -> allTags.addAll(parentDescriptor.getTags()));
 		return allTags;
 	}
@@ -73,8 +70,7 @@ public class NestedClassTestDescriptor extends ClassTestDescriptor {
 		Optional<ExtensionRegistry> childExtensionRegistryForOuterInstance = Optional.empty();
 		Object outerInstance = parentExecutionContext.getTestInstanceProvider().getTestInstance(
 			childExtensionRegistryForOuterInstance);
-		Constructor<?> constructor = ReflectionUtils.getDeclaredConstructor(getTestClass());
-		return executableInvoker.invoke(constructor, outerInstance, extensionContext, registry);
+		return instantiateTestClass(Optional.of(outerInstance), registry, extensionContext);
 	}
 
 }
