@@ -119,6 +119,25 @@ NOTE: `@RegisterExtension` フィールドは、`private` または `null` (評�
 include::{testDir}/example/registration/WebServerDemo.java[tags=user_guide]
 ----
 
+[[extensions-registration-programmatic-static-fields-kotlin]]
+===== Static Fields in Kotlin
+
+The Kotlin programming language does not have the concept of a `static` field. However,
+the compiler can be instructed to generate static fields using annotations. Since, as
+stated earlier, `@RegisterExtension` fields must not be `private` nor `null`, one
+**cannot** use the `@JvmStatic` annotation in Kotlin as it generates `private` fields.
+Rather, the `@JvmField` annotation must be used.
+
+The following example is a version of the `WebServerDemo` from the previous section that
+has been ported to Kotlin.
+
+// TODO: Change to using kotlin language highlighting after switch to rouge syntax highlighter
+[source,groovy,indent=0]
+.Registering an extension via a static field in Kotlin
+----
+include::{kotlinTestDir}/example/registration/KotlinWebServerDemo.kt[tags=user_guide]
+----
+
 [[extensions-registration-programmatic-instance-fields]]
 ===== インスタンスフィールド
 
@@ -247,6 +266,31 @@ JVMを次のシステムプロパティ付きで起動します。
 - `+*.MyCondition+`: 単純クラス名が `MyCondition` である条件をすべて非アクティブにします。
 - `+*System*+`: 単純クラス名に `System` を含む条件をすべて非アクティブにします。
 - `org.example.MyCondition`: FQCNが `org.example.MyCondition` である条件を非アクティブにします。
+
+[[extensions-test-instance-factories]]
+=== Test Instance Factories
+
+`{TestInstanceFactory}` defines the API for `Extensions` that wish to _create_ test class
+instances.
+
+Common use cases include acquiring the test instance from a dependency injection
+framework or invoking a static factory method to create the test class instance.
+
+If no `TestInstanceFactory` is registered, the framework will simply invoke the default
+constructor for the test class to instantiate it.
+
+Extensions that implement `TestInstanceFactory` can be registered on top-level test
+classes as well as on `@Nested` test classes. A factory registered on a `@Nested` test
+class will override any factories registered on enclosing classes.
+
+[WARNING]
+====
+Registering multiple extensions that implement `TestInstanceFactory` for any single class
+will result in an exception being thrown for all tests in that class and in any nested
+test classes. Note that any `TestInstanceFactory` registered in a superclass is
+_inherited_. It is the user's responsibility to ensure that only a single
+`TestInstanceFactory` is registered for any specific test class.
+====
 
 [[extensions-test-instance-post-processing]]
 === テストインスタンスの後処理

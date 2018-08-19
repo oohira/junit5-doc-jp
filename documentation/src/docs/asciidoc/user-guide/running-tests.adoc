@@ -119,10 +119,10 @@ https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_test[Gradle�
 を参照してください。
 
 [WARNING]
-.JUnit Platform Gradleプラグインは非推奨 (deprecated)
+.JUnit Platform Gradleプラグインは廃止
 ====
 JUnitチームによって開発されていた `junit-platform-gradle-plugin` は、
-JUnit Platform 1.2 から非推奨となり、1.3 で廃止されます。
+JUnit Platform 1.2 から非推奨となり、1.3 で廃止されました。
 Gradle標準の `test` タスクに移行してください。
 ====
 
@@ -208,9 +208,16 @@ https://www.slf4j.org/legacy.html#jul-to-slf4j[JULからSLF4Jへのブリッジ]
 [[running-tests-build-maven]]
 ==== Maven
 
-JUnitチームは、`mvn test` でJUnit 4とJUnit Jupiterのテストを実行できる
-Maven Surefireプロバイダを開発しています。 `{junit5-jupiter-starter-maven}`
-プロジェクトの `pom.xml` ファイルが使い方を示しています。
+NOTE: https://issues.apache.org/jira/browse/SUREFIRE-1330[バージョン 2.22.0] から、
+Maven SurefireはJUnit Platform上でテストを実行するための
+http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html[ネイティブサポート]
+を提供しています。 `{junit5-jupiter-starter-maven}` プロジェクトの `pom.xml`
+ファイルがその使い方を示すとともに、Mavenビルドを設定するための出発点となるでしょう。
+
+JUnitチームは、Maven Surefire 2.22.0より古いバージョンで `mvn test` でJUnit 4と
+JUnit Jupiterのテストを実行できるMaven Surefireプロバイダを開発してきました。しかし、
+Surefire 2.22.0がリリースされたため、JUnitチームによる `junit-platform-surefire-provider`
+は非推奨となり、JUnit Platformの今後のリリースで廃止されます。
 
 NOTE: `junit-platform-surefire-provider` とはMaven Surefire {surefire-version}
 を使ってください。
@@ -575,8 +582,9 @@ Test run finished after 64 ms
 ....
 
 .終了コード
-NOTE: `{ConsoleLauncher}` は、コンテナやテストが失敗するとステータスコード
-`1` で終了します。成功した場合は、`0` です。
+NOTE: `{ConsoleLauncher}` は、コンテナやテストが失敗するとステータスコード `1` で終了します。
+テストが見つからず、かつコマンドラインオプション `--fail-if-no-tests` が指定されていた場合は、
+`ConsoleLauncher` はステータスコード `2` で終了します。その他の場合は、終了コードは `0` です。
 
 [[running-tests-console-launcher-options]]
 ==== オプション
@@ -584,6 +592,34 @@ NOTE: `{ConsoleLauncher}` は、コンテナやテストが失敗するとステ
 ----
 include::{consoleLauncherOptionsFile}[]
 ----
+
+[[running-tests-console-launcher-argument-files]]
+==== Argument Files (@-files)
+
+On some platforms you may run into system limitations on the length of a command line
+when creating a command line with lots of options or with long arguments.
+
+Since version 1.3, the `ConsoleLauncher` supports _argument files_, also known as
+_@-files_. Argument files are files that themselves contain arguments to be passed to the
+command. When the underlying https://github.com/remkop/picocli[picocli] command line
+parser encounters an argument beginning with the character `@`, it expands the contents
+of that file into the argument list.
+
+The arguments within a file can be separated by spaces or newlines. If an argument
+contains embedded whitespace, the whole argument should be wrapped in double or single
+quotes -- for example, `"-f=My Files/Stuff.java"`.
+
+If the argument file does not exist or cannot be read, the argument will be treated
+literally and will not be removed. This will likely result in an "unmatched argument"
+error message. You can troubleshoot such errors by executing the command with the
+`picocli.trace` system property set to `DEBUG`.
+
+Multiple _@-files_ may be specified on the command line. The specified path may be
+relative to the current directory or absolute.
+
+You can pass a real parameter with an initial `@` character by escaping it with an
+additional `@` symbol. For example, `@@somearg` will become `@somearg` and will not be
+subject to expansion.
 
 
 [[running-tests-junit-platform-runner]]
@@ -707,8 +743,8 @@ _設定パラメーター_ は、テキストベースのキーと値のペア�
   が提供するツールを使ってテストを実行する場合、設定パラメーターは次のように指定できます。
   * <<running-tests-console-launcher,Console Launcher>>: `--config`
     コマンドラインオプションを使います
-  * <<running-tests-build-gradle-config-params,Gradleプラグイン>>:
-    `configurationParameter` または `configurationParameters` DSLを使います
+  * <<running-tests-build-gradle-config-params,Gradle>>:
+    `systemProperty` または `systemProperties` DSLを使います
   * <<running-tests-build-maven-config-params,Maven Surefireプロバイダ>>:
     `configurationParameters` プロパティを使います
 2. JVMシステムプロパティ
@@ -758,3 +794,28 @@ NOTE: 設定パラメーターは、上で定義された順番に従って解�
 | +(micro \| integration) & (foo \| baz)+
 | *foo* または *baz* に対するテストのうち、_micro_ または _integration_ レベルのすべてのテスト
 |===
+
+[[running-tests-capturing-output]]
+=== Capturing Standard Output/Error
+
+Since version 1.3, the JUnit Platform provides opt-in support for capturing output
+printed to `System.out` and `System.err`. To enable it, simply set the
+`junit.platform.output.capture.stdout` and/or `junit.platform.output.capture.stderr`
+<<running-tests-config-params, configuration parameter>> to `true`. In addition, you may
+configure the maximum number of buffered bytes to be used per executed test or container
+using `junit.platform.output.capture.maxBuffer`.
+
+If enabled, the JUnit Platform captures the corresponding output and publishes it as a
+report entry using the `stdout` or `stderr` keys to all registered
+`{TestExecutionListener}` instances immediately before reporting the test or container as
+finished.
+
+Please note that the captured output will only contain output emitted by the thread that
+was used to execute a container or test. Any output by other threads will be omitted
+because particularly when
+<<writing-tests-parallel-execution, executing tests in parallel>> it would be impossible
+to attribute it to a specific test or container.
+
+WARNING: Capturing output is currently an _experimental_ feature. You're invited to give
+it a try and provide feedback to the JUnit team so they can improve and eventually
+<<api-evolution, promote>> this feature.
