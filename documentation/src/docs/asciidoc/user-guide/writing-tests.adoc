@@ -1312,22 +1312,22 @@ include::{testDir}/example/DynamicTestsDemo.java[tags=user_guide]
 
 
 [[writing-tests-parallel-execution]]
-=== Parallel Execution
+=== 並列実行
 
-By default, JUnit Jupiter tests are run sequentially in a single thread. Running tests in
-parallel, e.g. to speed up execution, is available as an opt-in feature since version 5.3.
-To enable parallel execution, simply set the set the
-`junit.jupiter.execution.parallel.enabled` configuration parameter to `true`, e.g. in `junit-platform.properties` (see <<running-tests-config-params>> for other options).
+デフォルトでは、JUnit Jupiterのテストはシングルスレッドで逐次実行されます。バージョン
+5.3からは、オプトインの機能として（例えば高速化のために）テストの並列実行を利用できます。
+並列実行を有効にするには、単に `junit-platform.properties` ファイルで
+`junit.jupiter.execution.parallel.enabled` 設定パラメーターに `true`
+を指定するだけです（その他の選択肢については、<<running-tests-config-params>> を参照）。
 
-Once enabled, the JUnit Jupiter engine will execute tests on all levels of the test tree
-fully in parallel according to the provided
-<<writing-tests-parallel-execution-config, configuration>> while observing the declarative
-<<writing-tests-parallel-execution-synchronization, synchronization>> mechanisms. Please
-note that the <<running-tests-capturing-output>> feature needs to enabled separately.
+有効にすると、JUnit Jupiterエンジンは与えられた
+<<writing-tests-parallel-execution-config, 設定>> と宣言的に指定された
+<<writing-tests-parallel-execution-synchronization, 同期化>> メカニズムに従って、
+テストツリーのすべてのレベルのテストを並列実行します。なお、
+<<running-tests-capturing-output>> 機能は別途有効にする必要がある点に注意してください。
 
-WARNING: Parallel test execution is currently an _experimental_ feature. You're invited
-to give it a try and provide feedback to the JUnit team so they can improve and
-eventually <<api-evolution, promote>> this feature.
+WARNING: テストの並列実行は、今のところ _実験的な_ 機能です。JUnitチームがこの機能を改善し、
+最終的には <<api-evolution, 昇格>> できるよう、試しに使ってみてフィードバックをください。
 
 [[writing-tests-parallel-execution-config]]
 ==== Configuration
