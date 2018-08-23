@@ -1317,7 +1317,7 @@ include::{testDir}/example/DynamicTestsDemo.java[tags=user_guide]
 デフォルトでは、JUnit Jupiterのテストはシングルスレッドで逐次実行されます。バージョン
 5.3からは、オプトインの機能として（例えば高速化のために）テストの並列実行を利用できます。
 並列実行を有効にするには、単に `junit-platform.properties` ファイルで
-`junit.jupiter.execution.parallel.enabled` 設定パラメーターに `true`
+設定パラメーター `junit.jupiter.execution.parallel.enabled` に `true`
 を指定するだけです（その他の選択肢については、<<running-tests-config-params>> を参照）。
 
 有効にすると、JUnit Jupiterエンジンは与えられた
@@ -1330,33 +1330,32 @@ WARNING: テストの並列実行は、今のところ _実験的な_ 機能で�
 最終的には <<api-evolution, 昇格>> できるよう、試しに使ってみてフィードバックをください。
 
 [[writing-tests-parallel-execution-config]]
-==== Configuration
+==== 設定
 
-Properties like the desired parallelism and the maximum pool size can be configured using
-a `{ParallelExecutionConfigurationStrategy}`. The JUnit Platform provides two
-implementations out of the box: `dynamic` and `fixed`. Alternatively, you may implement a
-`custom` strategy.
+希望する並列数やプールの最大サイズなどのプロパティは、
+`{ParallelExecutionConfigurationStrategy}` を使って設定できます。
+JUnit Platformは、すぐに使える2つの実装（`dynamic` と `fixed`）を提供しています。
+なお、代わりに独自の `custom` 戦略を実装することもできます。
 
-To select a strategy, simply set the `junit.jupiter.execution.parallel.config.strategy`
-configuration parameter to one of the following options:
+並列戦略を選択するには、設定パラメーター `junit.jupiter.execution.parallel.config.strategy`
+に次のいずれかを指定します。
 
 `dynamic`::
-  Computes the desired parallelism based on the number of available processors/cores
-  multiplied by the `junit.jupiter.execution.parallel.config.dynamic.factor`
-  configuration parameter (defaults to `1`).
+  利用可能なプロセッサ／コア数に、設定パラメーター
+  `junit.jupiter.execution.parallel.config.dynamic.factor` の値
+  （デフォルトは `1`）を掛けた数に基づいて並列数を計算します。
 
 `fixed`::
-  Uses the mandatory `junit.jupiter.execution.parallel.config.fixed.parallelism`
-  configuration parameter as desired parallelism.
+  設定パラメーター `junit.jupiter.execution.parallel.config.fixed.parallelism`
+  の値を並列数として使用します。
 
 `custom`::
-  Allows to specify a custom `{ParallelExecutionConfigurationStrategy}` implementation via
-  the mandatory `junit.jupiter.execution.parallel.config.custom.class` configuration
-  parameter to determine the desired configuration.
+  設定パラメーター `junit.jupiter.execution.parallel.config.custom.class`
+  で指定された独自の `{ParallelExecutionConfigurationStrategy}` 実装を使って、
+  並列数を決定します。
 
-If no configuration strategy is set, JUnit Jupiter uses the `dynamic` configuration
-strategy with a factor of 1, i.e. the desired parallelism will equal the number of
-available processors/cores.
+もし並列戦略が指定されていなかった場合、JUnit Jupiterは `dynamic` 戦略を使います。
+つまり、並列数は利用可能なプロセッサ／コア数の数と同じになります。
 
 [[writing-tests-parallel-execution-synchronization]]
 ==== Synchronization
