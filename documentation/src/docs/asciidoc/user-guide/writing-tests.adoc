@@ -1322,7 +1322,7 @@ include::{testDir}/example/DynamicTestsDemo.java[tags=user_guide]
 
 有効にすると、JUnit Jupiterエンジンは与えられた
 <<writing-tests-parallel-execution-config, 設定>> と宣言的に指定された
-<<writing-tests-parallel-execution-synchronization, 同期化>> メカニズムに従って、
+<<writing-tests-parallel-execution-synchronization, 同期化>> に従って、
 テストツリーのすべてのレベルのテストを並列実行します。なお、
 <<running-tests-capturing-output>> 機能は別途有効にする必要がある点に注意してください。
 
@@ -1358,40 +1358,42 @@ JUnit Platformは、すぐに使える2つの実装（`dynamic` と `fixed`）�
 つまり、並列数は利用可能なプロセッサ／コア数の数と同じになります。
 
 [[writing-tests-parallel-execution-synchronization]]
-==== Synchronization
+==== 同期化
 
-In the `org.junit.jupiter.api.parallel` package, JUnit Jupiter provides two
-annotation-based declarative mechanisms to change the execution mode and allow for
-synchronization when using shared resources in different tests.
+JUnit Jupiterは、異なるテスト間で共有リソースを使うときの実行モデルを変更し、
+同期化を可能にするためのアノテーションベースの仕組みを2つ
+`org.junit.jupiter.api.parallel` パッケージで提供しています。
 
-If parallel execution is enabled, all classes and methods are executed concurrently by
-default. You can change the execution mode for the annotated element and its subelements
-(if any) by using the `{Execution}` annotation. The following two modes are available:
+並列実行が有効な場合、デフォルトではすべてのクラスとメソッドが同時に実行されます。
+`{Execution}` アノテーションを使うことで、アノテーションが付与された要素と
+（もしあれば）サブ要素の実行モデルを変更することができます。
+次の2つのモードが利用可能です。
 
 `SAME_THREAD`::
-  Force execution in the same thread used by the parent. For example, when used on a test
-  method, the test method will be executed in the same thread as any `@BeforeAll` or
-  `@AfterAll` methods of the containing test class.
+  親と同じスレッドで実行することを強制します。例えば、テストメソッドに指定した場合、
+  該当メソッドはテストクラスの `@BeforeAll` メソッドや `@AfterAll` メソッドを
+  実行するスレッドと同じスレッドで実行されます。
 
 `CONCURRENT`::
-  Execute concurrently unless a resource constraint forces execution in the same thread.
+  リソース制約で同一スレッドでの実行が強制されない限り、別スレッドで並列実行されます。
 
-In addition, the `{ResourceLock}` annotation allows to declare that a test class or
-method uses a specific shared resource that requires synchronized access to ensure
-reliable test execution.
+加えて、`{ResourceLock}` アノテーションを使うと、テストクラスやテストメソッドが
+同期化されたアクセスを必要とする共有リソースを使用していると宣言できます。
 
-If the tests in the following example were run in parallel they would be flaky, i.e.
-sometimes pass and other times fail, because of the inherent race condition of
-writing and then reading the same system property.
+仮に次のサンプルのテストが並列実行されたとすると、結果は不安定 (flaky) 、
+つまり成功したり失敗したりします。
+というのも、同じシステムプロパティを読み書きする競合状態があるからです
+（訳注： `@ResourceLock` による同期化がない仮定の話）。
 
 [source,java]
 ----
 include::{testDir}/example/SharedResourcesDemo.java[tags=user_guide]
 ----
 
-When access to shared resources is declared using this annotation, the JUnit Jupiter
-engine uses this information to ensure that no conflicting tests are run in parallel.
+共有リソースへのアクセスが `@ResourceLock` アノテーションで宣言されている場合、
+JUnit Jupiterエンジンはこの情報を活用し、互いにコンフリクトするテストが同時に
+実行されないよう保証します。
 
-In addition to the string that uniquely identifies the used resource, you may specify an
-access mode. Two tests that require `READ` access to a resource may run in parallel with
-each other but not while any other test that requires `READ_WRITE` access is running.
+使用されるリソースを一意に特定する文字列に加えて、アクセスモードを指定することもできます。
+同じリソースの `READ` アクセスを要求する2つのテストは同時に実行することができますが、
+`READ_WRITE` アクセスを要求するテストが実行中の場合は実行できません。
