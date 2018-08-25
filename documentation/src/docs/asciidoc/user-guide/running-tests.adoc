@@ -594,32 +594,30 @@ include::{consoleLauncherOptionsFile}[]
 ----
 
 [[running-tests-console-launcher-argument-files]]
-==== Argument Files (@-files)
+==== 引数ファイル (@ファイル)
 
-On some platforms you may run into system limitations on the length of a command line
-when creating a command line with lots of options or with long arguments.
+プラットフォームによっては、多数のオプションや長い引数をもつコマンドラインを作ろうとすると、
+システムのコマンドライン文字数の上限に引っかかるかもしれません。
 
-Since version 1.3, the `ConsoleLauncher` supports _argument files_, also known as
-_@-files_. Argument files are files that themselves contain arguments to be passed to the
-command. When the underlying https://github.com/remkop/picocli[picocli] command line
-parser encounters an argument beginning with the character `@`, it expands the contents
-of that file into the argument list.
+バージョン1.3から、`ConsoleLauncher` は _引数ファイル_ (_@ファイル_ としても知られる)
+をサポートします。引数ファイルは、コマンドに与える引数を記述したファイルです。
+内部で使用している https://github.com/remkop/picocli[picocli] コマンドラインパーサーは、
+`@` 文字から始まる引数を見つけると、そのファイルの中身を引数リストとして展開します。
 
-The arguments within a file can be separated by spaces or newlines. If an argument
-contains embedded whitespace, the whole argument should be wrapped in double or single
-quotes -- for example, `"-f=My Files/Stuff.java"`.
+ファイル内の引数は、スペースまたは改行で分割できます。引数自身が空白を含む場合は、
+引数全体をダブルクォートかシングルクォートで囲まなければなりません。
+例えば、`"-f=My Files/Stuff.java"` のようになります。
 
-If the argument file does not exist or cannot be read, the argument will be treated
-literally and will not be removed. This will likely result in an "unmatched argument"
-error message. You can troubleshoot such errors by executing the command with the
-`picocli.trace` system property set to `DEBUG`.
+引数ファイルが存在しないか読み込めない場合は、無視されずにそのリテラル文字列が引数として扱われます。
+その結果、 "unmatched argument" エラーメッセージが表示される結果になりがちです。
+`picocli.trace` システムプロパティを `DEBUG` に設定してからコマンドを実行すれば、
+このようなエラーをトラブルシュートすることができます。
 
-Multiple _@-files_ may be specified on the command line. The specified path may be
-relative to the current directory or absolute.
+複数の _@ファイル_ をコマンドラインに指定することもできます。指定するパスは、
+カレントディレクトリからの相対パスにするか、絶対パスにします。
 
-You can pass a real parameter with an initial `@` character by escaping it with an
-additional `@` symbol. For example, `@@somearg` will become `@somearg` and will not be
-subject to expansion.
+実際の引数が `@` 文字から始まる場合は、`@` をもう1つ追加してエスケープします。
+例えば、`@@somearg` は `@somearg` と解釈され、展開はされません。
 
 
 [[running-tests-junit-platform-runner]]
