@@ -91,7 +91,7 @@ _宣言的に_ 登録する場合、拡張機能の設定はアノテーショ�
 ビルダーAPIに引数を渡して _手続き的に_ 設定することができます。
 
 NOTE: `@RegisterExtension` フィールドは、`private` または `null` (評価時)
-であってはなりませんが、`static` か非 `static` はどちらでもかまいません。
+であってはなりませんが、`static` か非 `static` かはどちらでもかまいません。
 
 [[extensions-registration-programmatic-static-fields]]
 ===== staticフィールド
@@ -120,20 +120,20 @@ include::{testDir}/example/registration/WebServerDemo.java[tags=user_guide]
 ----
 
 [[extensions-registration-programmatic-static-fields-kotlin]]
-===== Static Fields in Kotlin
+===== Kotlinでのstaticフィールド
 
-The Kotlin programming language does not have the concept of a `static` field. However,
-the compiler can be instructed to generate static fields using annotations. Since, as
-stated earlier, `@RegisterExtension` fields must not be `private` nor `null`, one
-**cannot** use the `@JvmStatic` annotation in Kotlin as it generates `private` fields.
-Rather, the `@JvmField` annotation must be used.
+プログラミング言語Kotlinには、`static` フィールドがありません。しかし、
+アノテーションを使うと、コンパイラにstaticフィールドを生成させることができます。
+先に述べた通り、`@RegisterExtension` フィールドは `private` または `null`
+になってはならないため、`private` フィールドを生成する `@JvmStatic`
+アノテーションをKotlinで **使うことはできません。**
+代わりに、`@JvmField` アノテーションを使ってください。
 
-The following example is a version of the `WebServerDemo` from the previous section that
-has been ported to Kotlin.
+次の例は、前節の `WebServerDemo` をKotlinに移植したものです。
 
 // TODO: Change to using kotlin language highlighting after switch to rouge syntax highlighter
 [source,groovy,indent=0]
-.Registering an extension via a static field in Kotlin
+.Kotlinのstaticフィールド経由で拡張機能を登録する
 ----
 include::{kotlinTestDir}/example/registration/KotlinWebServerDemo.kt[tags=user_guide]
 ----
