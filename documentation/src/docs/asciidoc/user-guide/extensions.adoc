@@ -268,28 +268,28 @@ JVMを次のシステムプロパティ付きで起動します。
 - `org.example.MyCondition`: FQCNが `org.example.MyCondition` である条件を非アクティブにします。
 
 [[extensions-test-instance-factories]]
-=== Test Instance Factories
+=== テストインスタンスのファクトリ
 
-`{TestInstanceFactory}` defines the API for `Extensions` that wish to _create_ test class
-instances.
+`{TestInstanceFactory}` は、テストクラスのインスタンスを _生成する_
+ための Extension APIを定めています。
 
-Common use cases include acquiring the test instance from a dependency injection
-framework or invoking a static factory method to create the test class instance.
+一般的なユースケースとしては、DI（依存性注入）フレームワークからテストインスタンスを取得したり、
+テストクラスのインスタンス生成にstaticファクトリメソッドを呼んだりすることです。
 
-If no `TestInstanceFactory` is registered, the framework will simply invoke the default
-constructor for the test class to instantiate it.
+`TestInstanceFactory` が登録されていない場合は、
+フレームワークは単にテストクラスのデフォルトコンストラクタを実行して初期化します。
 
-Extensions that implement `TestInstanceFactory` can be registered on top-level test
-classes as well as on `@Nested` test classes. A factory registered on a `@Nested` test
-class will override any factories registered on enclosing classes.
+`TestInstanceFactory` を実装する拡張機能は、トップレベルのクラスだけでなく `@Nested`
+テストクラスに対しても登録できます。`@Nested` テストクラスに対して登録されたファクトリは、
+その内部クラスに登録されるほかのファクトリを上書きします。
 
 [WARNING]
 ====
-Registering multiple extensions that implement `TestInstanceFactory` for any single class
-will result in an exception being thrown for all tests in that class and in any nested
-test classes. Note that any `TestInstanceFactory` registered in a superclass is
-_inherited_. It is the user's responsibility to ensure that only a single
-`TestInstanceFactory` is registered for any specific test class.
+`TestInstanceFactory` を実装する複数の拡張機能を1つのクラスに登録すると、
+そのクラスおよびネストするクラスのすべてのテストで例外がスローされます。
+親クラスに登録された `TestInstanceFactory` は _継承される_ 点に注意してください。
+テストクラスに `TestInstanceFactory` が1つだけしか登録されないようにするのは、
+ユーザーの責任となります。
 ====
 
 [[extensions-test-instance-post-processing]]
