@@ -691,9 +691,8 @@ INFO: About to execute repetition 5 of 5 for repeatedTestInGerman
 include::{testDir}/example/RepeatedTestsDemo.java[tags=user_guide]
 ----
 
-Unicodeテーマを有効にした `ConsoleLauncher` または `junitPlatformTest`
-Gradle プラグインで `RepeatedTestsDemo` を実行すると、コンソールには
-以下のように出力されます。
+Unicodeテーマを有効にした `ConsoleLauncher` で `RepeatedTestsDemo` を実行すると、
+コンソールには以下のように出力されます。
 
 ....
 ├─ RepeatedTestsDemo ✔
@@ -776,7 +775,7 @@ WARNING: パラーメーター化テストは、現在 _実験中_ の機能で�
 詳細は、<<dependency-metadata>> を参照してください。
 
 [[writing-tests-parameterized-tests-consuming-arguments]]
-=== パラメーターの消費
+==== パラメーターの消費
 
 パラメーター化テストのメソッドは、通常は設定されたソース
 (<<writing-tests-parameterized-tests-sources>> 参照)
@@ -868,13 +867,24 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=EnumSource_regex_exam
 [[writing-tests-parameterized-tests-sources-MethodSource]]
 ===== @MethodSource
 
-`@MethodSource` は、テストクラスまたは外部のクラスの _ファクトリ_
+`{MethodSource}` は、テストクラスまたは外部のクラスの _ファクトリ_
 メソッドによるパラメーターの指定を可能にします。
-ファクトリメソッドは、`Stream`, `Iterable`, `Iterator` または配列のいずれかを
-返さなければいけません。また、引数を受け取ることもできません。
+
 テストクラス内のファクトリメソッドは、`@TestInstance(Lifecycle.PER_CLASS)`
 アノテーションが付与されていない限り、`static` でなければいけません。
 一方、外部クラスのファクトリメソッドは、常に `static` でなければいけません。
+これらのファクトリメソッドは、引数を受け取ることもできません。
+
+ファクトリメソッドは、 `@ParameterizedTest` メソッドの各呼び出しに対して
+実際の引数として渡される _パラメーター_ の _ストリーム_ を生成しなければなりません。
+一般的に言えば、これは `Arguments` の `Stream` (つまり、`Stream<Arguments>`)
+となりますが、実際の戻り値は様々な型をとりえます。ここでいう "ストリーム" とは、
+JUnitが確実に `Stream` へ変換できるものであれば何でも構いません。例えば、
+`Stream`, `DoubleStream`, `LongStream`, `IntStream`, `Collection`,
+`Iterator`, `Iterable`, オブジェクト配列, プリミティブ型の配列などです。
+ストリームの "パラメーター" は、 `Arguments` のインスタンス、オブジェクト配列
+(つまり、`Object[]`)、あるいはパラメーター化テストメソッドが1つだけしか
+パラメーターを受け取らない場合には単一の値となります。
 
 パラメーターが1つしか必要なければ、次の例のようにパラメーターのインスタンスを
 `Stream` で返すことができます。
@@ -900,9 +910,12 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=simple_MethodSource_w
 include::{testDir}/example/ParameterizedTestDemo.java[tags=primitive_MethodSource_example]
 ----
 
-テストメソッドが複数の仮引数を宣言している場合、以下で示すように `Arguments`
-のコレクションかストリームを返す必要があります。`Arguments.of(Object...)` は、
-`Arguments` インターフェースで定義されるstaticファクトリメソッドである点に注意してください。
+パラメーター化テストメソッドが複数の仮引数を宣言している場合、以下で示すように `Arguments`
+インスタンスかオブジェクト配列を要素とするコレクション、ストリーム、配列のいずれかを返す必要があります
+（サポートされる戻り値型のさらなる詳細は、`{MethodSource}` のJavadocを参照）。
+`arguments(Object...)` は `Arguments` インターフェースで定義されるstaticファクトリメソッドである
+点に注意してください。また、`Arguments.of(Object...)` を `arguments(Object...)`
+の代わりに使用することもできます。
 
 [source,java,indent=0]
 ----
@@ -1028,6 +1041,9 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=implicit_conversion_e
 | `double`/`Double`          | `"1.0"`                                  -> `1.0d`
 | `Enum` subclass            | `"SECONDS"`                              -> `TimeUnit.SECONDS`
 | `java.io.File`             | `"/path/to/file"`                        -> `new File("/path/to/file")`
+| `java.lang.Class`          | `"java.lang.Integer"`                    -> `java.lang.Integer.class` _(use `$` for nested classes, e.g. `"java.lang.Thread$State"`)_
+| `java.lang.Class`          | `"byte"`                                 -> `byte.class` _(primitive types are supported)_
+| `java.lang.Class`          | `"char[]"`                               -> `char[].class` _(array types are supported)_
 | `java.math.BigDecimal`     | `"123.456e789"`                          -> `new BigDecimal("123.456e789")`
 | `java.math.BigInteger`     | `"1234567890123456789"`                  -> `new BigInteger("1234567890123456789")`
 | `java.net.URI`             | `"http://junit.org/"`                    -> `URI.create("http://junit.org/")`
@@ -1231,7 +1247,7 @@ JUnit Jupiterでは、これらの標準的なテストに加えて、完全に�
 `@Test` メソッドとは異なり、`@TestFactory` メソッド自身はテストケースではなく、
 テストケースのファクトリとなります。ファクトリの出力が動的テストになります。
 技術的に言うと、`@TestFactory` メソッドは、`DynamicNode` インスタンスの
-`Stream`, `Collection`, `Iterable`, `Iterator` いずれかを
+`Stream`, `Collection`, `Iterable`, `Iterator`, 配列のいずれかを
 返さなければなりません。`DynamicNode` のインスタンス化可能なサブクラスには、
 `DynamicContainer` と `DynamicTest` があります。`DynamicContainer`
 インスタンスは、_表示名_ と子どもの `DynamicNode` リストで構成され、
@@ -1296,3 +1312,91 @@ WARNING: 動的テストは現在 _実験中_ の機能です。詳細は、
 ----
 include::{testDir}/example/DynamicTestsDemo.java[tags=user_guide]
 ----
+
+
+[[writing-tests-parallel-execution]]
+=== 並列実行
+
+デフォルトでは、JUnit Jupiterのテストはシングルスレッドで逐次実行されます。バージョン
+5.3からは、オプトインの機能として（例えば高速化のために）テストの並列実行を利用できます。
+並列実行を有効にするには、単に `junit-platform.properties` ファイルで
+設定パラメーター `junit.jupiter.execution.parallel.enabled` に `true`
+を指定するだけです（その他の選択肢については、<<running-tests-config-params>> を参照）。
+
+有効にすると、JUnit Jupiterエンジンは与えられた
+<<writing-tests-parallel-execution-config, 設定>> と宣言的に指定された
+<<writing-tests-parallel-execution-synchronization, 同期化>> に従って、
+テストツリーのすべてのレベルのテストを並列実行します。なお、
+<<running-tests-capturing-output>> 機能は別途有効にする必要がある点に注意してください。
+
+WARNING: テストの並列実行は、今のところ _実験的な_ 機能です。JUnitチームがこの機能を改善し、
+最終的には <<api-evolution, 昇格>> できるよう、試しに使ってみてフィードバックをください。
+
+[[writing-tests-parallel-execution-config]]
+==== 設定
+
+希望する並列数やプールの最大サイズなどのプロパティは、
+`{ParallelExecutionConfigurationStrategy}` を使って設定できます。
+JUnit Platformは、すぐに使える2つの実装（`dynamic` と `fixed`）を提供しています。
+なお、代わりに独自の `custom` 戦略を実装することもできます。
+
+並列戦略を選択するには、設定パラメーター `junit.jupiter.execution.parallel.config.strategy`
+に次のいずれかを指定します。
+
+`dynamic`::
+  利用可能なプロセッサ／コア数に、設定パラメーター
+  `junit.jupiter.execution.parallel.config.dynamic.factor` の値
+  （デフォルトは `1`）を掛けた数に基づいて並列数を計算します。
+
+`fixed`::
+  設定パラメーター `junit.jupiter.execution.parallel.config.fixed.parallelism`
+  の値を並列数として使用します。
+
+`custom`::
+  設定パラメーター `junit.jupiter.execution.parallel.config.custom.class`
+  で指定された独自の `{ParallelExecutionConfigurationStrategy}` 実装を使って、
+  並列数を決定します。
+
+もし並列戦略が指定されていなかった場合、JUnit Jupiterは `dynamic` 戦略を使います。
+つまり、並列数は利用可能なプロセッサ／コア数の数と同じになります。
+
+[[writing-tests-parallel-execution-synchronization]]
+==== 同期化
+
+JUnit Jupiterは、異なるテスト間で共有リソースを使うときの実行モデルを変更し、
+同期化を可能にするためのアノテーションベースの仕組みを2つ
+`org.junit.jupiter.api.parallel` パッケージで提供しています。
+
+並列実行が有効な場合、デフォルトではすべてのクラスとメソッドが同時に実行されます。
+`{Execution}` アノテーションを使うことで、アノテーションが付与された要素と
+（もしあれば）サブ要素の実行モデルを変更することができます。
+次の2つのモードが利用可能です。
+
+`SAME_THREAD`::
+  親と同じスレッドで実行することを強制します。例えば、テストメソッドに指定した場合、
+  該当メソッドはテストクラスの `@BeforeAll` メソッドや `@AfterAll` メソッドを
+  実行するスレッドと同じスレッドで実行されます。
+
+`CONCURRENT`::
+  リソース制約で同一スレッドでの実行が強制されない限り、別スレッドで並列実行されます。
+
+加えて、`{ResourceLock}` アノテーションを使うと、テストクラスやテストメソッドが
+同期化されたアクセスを必要とする共有リソースを使用していると宣言できます。
+
+仮に次のサンプルのテストが並列実行されたとすると、結果は不安定 (flaky) 、
+つまり成功したり失敗したりします。
+というのも、同じシステムプロパティを読み書きする競合状態があるからです
+（訳注： `@ResourceLock` による同期化がない仮定の話）。
+
+[source,java]
+----
+include::{testDir}/example/SharedResourcesDemo.java[tags=user_guide]
+----
+
+共有リソースへのアクセスが `@ResourceLock` アノテーションで宣言されている場合、
+JUnit Jupiterエンジンはこの情報を活用し、互いにコンフリクトするテストが同時に
+実行されないよう保証します。
+
+使用されるリソースを一意に特定する文字列に加えて、アクセスモードを指定することもできます。
+同じリソースの `READ` アクセスを要求する2つのテストは同時に実行することができますが、
+`READ_WRITE` アクセスを要求するテストが実行中の場合は実行できません。

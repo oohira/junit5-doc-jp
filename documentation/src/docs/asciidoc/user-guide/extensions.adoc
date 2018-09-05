@@ -91,7 +91,7 @@ _宣言的に_ 登録する場合、拡張機能の設定はアノテーショ�
 ビルダーAPIに引数を渡して _手続き的に_ 設定することができます。
 
 NOTE: `@RegisterExtension` フィールドは、`private` または `null` (評価時)
-であってはなりませんが、`static` か非 `static` はどちらでもかまいません。
+であってはなりませんが、`static` か非 `static` かはどちらでもかまいません。
 
 [[extensions-registration-programmatic-static-fields]]
 ===== staticフィールド
@@ -117,6 +117,25 @@ NOTE: `@RegisterExtension` フィールドは、`private` または `null` (評�
 .staticフィールド経由で登録される拡張機能
 ----
 include::{testDir}/example/registration/WebServerDemo.java[tags=user_guide]
+----
+
+[[extensions-registration-programmatic-static-fields-kotlin]]
+===== Kotlinでのstaticフィールド
+
+プログラミング言語Kotlinには、`static` フィールドがありません。しかし、
+アノテーションを使うと、コンパイラにstaticフィールドを生成させることができます。
+先に述べた通り、`@RegisterExtension` フィールドは `private` または `null`
+になってはならないため、`private` フィールドを生成する `@JvmStatic`
+アノテーションをKotlinで **使うことはできません。**
+代わりに、`@JvmField` アノテーションを使ってください。
+
+次の例は、前節の `WebServerDemo` をKotlinに移植したものです。
+
+// TODO: Change to using kotlin language highlighting after switch to rouge syntax highlighter
+[source,groovy,indent=0]
+.Kotlinのstaticフィールド経由で拡張機能を登録する
+----
+include::{kotlinTestDir}/example/registration/KotlinWebServerDemo.kt[tags=user_guide]
 ----
 
 [[extensions-registration-programmatic-instance-fields]]
@@ -247,6 +266,32 @@ JVMを次のシステムプロパティ付きで起動します。
 - `+*.MyCondition+`: 単純クラス名が `MyCondition` である条件をすべて非アクティブにします。
 - `+*System*+`: 単純クラス名に `System` を含む条件をすべて非アクティブにします。
 - `org.example.MyCondition`: FQCNが `org.example.MyCondition` である条件を非アクティブにします。
+
+[[extensions-test-instance-factories]]
+=== テストインスタンスのファクトリ
+
+`{TestInstanceFactory}` は、テストクラスのインスタンスを _生成する_
+ための Extension APIを定めています。
+
+一般的なユースケースとしては、DI（依存性注入）フレームワークからテストインスタンスを取得したり、
+テストクラスのインスタンス生成にstaticファクトリメソッドを呼んだりすることです。
+
+`TestInstanceFactory` が登録されていない場合は、
+フレームワークは単にテストクラスの _唯一の_ コンストラクタを実行して初期化します。
+このとき、コンストラクタの引数は、登録済みの `ParameterResolver` 拡張で解決されます。
+
+`TestInstanceFactory` を実装する拡張機能は、テストインターフェースや
+トップレベルのテストクラス、あるいは `@Nested` テストクラスに対しても登録できます。
+
+[WARNING]
+====
+`TestInstanceFactory` を実装する複数の拡張機能を1つのクラスに登録すると、
+そのクラスとサブクラス、およびネストするクラスのすべてのテストで例外がスローされます。
+親クラスまたは _外部_ クラス（つまり、`@Nested` テストクラスの場合）に登録された
+`TestInstanceFactory` は _継承される_ 点に注意してください。
+テストクラスに `TestInstanceFactory` が1つだけしか登録されないようにするのは、
+ユーザーの責任となります。
+====
 
 [[extensions-test-instance-post-processing]]
 === テストインスタンスの後処理

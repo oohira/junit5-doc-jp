@@ -6,46 +6,48 @@ buildscript {
 
 		// classpath('org.asciidoctor:asciidoctorj-epub3:1.5.0-alpha.16')
 		classpath('org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16')
-		classpath('org.asciidoctor:asciidoctorj-diagram:1.5.8')
+		classpath('org.asciidoctor:asciidoctorj-diagram:1.5.9')
 	}
 }
 
 plugins {
-	id 'org.asciidoctor.convert' version '1.5.7'
+	id 'org.asciidoctor.convert' version '1.5.8.1'
 }
 
-apply plugin: 'org.junit.platform.gradle.plugin'
-
-junitPlatform {
-	details 'tree'
-	filters {
-		includeClassNamePattern '.+(Tests|Demo)$'
-		tags {
-			exclude 'exclude'
-		}
-	}
-	logManager 'org.apache.logging.log4j.jul.LogManager'
+task consoleLauncherTest(type: JavaExec) {
+	dependsOn testClasses
+	def reportsDir = file("$buildDir/test-results")
+	outputs.dir reportsDir
+	classpath sourceSets.test.runtimeClasspath
+	main 'org.junit.platform.console.ConsoleLauncher'
+	args '--scan-classpath'
+	args '--details', 'tree'
+	args '--include-classname', '.*Tests'
+	args '--include-classname', '.*Demo'
+	args '--exclude-tag', 'exclude'
+	args '--reports-dir', reportsDir
+	systemProperty 'java.util.logging.manager', 'org.apache.logging.log4j.jul.LogManager'
 }
-
-/*
-test {
-	scanForTestClasses = false
-	include(['example/DocumentationTestSuite.class'])
-}
-*/
+//test {
+//	dependsOn consoleLauncherTest
+//	exclude '**/*'
+//}
 
 dependencies {
 	asciidoctor('org.jruby:jruby-complete:9.1.17.0')
 
-	testImplementation("org.junit.jupiter:junit-jupiter-api:${version}")
+    // Jupiter API is used in src/main/java
+	implementation("org.junit.jupiter:junit-jupiter-api:${version}")
+
 	testImplementation("org.junit.jupiter:junit-jupiter-params:${version}")
 	testImplementation("org.junit.platform:junit-platform-runner:${platformVersion}")
 	testImplementation("org.junit.platform:junit-platform-launcher:${platformVersion}")
-    testImplementation("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
+	testImplementation("org.jetbrains.kotlin:kotlin-stdlib")
 
-	// Include junit-platform-console so that the JUnit Gradle plugin
-	// uses the local version of the ConsoleLauncher.
-	testRuntimeOnly("org.junit.platform:junit-platform-console:${platformVersion}")
+    // Required by :consoleLauncherTest and :generateConsoleLauncherOptions
+    testRuntimeOnly("org.junit.platform:junit-platform-console:${platformVersion}")
+	testRuntimeOnly("org.junit.platform:junit-platform-suite-api:${platformVersion}")
+	testRuntimeOnly("org.junit.platform:junit-platform-surefire-provider:${platformVersion}")
 
 	testRuntimeOnly("org.junit.vintage:junit-vintage-engine:${vintageVersion}")
 	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${version}")
@@ -53,7 +55,7 @@ dependencies {
 	testRuntimeOnly("org.apache.logging.log4j:log4j-jul:${log4jVersion}")
 
 	// for ApiReportGenerator
-	testImplementation("io.github.lukehutch:fast-classpath-scanner:2.18.2")
+	testImplementation('io.github.classgraph:classgraph:4.0.2')
 }
 
 asciidoctorj {
@@ -64,6 +66,7 @@ ext {
 	generatedAsciiDocPath = buildDir.toPath().resolve('generated/asciidoc')
 	consoleLauncherOptionsFile = generatedAsciiDocPath.resolve('console-launcher-options.txt')
 	experimentalApisTableFile = generatedAsciiDocPath.resolve('experimental-apis-table.txt')
+	deprecatedApisTableFile = generatedAsciiDocPath.resolve('deprecated-apis-table.txt')
 }
 
 def createJavaExecTaskWithOutputFile(taskName, outputFile, mainClass, mainArgs = []) {
@@ -82,10 +85,11 @@ def createJavaExecTaskWithOutputFile(taskName, outputFile, mainClass, mainArgs =
 
 createJavaExecTaskWithOutputFile('generateConsoleLauncherOptions', consoleLauncherOptionsFile, 'org.junit.platform.console.ConsoleLauncher', ['--help'])
 
-createJavaExecTaskWithOutputFile('generateExperimentalApisTable', experimentalApisTableFile, 'org.junit.api.tools.ApiReportGenerator')
+createJavaExecTaskWithOutputFile('generateExperimentalApisTable', experimentalApisTableFile, 'org.junit.api.tools.ApiReportGenerator', ['EXPERIMENTAL'])
+createJavaExecTaskWithOutputFile('generateDeprecatedApisTable', deprecatedApisTableFile, 'org.junit.api.tools.ApiReportGenerator', ['DEPRECATED'])
 
 asciidoctor {
-	dependsOn 'generateConsoleLauncherOptions', 'generateExperimentalApisTable'
+	dependsOn 'generateConsoleLauncherOptions', 'generateExperimentalApisTable', 'generateDeprecatedApisTable'
 
 	// enable the Asciidoctor Diagram extension
 	requires 'asciidoctor-diagram'
@@ -118,6 +122,7 @@ asciidoctor {
 				'kotlinTestDir': sourceSets.test.kotlin.srcDirs[0],
 				'consoleLauncherOptionsFile': consoleLauncherOptionsFile.toString(),
 				'experimentalApisTableFile': experimentalApisTableFile.toString(),
+				'deprecatedApisTableFile': deprecatedApisTableFile.toString(),
 				'testResourcesDir': sourceSets.test.resources.srcDirs[0],
 				'outdir': outputDir.absolutePath,
 				'source-highlighter': 'coderay@', // TODO switch to 'rouge' once supported by the html5 backend and on MS Windows
