@@ -208,75 +208,34 @@ https://www.slf4j.org/legacy.html#jul-to-slf4j[JULからSLF4Jへのブリッジ]
 [[running-tests-build-maven]]
 ==== Maven
 
-NOTE: https://issues.apache.org/jira/browse/SUREFIRE-1330[バージョン 2.22.0] から、
+NOTE: JUnitチームによって開発されていた `junit-platform-surefire-provider`
+は非推奨となり、JUnit Platform 1.4で削除が予定されています。
+代わりに、Maven Surefireを使用してください。
+
+https://issues.apache.org/jira/browse/SUREFIRE-1330[バージョン 2.22.0] から、
 Maven SurefireはJUnit Platform上でテストを実行するための
 http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html[ネイティブサポート]
 を提供しています。 `{junit5-jupiter-starter-maven}` プロジェクトの `pom.xml`
 ファイルがその使い方を示すとともに、Mavenビルドを設定するための出発点となるでしょう。
 
-JUnitチームは、Maven Surefire 2.22.0より古いバージョンで `mvn test` でJUnit 4と
-JUnit Jupiterのテストを実行できるMaven Surefireプロバイダを開発してきました。しかし、
-Surefire 2.22.0がリリースされたため、JUnitチームによる `junit-platform-surefire-provider`
-は非推奨となり、JUnit Platformの今後のリリースで廃止されます。
-
-NOTE: `junit-platform-surefire-provider` とはMaven Surefire {surefire-version}
-を使ってください。
-
-[source,xml,indent=0]
-[subs=attributes+]
-----
-	...
-	<build>
-		<plugins>
-			...
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>{surefire-version}</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.junit.platform</groupId>
-						<artifactId>junit-platform-surefire-provider</artifactId>
-						<version>{platform-version}</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-	</build>
-	...
-----
-
 [[running-tests-build-maven-engines-configure]]
 ===== テストエンジンを設定する
 
-Maven Surefireにテストを実行させるためには、`TestEngine` の実装が
+Maven Surefireにテストを実行させるためには、`TestEngine` の実装が少なくとも1つ
 実行時のクラスパスに必要です。
 
-JUnit Jupiterベースのテストをサポートするためには、JUnit Jupiter API
-に対する `test` 依存と、JUnit Jupiter `TestEngine` 実装に対する
-`maven-surefire-plugin` の依存を次のように指定する必要があります。
+JUnit Jupiterベースのテストをサポートするためには、JUnit Jupiter APIと
+JUnit Jupiter `TestEngine` 実装に対する `test` スコープの依存を
+次のように指定する必要があります。
 
 [source,xml,indent=0]
 [subs=attributes+]
 ----
-	...
 	<build>
 		<plugins>
-			...
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>{surefire-version}</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.junit.platform</groupId>
-						<artifactId>junit-platform-surefire-provider</artifactId>
-						<version>{platform-version}</version>
-					</dependency>
-					<dependency>
-						<groupId>org.junit.jupiter</groupId>
-						<artifactId>junit-jupiter-engine</artifactId>
-						<version>{jupiter-version}</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
@@ -289,13 +248,20 @@ JUnit Jupiterベースのテストをサポートするためには、JUnit Jupi
 			<version>{jupiter-version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>{jupiter-version}</version>
+			<scope>test</scope>
+		</dependency>
+		...
 	</dependencies>
 	...
 ----
 
-JUnit Platform Surefireプロバイダは、JUnit 4ベースのテストも実行することができます。
-そのためには、JUnit 4に対する `test` 依存と、JUnit Vintage `TestEngine` 実装に対する
-`maven-surefire-plugin` の依存が必要です。
+Maven Surefireは、JUnit 4ベースのテストも実行することができます。
+そのためには、次のようにJUnit 4とJUnit Vintage `TestEngine` 実装に対する `test`
+スコープの依存が必要です。
 
 [source,xml,indent=0]
 [subs=attributes+]
@@ -303,23 +269,9 @@ JUnit Platform Surefireプロバイダは、JUnit 4ベースのテストも実�
 	...
 	<build>
 		<plugins>
-			...
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>{surefire-version}</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.junit.platform</groupId>
-						<artifactId>junit-platform-surefire-provider</artifactId>
-						<version>{platform-version}</version>
-					</dependency>
-					...
-					<dependency>
-						<groupId>org.junit.vintage</groupId>
-						<artifactId>junit-vintage-engine</artifactId>
-						<version>{vintage-version}</version>
-					</dependency>
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
@@ -332,19 +284,16 @@ JUnit Platform Surefireプロバイダは、JUnit 4ベースのテストも実�
 			<version>{junit4-version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>{vintage-version}</version>
+			<scope>test</scope>
+		</dependency>
+		...
 	</dependencies>
 	...
 ----
-
-[[running-tests-build-maven-test-system-property]]
-===== 単一のテストクラスを実行する
-
-JUnit Platform Surefireプロバイダは、Maven Surefireプラグインがサポートする
-JVMシステムプロパティ `test` に対応しています。例えば、コマンドラインから
-`mvn -Dtest=org.example.MyTest test` を実行することで、テストクラス
-`org.example.MyTest` のテストメソッドだけを実行できます。詳細は、
-https://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html[Maven Surefireプラグイン]
-のドキュメントを参照してください。
 
 [[running-tests-build-maven-filter-test-class-names]]
 ===== テストクラス名でフィルタリングする
@@ -369,7 +318,6 @@ Maven Surefireプラグインは、完全修飾名が次のパターンにマッ
 	...
 	<build>
 		<plugins>
-			...
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>{surefire-version}</version>
@@ -378,7 +326,6 @@ Maven Surefireプラグインは、完全修飾名が次のパターンにマッ
 						<exclude/>
 					</excludes>
 				</configuration>
-				...
 			</plugin>
 		</plugins>
 	</build>
@@ -395,8 +342,8 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 次のように、タグまたは <<running-tests-tag-expressions, タグ式>>
 を使ってテストをフィルタリングすることもできます。
 
-- _タグ_ または _タグ式_ をテスト対象に含めるには、`groups` または `includeTags` を指定します。
-- _タグ_ または _タグ式_ をテスト対象から除外するには、`excludedGroups` または `excludeTags` を指定します。
+- _タグ_ または _タグ式_ をテスト対象に含めるには、`groups` を指定します。
+- _タグ_ または _タグ式_ をテスト対象から除外するには、`excludedGroups` を指定します。
 
 [source,xml,indent=0]
 [subs=attributes+]
@@ -404,19 +351,13 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 	...
 	<build>
 		<plugins>
-			...
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>{surefire-version}</version>
 				<configuration>
-			        <properties>
-			            <includeTags>acceptance | !feature-a</includeTags>
-			            <excludeTags>integration, regression</excludeTags>
-			        </properties>
+					<groups>acceptance | !feature-a</groups>
+					<excludedGroups>integration, regression</excludedGroups>
 			    </configuration>
-				<dependencies>
-					...
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
@@ -437,7 +378,6 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 	...
 	<build>
 		<plugins>
-			...
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>{surefire-version}</version>
@@ -450,9 +390,6 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 						</configurationParameters>
 					</properties>
 				</configuration>
-				<dependencies>
-					...
-				</dependencies>
 			</plugin>
 		</plugins>
 	</build>

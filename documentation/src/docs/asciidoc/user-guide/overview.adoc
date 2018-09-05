@@ -234,7 +234,11 @@ vintage_engine ..> junit4
 
 {junit5-samples-repo}[`junit5-samples`] リポジトリは、
 JUnit JupiterベースとJUnit Vintageベースのプロジェクトの様々なサンプルを提供します。
-次のプロジェクトで `build.gradle` と `pom.xml` を見つけられるでしょう。
+以下のプロジェクトでビルドスクリプト（例えば、`build.gradle` や `pom.xml` など）
+を見つけられるでしょう。
 
-* Gradleの場合は、`{junit5-jupiter-starter-gradle}` プロジェクトを参照してください
+* GradleとJavaの場合は、`{junit5-jupiter-starter-gradle}` プロジェクトを参照してください
+* GradleとKotlinの場合は、`{junit5-jupiter-starter-gradle-kotlin}` プロジェクトを参照してください
+* GradleとGroovyの場合は、`{junit5-jupiter-starter-gradle-groovy}` プロジェクトを参照してください
 * Mavenの場合は、`{junit5-jupiter-starter-maven}` プロジェクトを参照してください
+* Antの場合は、`{junit5-jupiter-starter-ant}` プロジェクトを参照してください

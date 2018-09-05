@@ -40,10 +40,18 @@ JUnit 5がすべての公開インターフェースやクラス、メソッド�
 [[api-evolution-experimental-apis]]
 === 実験的なAPI
 
-次の表は、現在 _実験的_ (`@API(status = EXPERIMENTAL)`) と指定されたAPIを一覧しています。
+次の表は、`@API(status = EXPERIMENTAL)` で現在 _実験的_ と指定されたAPIを一覧しています。
 これらのAPIを使う場合は注意してください。
 
 include::{experimentalApisTableFile}[]
+
+[[api-evolution-deprecated-apis]]
+=== 非推奨のAPI
+
+次の表は、`@API(status = DEPRECATED)` で現在 _非推奨_ と指定されたAPIを一覧しています。
+非推奨になったAPIは今後のリリースで削除される可能性が高いため、可能な限り使わないようにしてください。
+
+include::{deprecatedApisTableFile}[]
 
 [[api-evolution-tooling]]
 === @APIツールサポート
