@@ -329,6 +329,7 @@ class AssertEqualsAssertionsTests {
 		assertEquals(0.56f, 0.6f, 0.05f);
 		assertEquals(0.01f, 0.011f, 0.002f);
 		assertEquals(Float.NaN, Float.NaN, 0.5f);
+		assertEquals(0.1f, 0.1f, 0.0f);
 	}
 
 	@Test
@@ -442,6 +443,7 @@ class AssertEqualsAssertionsTests {
 		assertEquals(0.42d, 0.24d, 0.19d);
 		assertEquals(0.02d, 0.011d, 0.01d);
 		assertEquals(Double.NaN, Double.NaN, 0.2d);
+		assertEquals(0.001d, 0.001d, 0.0d);
 	}
 
 	@Test
@@ -502,8 +504,13 @@ class AssertEqualsAssertionsTests {
 	}
 
 	@Test
-	void assertEqualsWithTwoNulls() {
-		assertEquals(null, null);
+	void assertEqualsWithNullReferences() {
+		Object null1 = null;
+		Object null2 = null;
+
+		assertEquals(null1, null);
+		assertEquals(null, null2);
+		assertEquals(null1, null2);
 	}
 
 	@Test
@@ -585,6 +592,139 @@ class AssertEqualsAssertionsTests {
 			assertMessageEndsWith(ex, "but was: <foo>");
 		}
 	}
+
+	// -------------------------------------------------------------------------
+
+	@Nested
+	class MixedBoxedAndUnboxedPrimitivesTests {
+
+		@Test
+		void bytes() {
+			byte primitive = (byte) 42;
+			Byte wrapper = Byte.valueOf("42");
+
+			assertEquals(primitive, wrapper);
+			assertEquals(primitive, wrapper, "message");
+			assertEquals(primitive, wrapper, () -> "message");
+
+			assertEquals(wrapper, primitive);
+			assertEquals(wrapper, primitive, "message");
+			assertEquals(wrapper, primitive, () -> "message");
+		}
+
+		@Test
+		void shorts() {
+			short primitive = (short) 42;
+			Short wrapper = Short.valueOf("42");
+
+			assertEquals(primitive, wrapper);
+			assertEquals(primitive, wrapper, "message");
+			assertEquals(primitive, wrapper, () -> "message");
+
+			assertEquals(wrapper, primitive);
+			assertEquals(wrapper, primitive, "message");
+			assertEquals(wrapper, primitive, () -> "message");
+		}
+
+		@Test
+		void integers() {
+			int primitive = 42;
+			Integer wrapper = Integer.valueOf("42");
+
+			assertEquals(primitive, wrapper);
+			assertEquals(primitive, wrapper, "message");
+			assertEquals(primitive, wrapper, () -> "message");
+
+			assertEquals(wrapper, primitive);
+			assertEquals(wrapper, primitive, "message");
+			assertEquals(wrapper, primitive, () -> "message");
+		}
+
+		@Test
+		void longs() {
+			long primitive = 42L;
+			Long wrapper = Long.valueOf("42");
+
+			assertEquals(primitive, wrapper);
+			assertEquals(primitive, wrapper, "message");
+			assertEquals(primitive, wrapper, () -> "message");
+
+			assertEquals(wrapper, primitive);
+			assertEquals(wrapper, primitive, "message");
+			assertEquals(wrapper, primitive, () -> "message");
+		}
+
+		@Test
+		void floats() {
+			float primitive = 42.0f;
+			Float wrapper = Float.valueOf("42.0");
+
+			assertEquals(primitive, wrapper);
+			assertEquals(primitive, wrapper, 0.0f);
+			assertEquals(primitive, wrapper, "message");
+			assertEquals(primitive, wrapper, 0.0f, "message");
+			assertEquals(primitive, wrapper, () -> "message");
+			assertEquals(primitive, wrapper, 0.0f, () -> "message");
+
+			assertEquals(wrapper, primitive);
+			assertEquals(wrapper, primitive, 0.0f);
+			assertEquals(wrapper, primitive, "message");
+			assertEquals(wrapper, primitive, 0.0f, "message");
+			assertEquals(wrapper, primitive, () -> "message");
+			assertEquals(wrapper, primitive, 0.0f, () -> "message");
+		}
+
+		@Test
+		void doubles() {
+			double primitive = 42.0d;
+			Double wrapper = Double.valueOf("42.0");
+
+			assertEquals(primitive, wrapper);
+			assertEquals(primitive, wrapper, 0.0d);
+			assertEquals(primitive, wrapper, "message");
+			assertEquals(primitive, wrapper, 0.0d, "message");
+			assertEquals(primitive, wrapper, () -> "message");
+			assertEquals(primitive, wrapper, 0.0d, () -> "message");
+
+			assertEquals(wrapper, primitive);
+			assertEquals(wrapper, primitive, 0.0d);
+			assertEquals(wrapper, primitive, "message");
+			assertEquals(wrapper, primitive, 0.0d, "message");
+			assertEquals(wrapper, primitive, () -> "message");
+			assertEquals(wrapper, primitive, 0.0d, () -> "message");
+		}
+
+		@Test
+		void booleans() {
+			boolean primitive = true;
+			Boolean wrapper = Boolean.valueOf("true");
+
+			assertEquals(primitive, wrapper);
+			assertEquals(primitive, wrapper, "message");
+			assertEquals(primitive, wrapper, () -> "message");
+
+			assertEquals(wrapper, primitive);
+			assertEquals(wrapper, primitive, "message");
+			assertEquals(wrapper, primitive, () -> "message");
+		}
+
+		@Test
+		void chars() {
+			char primitive = 'a';
+			Character wrapper = Character.valueOf('a');
+
+			assertEquals(primitive, wrapper);
+			assertEquals(primitive, wrapper, "message");
+			assertEquals(primitive, wrapper, () -> "message");
+
+			assertEquals(wrapper, primitive);
+			assertEquals(wrapper, primitive, "message");
+			assertEquals(wrapper, primitive, () -> "message");
+		}
+
+	}
+
+	// -------------------------------------------------------------------------
 
 	private static class EqualsThrowsException {
 

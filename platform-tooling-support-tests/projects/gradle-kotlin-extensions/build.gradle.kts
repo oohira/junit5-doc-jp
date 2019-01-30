@@ -1,12 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	kotlin("jvm") version "1.2.41"
+	kotlin("jvm") version "1.3.10"
 }
 
 repositories {
 	mavenLocal()
 	mavenCentral()
+	maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
 }
 
 // don't use `build` as target to prevent Jenkins picking up

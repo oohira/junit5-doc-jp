@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 class DisabledTestsDemo {
 
-	@Disabled
+	@Disabled("Disabled until bug #42 has been resolved")
 	@Test
 	void testWillBeSkipped() {
 	}
@@ -24,5 +24,6 @@ class DisabledTestsDemo {
 	@Test
 	void testWillBeExecuted() {
 	}
+
 }
 // end::user_guide[]

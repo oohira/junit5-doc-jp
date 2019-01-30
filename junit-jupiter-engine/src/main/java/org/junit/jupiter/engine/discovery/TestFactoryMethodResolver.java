@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.TestFactoryTestDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsTestFactoryMethod;
 import org.junit.platform.engine.TestDescriptor;
@@ -36,13 +37,14 @@ class TestFactoryMethodResolver extends AbstractMethodResolver {
 
 	static final String SEGMENT_TYPE = "test-factory";
 
-	TestFactoryMethodResolver() {
-		super(SEGMENT_TYPE, isTestFactoryMethod);
+	TestFactoryMethodResolver(JupiterConfiguration configuration) {
+		super(SEGMENT_TYPE, isTestFactoryMethod, configuration);
 	}
 
 	@Override
-	protected TestDescriptor createTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method method) {
-		return new TestFactoryTestDescriptor(uniqueId, testClass, method);
+	protected TestDescriptor createTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method method,
+			JupiterConfiguration configuration) {
+		return new TestFactoryTestDescriptor(uniqueId, testClass, method, configuration);
 	}
 
 }

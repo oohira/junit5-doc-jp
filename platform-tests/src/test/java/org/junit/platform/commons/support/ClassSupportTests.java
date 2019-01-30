@@ -11,6 +11,7 @@
 package org.junit.platform.commons.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.platform.commons.support.PreconditionAssertions.assertPreconditionViolationException;
 
 import java.util.List;
 import java.util.function.Function;
@@ -24,7 +25,14 @@ import org.junit.platform.commons.util.ClassUtils;
 class ClassSupportTests {
 
 	@Test
-	void nullSafeToStringDelegates() throws Throwable {
+	void nullSafeToStringPreconditions() {
+		Function<? super Class<?>, ? extends String> mapper = null;
+		assertPreconditionViolationException("Mapping function",
+			() -> ClassSupport.nullSafeToString(mapper, String.class, List.class));
+	}
+
+	@Test
+	void nullSafeToStringDelegates() {
 		assertEquals(ClassUtils.nullSafeToString(String.class, List.class),
 			ClassSupport.nullSafeToString(String.class, List.class));
 

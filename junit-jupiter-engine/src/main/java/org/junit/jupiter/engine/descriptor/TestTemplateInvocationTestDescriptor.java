@@ -10,16 +10,20 @@
 
 package org.junit.jupiter.engine.descriptor;
 
+import static java.util.Collections.emptySet;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
+import org.junit.platform.engine.support.hierarchical.ExclusiveResource;
 
 /**
  * {@link TestDescriptor} for a {@link org.junit.jupiter.api.TestTemplate @TestTemplate}
@@ -36,10 +40,16 @@ public class TestTemplateInvocationTestDescriptor extends TestMethodTestDescript
 	private final int index;
 
 	TestTemplateInvocationTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method templateMethod,
-			TestTemplateInvocationContext invocationContext, int index) {
-		super(uniqueId, invocationContext.getDisplayName(index), testClass, templateMethod);
+			TestTemplateInvocationContext invocationContext, int index, JupiterConfiguration configuration) {
+		super(uniqueId, invocationContext.getDisplayName(index), testClass, templateMethod, configuration);
 		this.invocationContext = invocationContext;
 		this.index = index;
+	}
+
+	@Override
+	public Set<ExclusiveResource> getExclusiveResources() {
+		// @ResourceLock annotations are already collected and returned by the enclosing container
+		return emptySet();
 	}
 
 	@Override

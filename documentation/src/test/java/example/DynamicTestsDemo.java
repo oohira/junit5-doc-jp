@@ -10,7 +10,9 @@
 
 package example;
 
-//tag::user_guide[]
+// tag::user_guide[]
+
+import static example.util.StringUtils.isPalindrome;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,13 +29,20 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import example.util.Calculator;
+
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.function.ThrowingConsumer;
 
+// end::user_guide[]
+// @formatter:off
+// tag::user_guide[]
 class DynamicTestsDemo {
+
+	private final Calculator calculator = new Calculator();
 
 	// end::user_guide[]
 	@Tag("exclude")
@@ -46,83 +55,47 @@ class DynamicTestsDemo {
 
 	@TestFactory
 	Collection<DynamicTest> dynamicTestsFromCollection() {
-		// end::user_guide[]
-		// @formatter:off
-		// tag::user_guide[]
 		return Arrays.asList(
-			dynamicTest("1st dynamic test", () -> assertTrue(true)),
-			dynamicTest("2nd dynamic test", () -> assertEquals(4, 2 * 2))
+			dynamicTest("1st dynamic test", () -> assertTrue(isPalindrome("madam"))),
+			dynamicTest("2nd dynamic test", () -> assertEquals(4, calculator.multiply(2, 2)))
 		);
-		// end::user_guide[]
-		// @formatter:on
-		// tag::user_guide[]
 	}
 
 	@TestFactory
 	Iterable<DynamicTest> dynamicTestsFromIterable() {
-		// end::user_guide[]
-		// @formatter:off
-		// tag::user_guide[]
 		return Arrays.asList(
-			dynamicTest("3rd dynamic test", () -> assertTrue(true)),
-			dynamicTest("4th dynamic test", () -> assertEquals(4, 2 * 2))
+			dynamicTest("3rd dynamic test", () -> assertTrue(isPalindrome("madam"))),
+			dynamicTest("4th dynamic test", () -> assertEquals(4, calculator.multiply(2, 2)))
 		);
-		// end::user_guide[]
-		// @formatter:on
-		// tag::user_guide[]
 	}
 
 	@TestFactory
 	Iterator<DynamicTest> dynamicTestsFromIterator() {
-		// end::user_guide[]
-		// @formatter:off
-		// tag::user_guide[]
 		return Arrays.asList(
-			dynamicTest("5th dynamic test", () -> assertTrue(true)),
-			dynamicTest("6th dynamic test", () -> assertEquals(4, 2 * 2))
+			dynamicTest("5th dynamic test", () -> assertTrue(isPalindrome("madam"))),
+			dynamicTest("6th dynamic test", () -> assertEquals(4, calculator.multiply(2, 2)))
 		).iterator();
-		// end::user_guide[]
-		// @formatter:on
-		// tag::user_guide[]
 	}
 
 	@TestFactory
 	DynamicTest[] dynamicTestsFromArray() {
-		// end::user_guide[]
-		// @formatter:off
-		// tag::user_guide[]
 		return new DynamicTest[] {
-			dynamicTest("7th dynamic test", () -> assertTrue(true)),
-			dynamicTest("8th dynamic test", () -> assertEquals(4, 2 * 2))
+			dynamicTest("7th dynamic test", () -> assertTrue(isPalindrome("madam"))),
+			dynamicTest("8th dynamic test", () -> assertEquals(4, calculator.multiply(2, 2)))
 		};
-		// end::user_guide[]
-		// @formatter:on
-		// tag::user_guide[]
 	}
 
 	@TestFactory
 	Stream<DynamicTest> dynamicTestsFromStream() {
-		// end::user_guide[]
-		// @formatter:off
-		// tag::user_guide[]
-		return Stream.of("A", "B", "C")
-			.map(str -> dynamicTest("test" + str, () -> { /* ... */ }));
-		// end::user_guide[]
-		// @formatter:on
-		// tag::user_guide[]
+		return Stream.of("racecar", "radar", "mom", "dad")
+			.map(text -> dynamicTest(text, () -> assertTrue(isPalindrome(text))));
 	}
 
 	@TestFactory
 	Stream<DynamicTest> dynamicTestsFromIntStream() {
-		// end::user_guide[]
-		// @formatter:off
-		// tag::user_guide[]
 		// Generates tests for the first 10 even integers.
 		return IntStream.iterate(0, n -> n + 2).limit(10)
 			.mapToObj(n -> dynamicTest("test" + n, () -> assertTrue(n % 2 == 0)));
-		// end::user_guide[]
-		// @formatter:on
-		// tag::user_guide[]
 	}
 
 	@TestFactory
@@ -130,7 +103,7 @@ class DynamicTestsDemo {
 
 		// Generates random positive integers between 0 and 100 until
 		// a number evenly divisible by 7 is encountered.
-		Iterator<Integer> inputGenerator = new Iterator<>() {
+		Iterator<Integer> inputGenerator = new Iterator<Integer>() {
 
 			Random random = new Random();
 			// end::user_guide[]
@@ -165,9 +138,6 @@ class DynamicTestsDemo {
 
 	@TestFactory
 	Stream<DynamicNode> dynamicTestsWithContainers() {
-		// end::user_guide[]
-		// @formatter:off
-		// tag::user_guide[]
 		return Stream.of("A", "B", "C")
 			.map(input -> dynamicContainer("Container " + input, Stream.of(
 				dynamicTest("not null", () -> assertNotNull(input)),
@@ -176,9 +146,19 @@ class DynamicTestsDemo {
 					dynamicTest("not empty", () -> assertFalse(input.isEmpty()))
 				))
 			)));
-		// end::user_guide[]
-		// @formatter:on
-		// tag::user_guide[]
+	}
+
+	@TestFactory
+	DynamicNode dynamicNodeSingleTest() {
+		return dynamicTest("'pop' is a palindrome", () -> assertTrue(isPalindrome("pop")));
+	}
+
+	@TestFactory
+	DynamicNode dynamicNodeSingleContainer() {
+		return dynamicContainer("palindromes",
+			Stream.of("racecar", "radar", "mom", "dad")
+				.map(text -> dynamicTest(text, () -> assertTrue(isPalindrome(text)))
+		));
 	}
 
 }

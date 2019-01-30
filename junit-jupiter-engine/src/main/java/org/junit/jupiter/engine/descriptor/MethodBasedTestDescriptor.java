@@ -10,11 +10,16 @@
 
 package org.junit.jupiter.engine.descriptor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.junit.jupiter.engine.descriptor.DisplayNameUtils.determineDisplayNameForMethod;
+
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apiguardian.api.API;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.commons.util.ClassUtils;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.TestDescriptor;
@@ -25,8 +30,11 @@ import org.junit.platform.engine.support.hierarchical.ExclusiveResource;
 
 /**
  * Base class for {@link TestDescriptor TestDescriptors} based on Java methods.
+ *
+ * @since 5.0
  */
-abstract class MethodBasedTestDescriptor extends JupiterTestDescriptor {
+@API(status = INTERNAL, since = "5.0")
+public abstract class MethodBasedTestDescriptor extends JupiterTestDescriptor {
 
 	private final Class<?> testClass;
 
@@ -37,13 +45,14 @@ abstract class MethodBasedTestDescriptor extends JupiterTestDescriptor {
 	 */
 	private final Set<TestTag> tags;
 
-	MethodBasedTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method testMethod) {
-		this(uniqueId, determineDisplayName(Preconditions.notNull(testMethod, "Method must not be null"),
-			MethodBasedTestDescriptor::generateDefaultDisplayName), testClass, testMethod);
+	MethodBasedTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method testMethod,
+			JupiterConfiguration configuration) {
+		this(uniqueId, determineDisplayNameForMethod(testClass, testMethod), testClass, testMethod, configuration);
 	}
 
-	MethodBasedTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Method testMethod) {
-		super(uniqueId, displayName, MethodSource.from(testClass, testMethod));
+	MethodBasedTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Method testMethod,
+			JupiterConfiguration configuration) {
+		super(uniqueId, displayName, MethodSource.from(testClass, testMethod), configuration);
 
 		this.testClass = Preconditions.notNull(testClass, "Class must not be null");
 		this.testMethod = testMethod;
@@ -63,6 +72,7 @@ abstract class MethodBasedTestDescriptor extends JupiterTestDescriptor {
 		return getExclusiveResourcesFromAnnotation(getTestMethod());
 	}
 
+	@Override
 	protected Optional<ExecutionMode> getExplicitExecutionMode() {
 		return getExecutionModeFromAnnotation(getTestMethod());
 	}
@@ -77,10 +87,6 @@ abstract class MethodBasedTestDescriptor extends JupiterTestDescriptor {
 
 	@Override
 	public String getLegacyReportingName() {
-		return generateDefaultDisplayName(testMethod);
-	}
-
-	private static String generateDefaultDisplayName(Method testMethod) {
 		return String.format("%s(%s)", testMethod.getName(),
 			ClassUtils.nullSafeToString(Class::getSimpleName, testMethod.getParameterTypes()));
 	}

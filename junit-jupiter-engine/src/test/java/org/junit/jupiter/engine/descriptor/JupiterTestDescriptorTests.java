@@ -32,8 +32,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.JupiterTestDescriptorTests.StaticTestCase.StaticTestCaseLevel2;
-import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
@@ -45,17 +45,16 @@ import org.junit.platform.engine.support.descriptor.MethodSource;
  *
  * @since 5.0
  * @see org.junit.jupiter.engine.descriptor.LifecycleMethodUtilsTests
- * @see org.junit.jupiter.engine.InvalidLifecycleMethodConfigurationTests
  */
 class JupiterTestDescriptorTests {
 
 	private static final UniqueId uniqueId = UniqueId.root("enigma", "foo");
 
-	private final ConfigurationParameters configParams = mock(ConfigurationParameters.class);
+	private final JupiterConfiguration configuration = mock(JupiterConfiguration.class);
 
 	@Test
 	void constructFromClass() {
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCase.class, configParams);
+		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCase.class, configuration);
 
 		assertEquals(TestCase.class, descriptor.getTestClass());
 		assertThat(descriptor.getTags()).containsExactly(TestTag.create("inherited-class-level-tag"),
@@ -67,7 +66,7 @@ class JupiterTestDescriptorTests {
 		// Note: if we can instantiate the descriptor, then the invalid configuration
 		// will not be reported during the test engine discovery phase.
 		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidBeforeAllMethod.class,
-			configParams);
+			configuration);
 
 		assertEquals(TestCaseWithInvalidBeforeAllMethod.class, descriptor.getTestClass());
 	}
@@ -77,7 +76,7 @@ class JupiterTestDescriptorTests {
 		// Note: if we can instantiate the descriptor, then the invalid configuration
 		// will not be reported during the test engine discovery phase.
 		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidAfterAllMethod.class,
-			configParams);
+			configuration);
 
 		assertEquals(TestCaseWithInvalidAfterAllMethod.class, descriptor.getTestClass());
 	}
@@ -87,7 +86,7 @@ class JupiterTestDescriptorTests {
 		// Note: if we can instantiate the descriptor, then the invalid configuration
 		// will not be reported during the test engine discovery phase.
 		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidBeforeEachMethod.class,
-			configParams);
+			configuration);
 
 		assertEquals(TestCaseWithInvalidBeforeEachMethod.class, descriptor.getTestClass());
 	}
@@ -97,7 +96,7 @@ class JupiterTestDescriptorTests {
 		// Note: if we can instantiate the descriptor, then the invalid configuration
 		// will not be reported during the test engine discovery phase.
 		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, TestCaseWithInvalidAfterEachMethod.class,
-			configParams);
+			configuration);
 
 		assertEquals(TestCaseWithInvalidAfterEachMethod.class, descriptor.getTestClass());
 	}
@@ -106,22 +105,26 @@ class JupiterTestDescriptorTests {
 	void constructFromMethod() throws Exception {
 		Class<?> testClass = TestCase.class;
 		Method testMethod = testClass.getDeclaredMethod("test");
-		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, testClass, testMethod);
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, testClass, testMethod,
+			configuration);
 
 		assertEquals(uniqueId, descriptor.getUniqueId());
 		assertEquals(testMethod, descriptor.getTestMethod());
 		assertEquals("test()", descriptor.getDisplayName(), "display name:");
+		assertEquals("test()", descriptor.getLegacyReportingName(), "legacy name:");
 	}
 
 	@Test
 	void constructFromMethodWithAnnotations() throws Exception {
-		JupiterTestDescriptor classDescriptor = new ClassTestDescriptor(uniqueId, TestCase.class, configParams);
+		JupiterTestDescriptor classDescriptor = new ClassTestDescriptor(uniqueId, TestCase.class, configuration);
 		Method testMethod = TestCase.class.getDeclaredMethod("foo");
-		TestMethodTestDescriptor methodDescriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod);
+		TestMethodTestDescriptor methodDescriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod,
+			configuration);
 		classDescriptor.addChild(methodDescriptor);
 
 		assertEquals(testMethod, methodDescriptor.getTestMethod());
 		assertEquals("custom test name", methodDescriptor.getDisplayName(), "display name:");
+		assertEquals("foo()", methodDescriptor.getLegacyReportingName(), "legacy name:");
 
 		List<String> tags = methodDescriptor.getTags().stream().map(TestTag::getName).collect(toList());
 		assertThat(tags).containsExactlyInAnyOrder("inherited-class-level-tag", "classTag1", "classTag2", "methodTag1",
@@ -131,88 +134,105 @@ class JupiterTestDescriptorTests {
 	@Test
 	void constructFromMethodWithCustomTestAnnotation() throws Exception {
 		Method testMethod = TestCase.class.getDeclaredMethod("customTestAnnotation");
-		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod);
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod,
+			configuration);
 
 		assertEquals(testMethod, descriptor.getTestMethod());
 		assertEquals("custom name", descriptor.getDisplayName(), "display name:");
+		assertEquals("customTestAnnotation()", descriptor.getLegacyReportingName(), "legacy name:");
 		assertThat(descriptor.getTags()).containsExactly(TestTag.create("custom-tag"));
 	}
 
 	@Test
 	void constructFromMethodWithParameters() throws Exception {
 		Method testMethod = TestCase.class.getDeclaredMethod("test", String.class, BigDecimal.class);
-		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod);
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod,
+			configuration);
 
 		assertEquals(testMethod, descriptor.getTestMethod());
 		assertEquals("test(String, BigDecimal)", descriptor.getDisplayName(), "display name");
+		assertEquals("test(String, BigDecimal)", descriptor.getLegacyReportingName(), "legacy name");
 	}
 
 	@Test
 	void constructFromMethodWithPrimitiveArrayParameter() throws Exception {
 		Method testMethod = TestCase.class.getDeclaredMethod("test", int[].class);
-		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod);
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod,
+			configuration);
 
 		assertEquals(testMethod, descriptor.getTestMethod());
 		assertEquals("test(int[])", descriptor.getDisplayName(), "display name");
+		assertEquals("test(int[])", descriptor.getLegacyReportingName(), "legacy name");
 	}
 
 	@Test
 	void constructFromMethodWithObjectArrayParameter() throws Exception {
 		Method testMethod = TestCase.class.getDeclaredMethod("test", String[].class);
-		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod);
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod,
+			configuration);
 
 		assertEquals(testMethod, descriptor.getTestMethod());
 		assertEquals("test(String[])", descriptor.getDisplayName(), "display name");
+		assertEquals("test(String[])", descriptor.getLegacyReportingName(), "legacy name");
 	}
 
 	@Test
 	void constructFromMethodWithMultidimensionalPrimitiveArrayParameter() throws Exception {
 		Method testMethod = TestCase.class.getDeclaredMethod("test", int[][][][][].class);
-		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod);
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod,
+			configuration);
 
 		assertEquals(testMethod, descriptor.getTestMethod());
 		assertEquals("test(int[][][][][])", descriptor.getDisplayName(), "display name");
+		assertEquals("test(int[][][][][])", descriptor.getLegacyReportingName(), "legacy name");
 	}
 
 	@Test
 	void constructFromMethodWithMultidimensionalObjectArrayParameter() throws Exception {
 		Method testMethod = TestCase.class.getDeclaredMethod("test", String[][][][][].class);
-		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod);
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, TestCase.class, testMethod,
+			configuration);
 
 		assertEquals(testMethod, descriptor.getTestMethod());
 		assertEquals("test(String[][][][][])", descriptor.getDisplayName(), "display name");
+		assertEquals("test(String[][][][][])", descriptor.getLegacyReportingName(), "legacy name");
 	}
 
 	@Test
 	void constructFromInheritedMethod() throws Exception {
 		Method testMethod = ConcreteTest.class.getMethod("theTest");
-		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, ConcreteTest.class, testMethod);
+		TestMethodTestDescriptor descriptor = new TestMethodTestDescriptor(uniqueId, ConcreteTest.class, testMethod,
+			configuration);
 
 		assertEquals(testMethod, descriptor.getTestMethod());
 
 		Optional<TestSource> sourceOptional = descriptor.getSource();
 		assertThat(sourceOptional).containsInstanceOf(MethodSource.class);
 
-		MethodSource methodSource = (MethodSource) sourceOptional.get();
+		MethodSource methodSource = (MethodSource) sourceOptional.orElseThrow();
 		assertEquals(ConcreteTest.class.getName(), methodSource.getClassName());
 		assertEquals("theTest", methodSource.getMethodName());
 	}
 
 	@Test
 	void defaultDisplayNamesForTestClasses() {
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, getClass(), configParams);
+		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, getClass(), configuration);
 		assertEquals(getClass().getSimpleName(), descriptor.getDisplayName());
+		assertEquals(getClass().getName(), descriptor.getLegacyReportingName());
 
-		descriptor = new NestedClassTestDescriptor(uniqueId, NestedTestCase.class, configParams);
+		descriptor = new NestedClassTestDescriptor(uniqueId, NestedTestCase.class, configuration);
 		assertEquals(NestedTestCase.class.getSimpleName(), descriptor.getDisplayName());
+		assertEquals(NestedTestCase.class.getName(), descriptor.getLegacyReportingName());
 
-		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCase.class, configParams);
+		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCase.class, configuration);
 		String staticDisplayName = getClass().getSimpleName() + "$" + StaticTestCase.class.getSimpleName();
 		assertEquals(staticDisplayName, descriptor.getDisplayName());
+		assertEquals(StaticTestCase.class.getName(), descriptor.getLegacyReportingName());
 
-		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCaseLevel2.class, configParams);
+		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCaseLevel2.class, configuration);
 		staticDisplayName += "$" + StaticTestCaseLevel2.class.getSimpleName();
 		assertEquals(staticDisplayName, descriptor.getDisplayName());
+		assertEquals(StaticTestCaseLevel2.class.getName(), descriptor.getLegacyReportingName());
 	}
 
 	// -------------------------------------------------------------------------

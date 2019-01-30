@@ -11,6 +11,7 @@
 package org.junit.jupiter.engine.descriptor;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.junit.jupiter.engine.descriptor.DisplayNameUtils.createDisplayNameSupplierForNestedClass;
 
 import java.util.LinkedHashSet;
 import java.util.Optional;
@@ -18,9 +19,10 @@ import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestInstances;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
-import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
@@ -43,9 +45,8 @@ public class NestedClassTestDescriptor extends ClassTestDescriptor {
 	 */
 	private final Set<TestTag> tags;
 
-	public NestedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass,
-			ConfigurationParameters configurationParameters) {
-		super(uniqueId, Class::getSimpleName, testClass, configurationParameters);
+	public NestedClassTestDescriptor(UniqueId uniqueId, Class<?> testClass, JupiterConfiguration configuration) {
+		super(uniqueId, testClass, createDisplayNameSupplierForNestedClass(testClass), configuration);
 
 		this.tags = getTags(testClass);
 	}
@@ -63,14 +64,14 @@ public class NestedClassTestDescriptor extends ClassTestDescriptor {
 	// --- Node ----------------------------------------------------------------
 
 	@Override
-	protected Object instantiateTestClass(JupiterEngineExecutionContext parentExecutionContext,
+	protected TestInstances instantiateTestClass(JupiterEngineExecutionContext parentExecutionContext,
 			ExtensionRegistry registry, ExtensionContext extensionContext) {
 
 		// Extensions registered for nested classes and below are not to be used for instantiating outer classes
 		Optional<ExtensionRegistry> childExtensionRegistryForOuterInstance = Optional.empty();
-		Object outerInstance = parentExecutionContext.getTestInstanceProvider().getTestInstance(
+		TestInstances outerInstances = parentExecutionContext.getTestInstancesProvider().getTestInstances(
 			childExtensionRegistryForOuterInstance);
-		return instantiateTestClass(Optional.of(outerInstance), registry, extensionContext);
+		return instantiateTestClass(Optional.of(outerInstances), registry, extensionContext);
 	}
 
 }

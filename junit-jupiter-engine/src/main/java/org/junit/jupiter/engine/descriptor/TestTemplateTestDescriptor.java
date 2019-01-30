@@ -21,8 +21,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.util.Preconditions;
@@ -40,8 +42,9 @@ public class TestTemplateTestDescriptor extends MethodBasedTestDescriptor implem
 
 	private final DynamicDescendantFilter dynamicDescendantFilter = new DynamicDescendantFilter();
 
-	public TestTemplateTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method templateMethod) {
-		super(uniqueId, testClass, templateMethod);
+	public TestTemplateTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method templateMethod,
+			JupiterConfiguration configuration) {
+		super(uniqueId, testClass, templateMethod, configuration);
 	}
 
 	// --- Filterable ----------------------------------------------------------
@@ -71,10 +74,10 @@ public class TestTemplateTestDescriptor extends MethodBasedTestDescriptor implem
 			context.getExtensionRegistry(), getTestMethod());
 
 		// The test instance should be properly maintained by the enclosing class's ExtensionContext.
-		Object testInstance = context.getExtensionContext().getTestInstance().orElse(null);
+		TestInstances testInstances = context.getExtensionContext().getTestInstances().orElse(null);
 
 		ExtensionContext extensionContext = new TestTemplateExtensionContext(context.getExtensionContext(),
-			context.getExecutionListener(), this, context.getConfigurationParameters(), testInstance);
+			context.getExecutionListener(), this, context.getConfiguration(), testInstances);
 
 		// @formatter:off
 		return context.extend()
@@ -123,7 +126,7 @@ public class TestTemplateTestDescriptor extends MethodBasedTestDescriptor implem
 		UniqueId uniqueId = getUniqueId().append(TestTemplateInvocationTestDescriptor.SEGMENT_TYPE, "#" + index);
 		if (getDynamicDescendantFilter().test(uniqueId)) {
 			return Optional.of(new TestTemplateInvocationTestDescriptor(uniqueId, getTestClass(), getTestMethod(),
-				invocationContext, index));
+				invocationContext, index, configuration));
 		}
 		return Optional.empty();
 	}

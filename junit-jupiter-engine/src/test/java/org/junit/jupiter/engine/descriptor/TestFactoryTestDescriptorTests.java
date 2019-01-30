@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
@@ -125,7 +126,7 @@ class TestFactoryTestDescriptorTests {
 
 			Method testMethod = CustomStreamTestCase.class.getDeclaredMethod("customStream");
 			descriptor = new TestFactoryTestDescriptor(UniqueId.forEngine("engine"), CustomStreamTestCase.class,
-				testMethod);
+				testMethod, mock(JupiterConfiguration.class));
 			when(extensionContext.getTestMethod()).thenReturn(Optional.of(testMethod));
 		}
 

@@ -54,11 +54,6 @@ public class ModuleUtils {
 	private static final Logger logger = LoggerFactory.getLogger(ModuleUtils.class);
 
 	/**
-	 * Version hint is set to {@code "9"} here.
-	 */
-	public static final String VERSION = "9";
-
-	/**
 	 * Find all non-system boot modules names.
 	 *
 	 * @return a set of all such module names; never {@code null} but
@@ -76,7 +71,7 @@ public class ModuleUtils {
 	}
 
 	/**
-	 * Java 9 runtime supports the Java Platform Module System.
+	 * Java 9+ runtime supports the Java Platform Module System.
 	 *
 	 * @return {@code true}
 	 */
@@ -100,8 +95,9 @@ public class ModuleUtils {
 	/**
 	 * Find all classes for the given module name.
 	 *
-	 * @param moduleName the name of the module to scan
-	 * @param filter the class filter to apply
+	 * @param moduleName the name of the module to scan; never {@code null} or
+	 * <em>empty</em>
+	 * @param filter the class filter to apply; never {@code null}
 	 * @return an immutable list of all such classes found; never {@code null}
 	 * but potentially empty
 	 */

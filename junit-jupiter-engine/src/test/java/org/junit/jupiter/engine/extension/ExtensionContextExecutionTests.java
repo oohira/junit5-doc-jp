@@ -12,7 +12,6 @@ package org.junit.jupiter.engine.extension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
-import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -26,7 +25,7 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.engine.AbstractJupiterTestEngineTests;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
 
 class ExtensionContextExecutionTests extends AbstractJupiterTestEngineTests {
 
@@ -65,10 +64,9 @@ class ExtensionContextExecutionTests extends AbstractJupiterTestEngineTests {
 	void twoTestClassesCanShareStateViaEngineExtensionContext() {
 		Parent.counter.set(0);
 
-		ExecutionEventRecorder eventRecorder = executeTests(
-			request().selectors(selectClass(A.class), selectClass(B.class)).build());
+		EngineExecutionResults executionResults = executeTests(selectClass(A.class), selectClass(B.class));
 
-		assertThat(eventRecorder.getTestFinishedCount()).isEqualTo(2);
+		assertThat(executionResults.tests().started().count()).isEqualTo(2);
 		assertThat(Parent.counter).hasValue(1);
 	}
 
@@ -89,7 +87,7 @@ class ExtensionContextExecutionTests extends AbstractJupiterTestEngineTests {
 
 	static class OnlyIncrementCounterOnce implements BeforeAllCallback {
 		@Override
-		public void beforeAll(ExtensionContext context) throws Exception {
+		public void beforeAll(ExtensionContext context) {
 			ExtensionContext.Store store = getRoot(context).getStore(ExtensionContext.Namespace.GLOBAL);
 			store.getOrComputeIfAbsent("counter", key -> Parent.counter.incrementAndGet());
 		}

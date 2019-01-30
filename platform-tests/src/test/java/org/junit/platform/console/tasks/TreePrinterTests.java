@@ -31,7 +31,7 @@ import org.junit.platform.console.options.Theme;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.reporting.ReportEntry;
-import org.junit.platform.engine.test.TestDescriptorStub;
+import org.junit.platform.fakes.TestDescriptorStub;
 import org.junit.platform.launcher.TestIdentifier;
 
 class TreePrinterTests {

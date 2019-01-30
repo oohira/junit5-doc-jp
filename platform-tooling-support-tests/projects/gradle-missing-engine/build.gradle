@@ -28,10 +28,13 @@ platformVersion=${platformVersion}
 repositories {
 	mavenLocal()
 	mavenCentral()
+	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
-	testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}")
+	testImplementation("org.junit.jupiter:junit-jupiter-api:${jupiterVersion}") {
+		exclude group:'org.junit.jupiter', module:'junit-jupiter-engine'
+	}
 }
 
 test {

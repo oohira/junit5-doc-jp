@@ -10,22 +10,17 @@
 
 package org.junit.jupiter.engine.extension;
 
-import static org.assertj.core.api.Assertions.allOf;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
-import static org.junit.platform.engine.test.event.ExecutionEventConditions.assertRecordedExecutionEventsContainsExactly;
-import static org.junit.platform.engine.test.event.ExecutionEventConditions.event;
-import static org.junit.platform.engine.test.event.ExecutionEventConditions.finishedWithFailure;
-import static org.junit.platform.engine.test.event.ExecutionEventConditions.test;
-import static org.junit.platform.engine.test.event.TestExecutionResultConditions.isA;
-import static org.junit.platform.engine.test.event.TestExecutionResultConditions.message;
-import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
+import static org.junit.platform.testkit.engine.EventConditions.event;
+import static org.junit.platform.testkit.engine.EventConditions.finishedWithFailure;
+import static org.junit.platform.testkit.engine.EventConditions.test;
+import static org.junit.platform.testkit.engine.TestExecutionResultConditions.instanceOf;
+import static org.junit.platform.testkit.engine.TestExecutionResultConditions.message;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
@@ -39,8 +34,7 @@ import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.AbstractJupiterTestEngineTests;
 import org.junit.platform.commons.JUnitException;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.testkit.engine.Events;
 import org.mockito.Mockito;
 
 /**
@@ -52,22 +46,14 @@ class ScriptExecutionConditionTests extends AbstractJupiterTestEngineTests {
 
 	@Test
 	void executeSimpleTestCases() {
-		LauncherDiscoveryRequest request = request().selectors(selectClass(SimpleTestCases.class)).build();
-		ExecutionEventRecorder eventRecorder = executeTests(request);
+		Events tests = executeTestsForClass(SimpleTestCases.class).tests();
 
-		assertAll("Summary of simple test cases run", //
-			() -> assertEquals(3, eventRecorder.getTestStartedCount(), "# tests started"), //
-			() -> assertEquals(1, eventRecorder.getTestSkippedCount(), "# tests skipped"), //
-			() -> assertEquals(1, eventRecorder.getTestFailedCount(), "# tests started") //
-		);
+		tests.assertStatistics(stats -> stats.started(3).skipped(1).failed(1));
 
-		assertRecordedExecutionEventsContainsExactly(eventRecorder.getFailedTestFinishedEvents(), //
+		tests.failed().assertEventsMatchExactly( //
 			event(test("syntaxError"), //
-				finishedWithFailure( //
-					allOf( //
-						isA(JUnitException.class), //
-						message(value -> value.contains("syntax error")) //
-					))));
+				finishedWithFailure(instanceOf(JUnitException.class),
+					message(value -> value.contains("syntax error")))));
 	}
 
 	@Test

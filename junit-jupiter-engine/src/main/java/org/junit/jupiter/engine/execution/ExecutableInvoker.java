@@ -30,8 +30,10 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
+import org.junit.platform.commons.util.BlacklistedExceptions;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.commons.util.ReflectionUtils;
+import org.junit.platform.commons.util.StringUtils;
 
 /**
  * {@code ExecutableInvoker} encapsulates the invocation of a
@@ -217,9 +219,17 @@ public class ExecutableInvoker {
 		catch (ParameterResolutionException ex) {
 			throw ex;
 		}
-		catch (Throwable ex) {
-			throw new ParameterResolutionException(String.format("Failed to resolve parameter [%s] in %s [%s]",
-				parameterContext.getParameter(), asLabel(executable), executable.toGenericString()), ex);
+		catch (Throwable throwable) {
+			BlacklistedExceptions.rethrowIfBlacklisted(throwable);
+
+			String message = String.format("Failed to resolve parameter [%s] in %s [%s]",
+				parameterContext.getParameter(), asLabel(executable), executable.toGenericString());
+
+			if (StringUtils.isNotBlank(throwable.getMessage())) {
+				message += ": " + throwable.getMessage();
+			}
+
+			throw new ParameterResolutionException(message, throwable);
 		}
 	}
 

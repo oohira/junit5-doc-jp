@@ -10,27 +10,24 @@
 
 package org.junit.jupiter.engine.descriptor;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import org.apiguardian.api.API;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.jupiter.api.extension.TestInstances;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.EngineExecutionListener;
 
 /**
  * @since 5.0
  */
-@API(status = INTERNAL, since = "5.0")
-public final class JupiterEngineExtensionContext extends AbstractExtensionContext<JupiterEngineDescriptor> {
+final class JupiterEngineExtensionContext extends AbstractExtensionContext<JupiterEngineDescriptor> {
 
-	public JupiterEngineExtensionContext(EngineExecutionListener engineExecutionListener,
-			JupiterEngineDescriptor testDescriptor, ConfigurationParameters configurationParameters) {
+	JupiterEngineExtensionContext(EngineExecutionListener engineExecutionListener,
+			JupiterEngineDescriptor testDescriptor, JupiterConfiguration configuration) {
 
-		super(null, engineExecutionListener, testDescriptor, configurationParameters);
+		super(null, engineExecutionListener, testDescriptor, configuration);
 	}
 
 	@Override
@@ -50,6 +47,11 @@ public final class JupiterEngineExtensionContext extends AbstractExtensionContex
 
 	@Override
 	public Optional<Object> getTestInstance() {
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<TestInstances> getTestInstances() {
 		return Optional.empty();
 	}
 

@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.joining;
 import java.util.Deque;
 import java.util.function.Supplier;
 
+import org.junit.platform.commons.util.BlacklistedExceptions;
 import org.junit.platform.commons.util.StringUtils;
 import org.opentest4j.AssertionFailedError;
 
@@ -88,6 +89,7 @@ class AssertionUtils {
 			return (canonicalName != null ? canonicalName : clazz.getName());
 		}
 		catch (Throwable t) {
+			BlacklistedExceptions.rethrowIfBlacklisted(t);
 			return clazz.getName();
 		}
 	}
@@ -142,13 +144,13 @@ class AssertionUtils {
 	}
 
 	static void assertValidDelta(float delta) {
-		if (Float.isNaN(delta) || delta <= 0.0) {
+		if (Float.isNaN(delta) || delta < 0.0) {
 			failIllegalDelta(String.valueOf(delta));
 		}
 	}
 
 	static void assertValidDelta(double delta) {
-		if (Double.isNaN(delta) || delta <= 0.0) {
+		if (Double.isNaN(delta) || delta < 0.0) {
 			failIllegalDelta(String.valueOf(delta));
 		}
 	}

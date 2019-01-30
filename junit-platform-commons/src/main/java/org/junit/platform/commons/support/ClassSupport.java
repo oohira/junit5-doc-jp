@@ -18,10 +18,18 @@ import org.apiguardian.api.API;
 import org.junit.platform.commons.util.ClassUtils;
 
 /**
- * Common class support.
+ * {@code ClassSupport} provides static utility methods for common tasks
+ * regarding {@linkplain Class classes} &mdash; for example, generating a
+ * comma-separated list of fully qualified class names for a set of supplied
+ * classes.
+ *
+ * <p>{@link org.junit.platform.engine.TestEngine TestEngine} and extension
+ * authors are encouraged to use these supported methods in order to align with
+ * the behavior of the JUnit Platform.
  *
  * @since 1.1
  * @see AnnotationSupport
+ * @see ModifierSupport
  * @see ReflectionSupport
  */
 @API(status = MAINTAINED, since = "1.1")
@@ -53,7 +61,7 @@ public final class ClassSupport {
 	 * a class reference is {@code null} in which case it will be mapped to
 	 * {@code "null"}.
 	 *
-	 * @param mapper the mapper to use
+	 * @param mapper the mapper to use; never {@code null}
 	 * @param classes the classes to map
 	 * @return a comma-separated list of mapped values, or an empty string if
 	 * the supplied class array is {@code null} or empty

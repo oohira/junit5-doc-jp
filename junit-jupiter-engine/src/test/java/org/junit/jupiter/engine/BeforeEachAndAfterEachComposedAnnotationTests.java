@@ -21,7 +21,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
 
 /**
  * Integration tests that verify support for {@link BeforeEach} and {@link AfterEach}
@@ -36,10 +36,10 @@ class BeforeEachAndAfterEachComposedAnnotationTests extends AbstractJupiterTestE
 
 	@Test
 	void beforeEachAndAfterEachAsMetaAnnotations() {
-		ExecutionEventRecorder eventRecorder = executeTestsForClass(TestCase.class);
+		EngineExecutionResults executionResults = executeTestsForClass(TestCase.class);
 
-		assertEquals(1, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(1, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
+		assertEquals(1, executionResults.tests().started().count(), "# tests started");
+		assertEquals(1, executionResults.tests().succeeded().count(), "# tests succeeded");
 		assertEquals(asList("beforeEach", "test", "afterEach"), methodsInvoked);
 	}
 

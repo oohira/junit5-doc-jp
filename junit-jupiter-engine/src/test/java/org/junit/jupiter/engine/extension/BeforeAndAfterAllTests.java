@@ -13,8 +13,6 @@ package org.junit.jupiter.engine.extension;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
-import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.AbstractJupiterTestEngineTests;
 import org.junit.jupiter.engine.JupiterTestEngine;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
-import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
 
 /**
  * Integration tests that verify support for {@link BeforeAll}, {@link AfterAll},
@@ -173,11 +170,11 @@ class BeforeAndAfterAllTests extends AbstractJupiterTestEngineTests {
 			String... expectedCalls) {
 
 		callSequence.clear();
-		LauncherDiscoveryRequest request = request().selectors(selectClass(testClass)).build();
-		ExecutionEventRecorder eventRecorder = executeTests(request);
 
-		assertEquals(testsStarted, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(testsSuccessful, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
+		EngineExecutionResults executionResults = executeTestsForClass(testClass);
+
+		assertEquals(testsStarted, executionResults.tests().started().count(), "# tests started");
+		assertEquals(testsSuccessful, executionResults.tests().succeeded().count(), "# tests succeeded");
 
 		assertEquals(asList(expectedCalls), callSequence, () -> "wrong call sequence for " + testClass.getName());
 	}

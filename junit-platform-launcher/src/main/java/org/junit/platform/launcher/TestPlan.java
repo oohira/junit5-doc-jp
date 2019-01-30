@@ -12,6 +12,7 @@ package org.junit.platform.launcher;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
@@ -47,12 +48,14 @@ import org.junit.platform.engine.TestDescriptor.Visitor;
  * test is registered at runtime, it is added to the original test plan and
  * reported to {@link TestExecutionListener} implementations.
  *
+ * <p>This class is not intended to be extended by clients.
+ *
  * @since 1.0
  * @see Launcher
  * @see TestExecutionListener
  */
 @API(status = STABLE, since = "1.0")
-public final class TestPlan {
+public class TestPlan {
 
 	private final Set<TestIdentifier> roots = Collections.synchronizedSet(new LinkedHashSet<>(4));
 
@@ -82,7 +85,8 @@ public final class TestPlan {
 		return testPlan;
 	}
 
-	private TestPlan(boolean containsTests) {
+	@API(status = INTERNAL, since = "1.4")
+	protected TestPlan(boolean containsTests) {
 		this.containsTests = containsTests;
 	}
 
@@ -90,7 +94,10 @@ public final class TestPlan {
 	 * Add the supplied {@link TestIdentifier} to this test plan.
 	 *
 	 * @param testIdentifier the identifier to add; never {@code null}
+	 * @deprecated without replacement since this method was intended to be internal.
 	 */
+	@Deprecated
+	@API(status = DEPRECATED, since = "1.4")
 	public void add(TestIdentifier testIdentifier) {
 		Preconditions.notNull(testIdentifier, "testIdentifier must not be null");
 		allIdentifiers.put(testIdentifier.getUniqueId(), testIdentifier);
@@ -197,7 +204,18 @@ public final class TestPlan {
 		return unmodifiableSet(result);
 	}
 
+	/**
+	 * Return whether this test plan contains any tests.
+	 *
+	 * <p>A test plan contains tests, if at least one of the contained engine
+	 * descriptors {@linkplain TestDescriptor#containsTests(TestDescriptor)
+	 * contains tests}.
+	 *
+	 * @return {@code true} if this test plan contains tests
+	 * @see TestDescriptor#containsTests(TestDescriptor)
+	 */
 	public boolean containsTests() {
 		return containsTests;
 	}
+
 }

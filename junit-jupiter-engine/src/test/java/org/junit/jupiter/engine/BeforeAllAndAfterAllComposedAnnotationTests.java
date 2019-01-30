@@ -21,7 +21,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
 
 /**
  * Integration tests that verify support for {@link BeforeAll} and {@link AfterAll}
@@ -36,10 +36,10 @@ class BeforeAllAndAfterAllComposedAnnotationTests extends AbstractJupiterTestEng
 
 	@Test
 	void beforeAllAndAfterAllAsMetaAnnotations() {
-		ExecutionEventRecorder eventRecorder = executeTestsForClass(TestCase.class);
+		EngineExecutionResults executionResults = executeTestsForClass(TestCase.class);
 
-		assertEquals(1, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(1, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
+		assertEquals(1, executionResults.tests().started().count(), "# tests started");
+		assertEquals(1, executionResults.tests().succeeded().count(), "# tests succeeded");
 		assertEquals(asList("beforeAll", "test", "afterAll"), methodsInvoked);
 	}
 

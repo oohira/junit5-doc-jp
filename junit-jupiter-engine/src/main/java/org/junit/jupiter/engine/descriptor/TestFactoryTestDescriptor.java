@@ -25,12 +25,15 @@ import org.junit.jupiter.api.DynamicContainer;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.ExecutableInvoker;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.platform.commons.JUnitException;
 import org.junit.platform.commons.util.CollectionUtils;
 import org.junit.platform.commons.util.PreconditionViolationException;
 import org.junit.platform.commons.util.Preconditions;
+import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClasspathResourceSource;
@@ -52,8 +55,9 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 
 	private final DynamicDescendantFilter dynamicDescendantFilter = new DynamicDescendantFilter();
 
-	public TestFactoryTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method testMethod) {
-		super(uniqueId, testClass, testMethod);
+	public TestFactoryTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method testMethod,
+			JupiterConfiguration configuration) {
+		super(uniqueId, testClass, testMethod, configuration);
 	}
 
 	// --- Filterable ----------------------------------------------------------
@@ -93,18 +97,22 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 				while (iterator.hasNext()) {
 					DynamicNode dynamicNode = iterator.next();
 					Optional<JupiterTestDescriptor> descriptor = createDynamicDescriptor(this, dynamicNode, index++,
-						defaultTestSource, getDynamicDescendantFilter());
+						defaultTestSource, getDynamicDescendantFilter(), configuration);
 					descriptor.ifPresent(dynamicTestExecutor::execute);
 				}
 			}
 			catch (ClassCastException ex) {
 				throw invalidReturnTypeException(ex);
 			}
+			dynamicTestExecutor.awaitFinished();
 		});
 	}
 
 	@SuppressWarnings("unchecked")
 	private Stream<DynamicNode> toDynamicNodeStream(Object testFactoryMethodResult) {
+		if (testFactoryMethodResult instanceof DynamicNode) {
+			return Stream.of((DynamicNode) testFactoryMethodResult);
+		}
 		try {
 			return (Stream<DynamicNode>) CollectionUtils.toStream(testFactoryMethodResult);
 		}
@@ -115,13 +123,14 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 
 	private JUnitException invalidReturnTypeException(Throwable cause) {
 		String message = String.format(
-			"@TestFactory method [%s] must return a Stream, Collection, Iterable, or Iterator of %s.",
+			"@TestFactory method [%s] must return a single %2$s or a Stream, Collection, Iterable, Iterator, or array of %2$s.",
 			getTestMethod().toGenericString(), DynamicNode.class.getName());
 		return new JUnitException(message, cause);
 	}
 
 	static Optional<JupiterTestDescriptor> createDynamicDescriptor(JupiterTestDescriptor parent, DynamicNode node,
-			int index, TestSource defaultTestSource, DynamicDescendantFilter dynamicDescendantFilter) {
+			int index, TestSource defaultTestSource, DynamicDescendantFilter dynamicDescendantFilter,
+			JupiterConfiguration configuration) {
 
 		UniqueId uniqueId;
 		Supplier<JupiterTestDescriptor> descriptorCreator;
@@ -131,13 +140,13 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 		if (node instanceof DynamicTest) {
 			DynamicTest test = (DynamicTest) node;
 			uniqueId = parent.getUniqueId().append(DYNAMIC_TEST_SEGMENT_TYPE, "#" + index);
-			descriptorCreator = () -> new DynamicTestTestDescriptor(uniqueId, index, test, source);
+			descriptorCreator = () -> new DynamicTestTestDescriptor(uniqueId, index, test, source, configuration);
 		}
 		else {
 			DynamicContainer container = (DynamicContainer) node;
 			uniqueId = parent.getUniqueId().append(DYNAMIC_CONTAINER_SEGMENT_TYPE, "#" + index);
 			descriptorCreator = () -> new DynamicContainerTestDescriptor(uniqueId, index, container, source,
-				dynamicDescendantFilter);
+				dynamicDescendantFilter, configuration);
 		}
 		if (dynamicDescendantFilter.test(uniqueId)) {
 			JupiterTestDescriptor descriptor = descriptorCreator.get();
@@ -153,6 +162,32 @@ public class TestFactoryTestDescriptor extends TestMethodTestDescriptor implemen
 	static TestSource fromUri(URI uri) {
 		Preconditions.notNull(uri, "URI must not be null");
 		return CLASSPATH_SCHEME.equals(uri.getScheme()) ? ClasspathResourceSource.from(uri) : UriSource.from(uri);
+	}
+
+	/**
+	 * Override {@link TestMethodTestDescriptor#nodeSkipped} as a no-op, since
+	 * the {@code TestWatcher} API is not supported for {@code @TestFactory}
+	 * containers.
+	 *
+	 * @since 5.4
+	 */
+	@Override
+	public void nodeSkipped(JupiterEngineExecutionContext context, TestDescriptor descriptor, SkipResult result) {
+		/* no-op */
+	}
+
+	/**
+	 * Override {@link TestMethodTestDescriptor#nodeFinished} as a no-op, since
+	 * the {@code TestWatcher} API is not supported for {@code @TestFactory}
+	 * containers.
+	 *
+	 * @since 5.4
+	 */
+	@Override
+	public void nodeFinished(JupiterEngineExecutionContext context, TestDescriptor descriptor,
+			TestExecutionResult result) {
+
+		/* no-op */
 	}
 
 }

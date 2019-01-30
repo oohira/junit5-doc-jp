@@ -33,6 +33,7 @@ import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
 import org.junit.platform.launcher.listeners.TestExecutionSummary;
+import org.junit.platform.reporting.legacy.xml.LegacyXmlReportGeneratingListener;
 
 /**
  * @since 1.0
@@ -122,7 +123,7 @@ public class ConsoleTestExecutor {
 	}
 
 	private Optional<TestExecutionListener> createXmlWritingListener(PrintWriter out) {
-		return options.getReportsDir().map(reportsDir -> new XmlReportsWritingListener(reportsDir, out));
+		return options.getReportsDir().map(reportsDir -> new LegacyXmlReportGeneratingListener(reportsDir, out));
 	}
 
 	private void printSummary(TestExecutionSummary summary, PrintWriter out) {

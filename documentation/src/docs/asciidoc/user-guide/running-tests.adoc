@@ -70,20 +70,51 @@ for JUnit 5_ section of the
 https://www.eclipse.org/eclipse/news/4.7.1a/#junit-5-support[Eclipse Project Oxygen.1a
 (4.7.1a) - New and Noteworthy] documentation.
 
+[[running-tests-ide-netbeans]]
+==== NetBeans
+
+NetBeans offers support for JUnit Jupiter and the JUnit Platform since the
+https://netbeans.apache.org/download/nb100/nb100.html[Apache NetBeans 10.0 release].
+
+For more information consult the JUnit 5 section of the
+https://netbeans.apache.org/download/nb100/index.html#_junit_5[Apache NetBeans 10.0
+release notes].
+
+[[running-tests-ide-vscode]]
+==== Visual Studio Code
+
+https://code.visualstudio.com/[Visual Studio Code] supports JUnit Jupiter and the JUnit
+Platform via the
+https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-test[Java Test
+Runner] extension which is installed by default as part of the
+https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack[Java
+Extension Pack].
+
+For more information consult the _Testing_ section of the
+https://code.visualstudio.com/docs/languages/java#_testing[Java in Visual Studio Code]
+documentation.
+
 [[running-tests-ide-other]]
 ==== Other IDEs
 
-At the time of this writing, there is no direct support for running tests on the JUnit
-Platform within IDEs other than IntelliJ IDEA and Eclipse. However, the JUnit team
-provides two intermediate solutions so that you can go ahead and try out JUnit 5 within
-your IDE today. You can use the <<running-tests-console-launcher>> manually or execute
-tests with a <<running-tests-junit-platform-runner,JUnit 4 based Runner>>.
+If you are using an editor or IDE other than one of those listed in the previous sections,
+the JUnit team provides two alternative solutions to assist you in using JUnit 5. You can
+use the <<running-tests-console-launcher>> manually -- for example, from the command line
+-- or execute tests with a <<running-tests-junit-platform-runner,JUnit 4 based Runner>> if
+your IDE has built-in support for JUnit 4.
 
 [[running-tests-build]]
 === Build Support
 
 [[running-tests-build-gradle]]
 ==== Gradle
+
+[WARNING]
+.The JUnit Platform Gradle Plugin has been discontinued
+====
+The `junit-platform-gradle-plugin` developed by the JUnit team was deprecated in JUnit
+Platform 1.2 and discontinued in 1.3. Please switch to Gradle's standard `test` task.
+====
 
 Starting with https://docs.gradle.org/4.6/release-notes.html[version 4.6], Gradle provides
 https://docs.gradle.org/current/userguide/java_testing.html#using_junit5[native support]
@@ -116,14 +147,6 @@ test {
 Please refer to the
 https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_test[official Gradle documentation]
 for a comprehensive list of options.
-
-[WARNING]
-.The JUnit Platform Gradle Plugin has been discontinued
-====
-The very basic `junit-platform-gradle-plugin` developed by the JUnit team was deprecated
-in JUnit Platform 1.2 and discontinued in 1.3. Please switch to Gradle's standard `test`
-task.
-====
 
 [[running-tests-build-gradle-config-params]]
 ===== Configuration Parameters
@@ -208,9 +231,13 @@ additional dependency to the runtime classpath.
 [[running-tests-build-maven]]
 ==== Maven
 
-NOTE: The custom `junit-platform-surefire-provider`, which was originally developed by
-the JUnit team, has been deprecated and is scheduled to be removed in JUnit Platform 1.4.
-Please use Maven Surefire's native support instead.
+[WARNING]
+.The JUnit Platform Maven Surefire Provider has been discontinued
+====
+The `junit-platform-surefire-provider`, which was originally developed by the JUnit team,
+was deprecated in JUnit Platform 1.3 and discontinued in 1.4. Please use Maven Surefire's
+native support instead.
+====
 
 Starting with https://issues.apache.org/jira/browse/SUREFIRE-1330[version 2.22.0], Maven
 Surefire provides
@@ -485,10 +512,10 @@ Platform from the console. For example, it can be used to run JUnit Vintage and 
 Jupiter tests and print test execution results to the console.
 
 An executable `junit-platform-console-standalone-{platform-version}.jar` with all
-dependencies included is published in the central Maven repository under the
+dependencies included is published in the {Maven_Central} repository under the
 https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone[junit-platform-console-standalone]
-directory. You can https://docs.oracle.com/javase/tutorial/deployment/jar/run.html[run] the
-standalone `ConsoleLauncher` as shown below.
+directory. You can https://docs.oracle.com/javase/tutorial/deployment/jar/run.html[run]
+the standalone `ConsoleLauncher` as shown below.
 
 `java -jar junit-platform-console-standalone-{platform-version}.jar <<<running-tests-console-launcher-options>>>`
 
@@ -589,8 +616,10 @@ You need the following artifacts and their dependencies on the classpath. See
 
 * `junit-platform-runner` in _test_ scope: location of the `JUnitPlatform` runner
 * `junit-{junit4-version}.jar` in _test_ scope: to run tests using JUnit 4
-* `junit-jupiter-api` in _test_ scope: API for writing tests using JUnit Jupiter, including `@Test`, etc.
-* `junit-jupiter-engine` in _test runtime_ scope: implementation of the `TestEngine` API for JUnit Jupiter
+* `junit-jupiter-api` in _test_ scope: API for writing tests using JUnit Jupiter,
+  including `@Test`, etc.
+* `junit-jupiter-engine` in _test runtime_ scope: implementation of the `TestEngine` API
+  for JUnit Jupiter
 
 ===== Transitive Dependencies
 
@@ -623,12 +652,12 @@ configured via `@SuiteDisplayName`.
 One way to use the `JUnitPlatform` runner is to annotate a test class with
 `@RunWith(JUnitPlatform.class)` directly. Please note that the test methods in the
 following example are annotated with `org.junit.jupiter.api.Test` (JUnit Jupiter), not
-`org.junit.Test` (JUnit Vintage). Moreover, in this case the test class must be `public`;
+`org.junit.Test` (JUnit 4). Moreover, in this case the test class must be `public`;
 otherwise, some IDEs and build tools might not recognize it as a JUnit 4 test class.
 
 [source,java,indent=0]
 ----
-include::{testDir}/example/JUnit4ClassDemo.java[tags=user_guide]
+include::{testDir}/example/JUnitPlatformClassDemo.java[tags=user_guide]
 ----
 
 [[running-tests-junit-platform-runner-test-suite]]
@@ -639,18 +668,23 @@ following example.
 
 [source,java,indent=0]
 ----
-include::{testDir}/example/JUnit4SuiteDemo.java[tags=user_guide]
+include::{testDir}/example/JUnitPlatformSuiteDemo.java[tags=user_guide]
 ----
 
-The `JUnit4SuiteDemo` will discover and run all tests in the `example` package
-and its subpackages. By default, it will only include test classes whose names
-either begin with `Test` or end with `Test` or `Tests`.
+The `JUnitPlatformSuiteDemo` will discover and run all tests in the `example` package and
+its subpackages. By default, it will only include test classes whose names either begin
+with `Test` or end with `Test` or `Tests`.
 
 .Additional Configuration Options
 NOTE: There are more configuration options for discovering and filtering tests than just
 `@SelectPackages`. Please consult the
 {javadoc-root}/org/junit/platform/suite/api/package-summary.html[Javadoc] for further
 details.
+
+WARNING: Test classes and suites annotated with `@RunWith(JUnitPlatform.class)`
+**cannot** be executed directly on the JUnit Platform (or as a "JUnit 5" test as
+documented in some IDEs). Such classes and suites can only be executed using JUnit 4
+infrastructure.
 
 [[running-tests-config-params]]
 === Configuration Parameters
@@ -703,29 +737,29 @@ Tag expressions are boolean expressions with the operators `!`, `&` and `|`. In 
 |===
 
 If you are tagging your tests across multiple dimensions, tag expressions help you to
-select which tests to execute. Tagging by test type (e.g. _micro_, _integration_,
-_end-to-end_) and feature (e.g. *foo*, *bar*, *baz*) the following tag expressions can be
-useful.
+select which tests to execute. When tagging by test type (e.g., _micro_, _integration_,
+_end-to-end_) and feature (e.g., *product*, *catalog*, *shipping*), the following tag
+expressions can be useful.
 
 [%header,cols="40,60"]
 |===
 | Tag Expression
 | Selection
 
-| +foo+
-| all tests for *foo*
+| +product+
+| all tests for *product*
 
-| +bar \| baz+
-| all tests for *bar* plus all tests for *baz*
+| +catalog \| shipping+
+| all tests for *catalog* plus all tests for *shipping*
 
-| +bar & baz+
-| all tests for the intersection between *bar* and *baz*
+| +catalog & shipping+
+| all tests for the intersection between *catalog* and *shipping*
 
-| +foo & !end-to-end+
-| all tests for *foo*, but not the _end-to-end_ tests
+| +product & !end-to-end+
+| all tests for *product*, but not the _end-to-end_ tests
 
-| +(micro \| integration) & (foo \| baz)+
-| all _micro_ or _integration_ tests for *foo* or *baz*
+| +(micro \| integration) & (product \| shipping)+
+| all _micro_ or _integration_ tests for *product* or *shipping*
 |===
 
 [[running-tests-capturing-output]]

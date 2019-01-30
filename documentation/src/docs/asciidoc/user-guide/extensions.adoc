@@ -4,7 +4,7 @@
 [[extensions-overview]]
 === Overview
 
-In contrast to the competing `Runner`, `@Rule`, and `@ClassRule` extension points in
+In contrast to the competing `Runner`, `TestRule`, and `MethodRule` extension points in
 JUnit 4, the JUnit Jupiter extension model consists of a single, coherent concept: the
 `Extension` API. Note, however, that `Extension` itself is just a marker interface.
 
@@ -24,8 +24,8 @@ interface, test class, test method, or custom _<<writing-tests-meta-annotations,
 annotation>>_ with `@ExtendWith(...)` and supplying class references for the extensions
 to register.
 
-For example, to register a custom `RandomParametersExtension` for a particular test method, you
-would annotate the test method as follows.
+For example, to register a custom `RandomParametersExtension` for a particular test
+method, you would annotate the test method as follows.
 
 [source,java,indent=0]
 ----
@@ -36,8 +36,8 @@ void test(@Random int i) {
 }
 ----
 
-To register a custom `RandomParametersExtension` for all tests in a particular class and its
-subclasses, you would annotate the test class as follows.
+To register a custom `RandomParametersExtension` for all tests in a particular class and
+its subclasses, you would annotate the test class as follows.
 
 [source,java,indent=0]
 ----
@@ -51,7 +51,7 @@ Multiple extensions can be registered together like this:
 
 [source,java,indent=0]
 ----
-@ExtendWith({ FooExtension.class, BarExtension.class })
+@ExtendWith({ DatabaseExtension.class, WebServerExtension.class })
 class MyFirstTests {
 	// ...
 }
@@ -61,33 +61,49 @@ As an alternative, multiple extensions can be registered separately like this:
 
 [source,java,indent=0]
 ----
-@ExtendWith(FooExtension.class)
-@ExtendWith(BarExtension.class)
+@ExtendWith(DatabaseExtension.class)
+@ExtendWith(WebServerExtension.class)
 class MySecondTests {
 	// ...
 }
 ----
 
+[TIP]
 .Extension Registration Order
-NOTE: Extensions registered declaratively via `@ExtendWith` will be executed in the order
-in which they are declared in the source code. For example, the execution of tests in
-both `MyFirstTests` and `MySecondTests` will be extended by the `FooExtension` and
-`BarExtension`, **in exactly that order**.
+====
+Extensions registered declaratively via `@ExtendWith` will be executed in the order in
+which they are declared in the source code. For example, the execution of tests in both
+`MyFirstTests` and `MySecondTests` will be extended by the `DatabaseExtension` and
+`WebServerExtension`, **in exactly that order**.
+====
 
 [[extensions-registration-programmatic]]
 ==== Programmatic Extension Registration
 
-Developers can register extensions _programmatically_ by annotating fields in test
-classes with `{RegisterExtension}`.
+Developers can register extensions _programmatically_ by annotating fields in test classes
+with `{RegisterExtension}`.
 
 When an extension is registered _declaratively_ via
-<<extensions-registration-declarative,`@ExtendWith`>>, it can typically only be
-configured via annotations. In contrast, when an extension is registered via
-`@RegisterExtension`, it can be configured _programmatically_ -- for example, in order to
-pass arguments to the extension's constructor, a static factory method, or a builder API.
+<<extensions-registration-declarative,`@ExtendWith`>>, it can typically only be configured
+via annotations. In contrast, when an extension is registered via `@RegisterExtension`, it
+can be configured _programmatically_ -- for example, in order to pass arguments to the
+extension's constructor, a static factory method, or a builder API.
 
-NOTE: `@RegisterExtension` fields must not be `private` or `null` (at evaluation time)
-but may be either `static` or non-static.
+[[extensions-registration-programmatic-order]]
+[TIP]
+.Extension Registration Order
+====
+By default, extensions registered programmatically via `@RegisterExtension` will be
+ordered using an algorithm that is deterministic but intentionally nonobvious. This
+ensures that subsequent runs of a test suite execute extensions in the same order, thereby
+allowing for repeatable builds. However, there are times when extensions need to be
+registered in an explicit order. To achieve that, annotate each `@RegisterExtension` field
+with `{Order}`. Any `@RegisterExtension` field not annotated with `@Order` will appear at
+the end of the sorted list.
+====
+
+NOTE: `@RegisterExtension` fields must not be `private` or `null` (at evaluation time) but
+may be either `static` or non-static.
 
 [[extensions-registration-programmatic-static-fields]]
 ===== Static Fields
@@ -330,6 +346,33 @@ those provided in `java.lang.reflect.Parameter` in order to avoid this bug in th
 * `List<A> findRepeatableAnnotations(Class<A> annotationType)`
 ====
 
+[[extensions-test-result-processing]]
+=== Test Result Processing
+
+`{TestWatcher}` defines the API for extensions that wish to process the results of _test
+method_ executions. Specifically, a `TestWatcher` will be invoked with contextual
+information for the following events.
+
+* `testDisabled`: invoked after a disabled _test method_ has been skipped
+* `testSuccessful`: invoked after a _test method_ has completed successfully
+* `testAborted`: invoked after a _test method_ has been aborted
+* `testFailed`: invoked after a _test method_ has failed
+
+NOTE: In this context, _test method_ refers to any `@Test` method or `@TestTemplate`
+method (for example, a `@RepeatedTest` or `@ParameterizedTest`).
+
+Extensions implementing this interface can be registered at the method level or at the
+class level. In the latter case they will be invoked for any contained _test method_
+including those in `@Nested` classes.
+
+[WARNING]
+====
+Any instances of `ExtensionContext.Store.CloseableResource` stored in the `Store` of the
+provided `{ExtensionContext}` will be closed _before_ methods in this API are invoked (see
+<<extensions-keeping-state>>). You can use the parent context's `Store` to work with such
+resources.
+====
+
 [[extensions-lifecycle-callbacks]]
 === Test Lifecycle Callbacks
 
@@ -420,14 +463,14 @@ include::{testDir}/example/TestTemplateDemo.java[tags=user_guide]
 ----
 
 In this example, the test template will be invoked twice. The display names of the
-invocations will be "`foo`" and "`bar`" as specified by the invocation context. Each
+invocations will be `apple` and `banana` as specified by the invocation context. Each
 invocation registers a custom `{ParameterResolver}` which is used to resolve the method
 parameter. The output when using the `ConsoleLauncher` is as follows.
 
 ....
 └─ testTemplate(String) ✔
-   ├─ foo ✔
-   └─ bar ✔
+   ├─ apple ✔
+   └─ banana ✔
 ....
 
 The `{TestTemplateInvocationContextProvider}` extension API is primarily intended for
@@ -450,7 +493,7 @@ values into a store for later retrieval. See the
 using the `Store` with a method-level scope. It is important to remember that values
 stored in an `ExtensionContext` during test execution will not be available in the
 surrounding `ExtensionContext`. Since `ExtensionContexts` may be nested, the scope of
-inner contexts may also be limited. Consult the corresponding JavaDoc for details on the
+inner contexts may also be limited. Consult the corresponding Javadoc for details on the
 methods available for storing and retrieving values via the `{ExtensionContext_Store}`.
 
 .`ExtensionContext.Store.CloseableResource`
@@ -476,14 +519,14 @@ the behavior of the JUnit Platform.
 These include methods to check whether an element is annotated or meta-annotated with a
 particular annotation, to search for specific annotations, and to find annotated methods
 and fields in a class or interface. Some of these methods search on implemented
-interfaces and within class hierarchies to find annotations. Consult the JavaDoc for
+interfaces and within class hierarchies to find annotations. Consult the Javadoc for
 `{AnnotationSupport}` for further details.
 
 [[extensions-supported-utilities-classes]]
 ==== Class Support
 
 `ClassSupport` provides static utility methods for working with classes (i.e., instances
-of `java.lang.Class`). Consult the JavaDoc for `{ClassSupport}` for further details.
+of `java.lang.Class`). Consult the Javadoc for `{ClassSupport}` for further details.
 
 [[extensions-supported-utilities-reflection]]
 ==== Reflection Support
@@ -492,8 +535,17 @@ of `java.lang.Class`). Consult the JavaDoc for `{ClassSupport}` for further deta
 reflection and class-loading mechanisms. These include methods to scan the classpath in
 search of classes matching specified predicates, to load and create new instances of a
 class, and to find and invoke methods. Some of these methods traverse class hierarchies
-to locate matching methods. Consult the JavaDoc for `{ReflectionSupport}` for further
+to locate matching methods. Consult the Javadoc for `{ReflectionSupport}` for further
 details.
+
+[[extensions-supported-utilities-modifier]]
+==== Modifier Support
+
+`ModifierSupport` provides static utility methods for working with member and class
+modifiers -- for example, to determine if a member is declared as `public`, `private`,
+`abstract`, `static`, etc. Consult the Javadoc for `{ModifierSupport}` for further
+details.
+
 
 [[extensions-execution-order]]
 === Relative Execution Order of User Code and Extensions
@@ -571,4 +623,4 @@ The following table further explains the twelve steps in the
 In the simplest case only the actual test method will be executed (step 6); all other
 steps are optional depending on the presence of user code or extension support for the
 corresponding lifecycle callback. For further details on the various lifecycle callbacks
-please consult the respective JavaDoc for each annotation and extension.
+please consult the respective Javadoc for each annotation and extension.

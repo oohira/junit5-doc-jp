@@ -29,9 +29,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.util.ReflectionUtils;
-import org.junit.platform.engine.ConfigurationParameters;
 
 /**
  * Unit tests for {@link ExecutableInvoker}.
@@ -47,9 +47,9 @@ class ExecutableInvokerTests {
 
 	private final ExtensionContext extensionContext = mock(ExtensionContext.class);
 
-	private final ConfigurationParameters configParams = mock(ConfigurationParameters.class);
+	private final JupiterConfiguration configuration = mock(JupiterConfiguration.class);
 
-	private ExtensionRegistry extensionRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(configParams);
+	private ExtensionRegistry extensionRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(configuration);
 
 	@Test
 	void constructorInjection() {
@@ -87,7 +87,7 @@ class ExecutableInvokerTests {
 	}
 
 	@Test
-	void invokingMethodsWithoutParameterDoesNotDependOnExtensions() throws Exception {
+	void invokingMethodsWithoutParameterDoesNotDependOnExtensions() {
 		testMethodWithNoParameters();
 		extensionRegistry = null;
 
@@ -239,8 +239,20 @@ class ExecutableInvokerTests {
 
 		assertSame(cause, caught.getCause(), () -> "cause should be present");
 		assertThat(caught.getMessage())//
-				.startsWith("Failed to resolve parameter [java.lang.String")//
-				.contains("in method");
+				.matches("^Failed to resolve parameter \\[java.lang.String .+?\\] in method \\[.+?\\]$");
+	}
+
+	@Test
+	void exceptionMessageContainsMessageFromEexceptionThrownDuringParameterResolution() {
+		anyTestMethodWithAtLeastOneParameter();
+		RuntimeException cause = new RuntimeException("boom!");
+		throwDuringParameterResolution(cause);
+
+		ParameterResolutionException caught = assertThrows(ParameterResolutionException.class, this::invokeMethod);
+
+		assertSame(cause, caught.getCause(), () -> "cause should be present");
+		assertThat(caught.getMessage())//
+				.matches("^Failed to resolve parameter \\[java.lang.String .+?\\] in method \\[.+?\\]: boom!$");
 	}
 
 	@Test

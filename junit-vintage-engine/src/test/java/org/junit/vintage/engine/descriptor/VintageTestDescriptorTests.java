@@ -26,7 +26,7 @@ class VintageTestDescriptorTests {
 	private static final UniqueId uniqueId = UniqueId.forEngine("vintage");
 
 	@Test
-	void constructFromInheritedMethod() throws Exception {
+	void constructFromInheritedMethod() {
 		Description description = Description.createTestDescription(ConcreteTest.class, "theTest");
 		VintageTestDescriptor descriptor = new VintageTestDescriptor(uniqueId, description);
 
@@ -36,6 +36,33 @@ class VintageTestDescriptorTests {
 		MethodSource methodSource = (MethodSource) sourceOptional.get();
 		assertEquals(ConcreteTest.class.getName(), methodSource.getClassName());
 		assertEquals("theTest", methodSource.getMethodName());
+	}
+
+	@Test
+	void legacyReportingNameUsesClassName() {
+		Description description = Description.createSuiteDescription(ConcreteTest.class);
+		VintageTestDescriptor testDescriptor = new VintageTestDescriptor(uniqueId, description);
+
+		assertEquals("org.junit.vintage.engine.descriptor.VintageTestDescriptorTests$ConcreteTest",
+			testDescriptor.getLegacyReportingName());
+	}
+
+	@Test
+	void legacyReportingNameUsesMethodName() {
+		Description description = Description.createTestDescription(ConcreteTest.class, "legacyTest");
+		VintageTestDescriptor testDescriptor = new VintageTestDescriptor(uniqueId, description);
+
+		assertEquals("legacyTest", testDescriptor.getLegacyReportingName());
+	}
+
+	@Test
+	void legacyReportingNameFallbackToDisplayName() {
+		String suiteName = "Legacy Suite";
+		Description description = Description.createSuiteDescription(suiteName);
+		VintageTestDescriptor testDescriptor = new VintageTestDescriptor(uniqueId, description);
+
+		assertEquals(testDescriptor.getDisplayName(), testDescriptor.getLegacyReportingName());
+		assertEquals(suiteName, testDescriptor.getLegacyReportingName());
 	}
 
 	private abstract static class AbstractTestBase {

@@ -350,7 +350,7 @@ class HierarchicalTestExecutorTests {
 	}
 
 	@Test
-	void abortInContainerBeforeAll() throws Exception {
+	void abortInRootBeforeAll() throws Exception {
 
 		MyContainer child = spy(new MyContainer(UniqueId.root("container", "child container")));
 		root.addChild(child);
@@ -371,6 +371,36 @@ class HierarchicalTestExecutorTests {
 
 		assertThat(rootExecutionResult.getValue().getStatus()).isEqualTo(ABORTED);
 		assertThat(rootExecutionResult.getValue().getThrowable()).containsSame(anAbortedException);
+
+		verify(child, never()).execute(any(), any());
+	}
+
+	@Test
+	void abortInChildContainerBeforeAll() throws Exception {
+
+		MyContainer child = spy(new MyContainer(UniqueId.root("container", "child container")));
+		root.addChild(child);
+		TestAbortedException anAbortedException = new TestAbortedException("in BeforeAll");
+		when(child.before(rootContext)).thenThrow(anAbortedException);
+
+		InOrder inOrder = inOrder(listener, root, child);
+
+		executor.execute();
+
+		ArgumentCaptor<TestExecutionResult> childExecutionResult = ArgumentCaptor.forClass(TestExecutionResult.class);
+
+		inOrder.verify(root).prepare(rootContext);
+		inOrder.verify(root).shouldBeSkipped(rootContext);
+		inOrder.verify(listener).executionStarted(root);
+		inOrder.verify(root).before(rootContext);
+		inOrder.verify(child).shouldBeSkipped(rootContext);
+		inOrder.verify(child).before(rootContext);
+		inOrder.verify(child).after(rootContext);
+		inOrder.verify(listener).executionFinished(eq(child), childExecutionResult.capture());
+		inOrder.verify(root).after(rootContext);
+
+		assertThat(childExecutionResult.getValue().getStatus()).isEqualTo(ABORTED);
+		assertThat(childExecutionResult.getValue().getThrowable()).containsSame(anAbortedException);
 
 		verify(child, never()).execute(any(), any());
 	}
@@ -512,7 +542,7 @@ class HierarchicalTestExecutorTests {
 	 * Verifies support for blacklisted exceptions.
 	 */
 	@Test
-	void outOfMemoryErrorInLeafExecution() throws Exception {
+	void outOfMemoryErrorInLeafExecution() {
 		MyLeaf child = spy(new MyLeaf(UniqueId.root("leaf", "leaf")));
 		OutOfMemoryError outOfMemoryError = new OutOfMemoryError("in test");
 		when(child.execute(eq(rootContext), any())).thenThrow(outOfMemoryError);
@@ -547,7 +577,7 @@ class HierarchicalTestExecutorTests {
 	}
 
 	@Test
-	void dynamicTestDescriptorsMustNotDeclareExclusiveResources() throws Exception {
+	void dynamicTestDescriptorsMustNotDeclareExclusiveResources() {
 
 		UniqueId leafUniqueId = UniqueId.root("leaf", "child leaf");
 		MyLeaf child = spy(new MyLeaf(leafUniqueId));
@@ -624,7 +654,7 @@ class HierarchicalTestExecutorTests {
 
 		@Override
 		public MyEngineExecutionContext execute(MyEngineExecutionContext context,
-				DynamicTestExecutor dynamicTestExecutor) throws Exception {
+				DynamicTestExecutor dynamicTestExecutor) {
 			return context;
 		}
 

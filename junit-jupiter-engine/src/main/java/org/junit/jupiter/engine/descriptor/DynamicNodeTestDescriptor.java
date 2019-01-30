@@ -11,6 +11,7 @@
 package org.junit.jupiter.engine.descriptor;
 
 import org.junit.jupiter.api.DynamicNode;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestSource;
@@ -25,8 +26,9 @@ abstract class DynamicNodeTestDescriptor extends JupiterTestDescriptor {
 
 	private final int index;
 
-	DynamicNodeTestDescriptor(UniqueId uniqueId, int index, DynamicNode dynamicNode, TestSource testSource) {
-		super(uniqueId, dynamicNode.getDisplayName(), testSource);
+	DynamicNodeTestDescriptor(UniqueId uniqueId, int index, DynamicNode dynamicNode, TestSource testSource,
+			JupiterConfiguration configuration) {
+		super(uniqueId, dynamicNode.getDisplayName(), testSource, configuration);
 		this.index = index;
 	}
 

@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.function.ThrowingSupplier;
+import org.junit.platform.commons.util.BlacklistedExceptions;
+import org.junit.platform.commons.util.StringUtils;
 import org.opentest4j.AssertionFailedError;
 
 /**
@@ -48,9 +50,8 @@ class AssertDoesNotThrow {
 			executable.execute();
 		}
 		catch (Throwable t) {
-			String message = buildPrefix(nullSafeGet(messageOrSupplier)) + "Unexpected exception thrown: "
-					+ t.getClass().getName();
-			throw new AssertionFailedError(message, t);
+			BlacklistedExceptions.rethrowIfBlacklisted(t);
+			throw createAssertionFailedError(messageOrSupplier, t);
 		}
 	}
 
@@ -71,10 +72,19 @@ class AssertDoesNotThrow {
 			return supplier.get();
 		}
 		catch (Throwable t) {
-			String message = buildPrefix(nullSafeGet(messageOrSupplier)) + "Unexpected exception thrown: "
-					+ t.getClass().getName();
-			throw new AssertionFailedError(message, t);
+			BlacklistedExceptions.rethrowIfBlacklisted(t);
+			throw createAssertionFailedError(messageOrSupplier, t);
 		}
+	}
+
+	private static AssertionFailedError createAssertionFailedError(Object messageOrSupplier, Throwable t) {
+		String message = buildPrefix(nullSafeGet(messageOrSupplier)) + "Unexpected exception thrown: "
+				+ t.getClass().getName() + buildSuffix(t.getMessage());
+		return new AssertionFailedError(message, t);
+	}
+
+	private static String buildSuffix(String message) {
+		return StringUtils.isNotBlank(message) ? ": " + message : "";
 	}
 
 }

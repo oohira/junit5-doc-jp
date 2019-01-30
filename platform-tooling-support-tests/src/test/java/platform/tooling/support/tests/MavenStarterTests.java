@@ -12,11 +12,9 @@ package platform.tooling.support.tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
-import java.nio.file.Paths;
 import java.time.Duration;
-
-import de.sormuras.bartholdy.tool.Maven;
 
 import org.junit.jupiter.api.Test;
 import platform.tooling.support.Request;
@@ -27,14 +25,16 @@ import platform.tooling.support.Request;
 class MavenStarterTests {
 
 	@Test
-	void maven_3_5_4() {
+	void verifyMavenStarterProject() {
 		var result = Request.builder() //
-				.setTool(Maven.install("3.5.4", Paths.get("build", "test-tools"))) //
+				.setTool(Request.maven()) //
 				.setProject("maven-starter") //
 				.addArguments("--debug", "verify") //
-				.setTimeout(Duration.ofSeconds(99)) //
+				.setTimeout(Duration.ofMinutes(2)) //
 				.build() //
 				.run();
+
+		assumeFalse(result.isTimedOut(), () -> "tool timed out: " + result);
 
 		assertEquals(0, result.getExitCode(), result.toString());
 		assertEquals("", result.getOutput("err"));

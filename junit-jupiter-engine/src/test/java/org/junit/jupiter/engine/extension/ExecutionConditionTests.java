@@ -10,7 +10,6 @@
 
 package org.junit.jupiter.engine.extension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.engine.Constants.DEACTIVATE_CONDITIONS_PATTERN_PROPERTY_NAME;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
@@ -25,8 +24,9 @@ import org.junit.jupiter.engine.AbstractJupiterTestEngineTests;
 import org.junit.jupiter.engine.JupiterTestEngine;
 import org.junit.jupiter.engine.extension.sub.SystemPropertyCondition;
 import org.junit.jupiter.engine.extension.sub.SystemPropertyCondition.SystemProperty;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
+import org.junit.platform.testkit.engine.Events;
 
 /**
  * Integration tests that verify support for the {@link ExecutionCondition}
@@ -52,23 +52,17 @@ class ExecutionConditionTests extends AbstractJupiterTestEngineTests {
 
 	@Test
 	void conditionWorksOnContainer() {
-		LauncherDiscoveryRequest request = request().selectors(
-			selectClass(TestCaseWithExecutionConditionOnClass.class)).build();
-		ExecutionEventRecorder eventRecorder = executeTests(request);
+		EngineExecutionResults executionResults = executeTestsForClass(TestCaseWithExecutionConditionOnClass.class);
 
-		assertEquals(1, eventRecorder.getContainerSkippedCount(), "# container skipped");
-		assertEquals(0, eventRecorder.getTestStartedCount(), "# tests started");
+		executionResults.containers().assertStatistics(stats -> stats.skipped(1));
+		executionResults.tests().assertStatistics(stats -> stats.started(0));
 	}
 
 	@Test
 	void conditionWorksOnTest() {
-		LauncherDiscoveryRequest request = request().selectors(
-			selectClass(TestCaseWithExecutionConditionOnMethods.class)).build();
-		ExecutionEventRecorder eventRecorder = executeTests(request);
+		Events tests = executeTestsForClass(TestCaseWithExecutionConditionOnMethods.class).tests();
 
-		assertEquals(2, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(2, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
-		assertEquals(3, eventRecorder.getTestSkippedCount(), "# tests skipped");
+		tests.assertStatistics(stats -> stats.started(2).succeeded(2).skipped(3));
 	}
 
 	@Test
@@ -118,12 +112,12 @@ class ExecutionConditionTests extends AbstractJupiterTestEngineTests {
 				.build();
 		// @formatter:on
 
-		ExecutionEventRecorder eventRecorder = executeTests(request);
+		EngineExecutionResults executionResults = executeTests(request);
+		Events containers = executionResults.containers();
+		Events tests = executionResults.tests();
 
-		assertEquals(0, eventRecorder.getContainerSkippedCount(), "# containers skipped");
-		assertEquals(2, eventRecorder.getContainerStartedCount(), "# containers started");
-		assertEquals(testStartedCount, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(testFailedCount, eventRecorder.getTestFailedCount(), "# tests failed");
+		containers.assertStatistics(stats -> stats.skipped(0).started(2));
+		tests.assertStatistics(stats -> stats.started(testStartedCount).failed(testFailedCount));
 	}
 
 	private void assertExecutionConditionOverride(String deactivatePattern, int started, int succeeded, int failed) {
@@ -134,11 +128,8 @@ class ExecutionConditionTests extends AbstractJupiterTestEngineTests {
 				.build();
 		// @formatter:on
 
-		ExecutionEventRecorder eventRecorder = executeTests(request);
-
-		assertEquals(started, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(succeeded, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
-		assertEquals(failed, eventRecorder.getTestFailedCount(), "# tests failed");
+		executeTests(request).tests().assertStatistics(
+			stats -> stats.started(started).succeeded(succeeded).failed(failed));
 	}
 
 	// -------------------------------------------------------------------

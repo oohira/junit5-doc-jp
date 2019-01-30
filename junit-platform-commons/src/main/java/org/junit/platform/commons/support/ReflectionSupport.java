@@ -10,8 +10,10 @@
 
 package org.junit.platform.commons.support;
 
+import static org.apiguardian.api.API.Status.DEPRECATED;
 import static org.apiguardian.api.API.Status.MAINTAINED;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.List;
@@ -19,15 +21,24 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.apiguardian.api.API;
+import org.junit.platform.commons.function.Try;
 import org.junit.platform.commons.util.ExceptionUtils;
+import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 /**
- * Common reflection and classpath scanning support.
+ * {@code ReflectionSupport} provides static utility methods for common
+ * reflection tasks &mdash; for example, scanning for classes in the class-path
+ * or module-path, loading classes, finding methods, invoking methods, etc.
+ *
+ * <p>{@link org.junit.platform.engine.TestEngine TestEngine} and extension
+ * authors are encouraged to use these supported methods in order to align with
+ * the behavior of the JUnit Platform.
  *
  * @since 1.0
  * @see AnnotationSupport
  * @see ClassSupport
+ * @see ModifierSupport
  */
 @API(status = MAINTAINED, since = "1.0")
 public final class ReflectionSupport {
@@ -49,9 +60,34 @@ public final class ReflectionSupport {
 	 * @param name the name of the class to load; never {@code null} or blank
 	 * @return an {@code Optional} containing the loaded class; never {@code null}
 	 * but potentially empty if no such class could be loaded
+	 * @deprecated Please use {@link #tryToLoadClass(String)} instead.
 	 */
+	@API(status = DEPRECATED, since = "1.4")
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	public static Optional<Class<?>> loadClass(String name) {
 		return ReflectionUtils.loadClass(name);
+	}
+
+	/**
+	 * Try to load a class by its <em>primitive name</em> or <em>fully qualified name</em>,
+	 * using the default {@link ClassLoader}.
+	 *
+	 * <p>Class names for arrays may be specified using either the JVM's internal
+	 * String representation (e.g., {@code [[I} for {@code int[][]},
+	 * {@code [Lava.lang.String;} for {@code java.lang.String[]}, etc.) or
+	 * <em>source code syntax</em> (e.g., {@code int[][]}, {@code java.lang.String[]},
+	 * etc.).
+	 *
+	 * @param name the name of the class to load; never {@code null} or blank
+	 * @return a successful {@code Try} containing the loaded class or a failed
+	 * {@code Try} containing the exception if no such class could be loaded;
+	 * never {@code null}
+	 * @since 1.4
+	 */
+	@API(status = MAINTAINED, since = "1.4")
+	public static Try<Class<?>> tryToLoadClass(String name) {
+		return ReflectionUtils.tryToLoadClass(name);
 	}
 
 	/**
@@ -62,7 +98,8 @@ public final class ReflectionSupport {
 	 * <p>The classpath scanning algorithm searches recursively in subpackages
 	 * beginning with the root of the classpath.
 	 *
-	 * @param root the URI for the classpath root in which to scan
+	 * @param root the URI for the classpath root in which to scan; never
+	 * {@code null}
 	 * @param classFilter the class type filter; never {@code null}
 	 * @param classNameFilter the class name filter; never {@code null}
 	 * @return an immutable list of all such classes found; never {@code null}
@@ -72,6 +109,7 @@ public final class ReflectionSupport {
 	 */
 	public static List<Class<?>> findAllClassesInClasspathRoot(URI root, Predicate<Class<?>> classFilter,
 			Predicate<String> classNameFilter) {
+
 		return ReflectionUtils.findAllClassesInClasspathRoot(root, classFilter, classNameFilter);
 	}
 
@@ -84,7 +122,8 @@ public final class ReflectionSupport {
 	 * beginning within the supplied base package.
 	 *
 	 * @param basePackageName the name of the base package in which to start
-	 * scanning
+	 * scanning; must not be {@code null} and must be valid in terms of Java
+	 * syntax
 	 * @param classFilter the class type filter; never {@code null}
 	 * @param classNameFilter the class name filter; never {@code null}
 	 * @return an immutable list of all such classes found; never {@code null}
@@ -94,6 +133,7 @@ public final class ReflectionSupport {
 	 */
 	public static List<Class<?>> findAllClassesInPackage(String basePackageName, Predicate<Class<?>> classFilter,
 			Predicate<String> classNameFilter) {
+
 		return ReflectionUtils.findAllClassesInPackage(basePackageName, classFilter, classNameFilter);
 	}
 
@@ -105,7 +145,8 @@ public final class ReflectionSupport {
 	 * <p>The module-path scanning algorithm searches recursively in all
 	 * packages contained in the module.
 	 *
-	 * @param moduleName the name of the module to scan
+	 * @param moduleName the name of the module to scan; never {@code null} or
+	 * <em>empty</em>
 	 * @param classFilter the class type filter; never {@code null}
 	 * @param classNameFilter the class name filter; never {@code null}
 	 * @return an immutable list of all such classes found; never {@code null}
@@ -116,6 +157,7 @@ public final class ReflectionSupport {
 	 */
 	public static List<Class<?>> findAllClassesInModule(String moduleName, Predicate<Class<?>> classFilter,
 			Predicate<String> classNameFilter) {
+
 		return ReflectionUtils.findAllClassesInModule(moduleName, classFilter, classNameFilter);
 	}
 
@@ -129,8 +171,9 @@ public final class ReflectionSupport {
 	 * as an unchecked exception.
 	 *
 	 * @param clazz the class to instantiate; never {@code null}
-	 * @param args the arguments to pass to the constructor none of which may be {@code null}
-	 * @return the new instance
+	 * @param args the arguments to pass to the constructor, none of which may
+	 * be {@code null}
+	 * @return the new instance; never {@code null}
 	 * @see ExceptionUtils#throwAsUncheckedException(Throwable)
 	 */
 	public static <T> T newInstance(Class<T> clazz, Object... args) {
@@ -152,6 +195,49 @@ public final class ReflectionSupport {
 	 */
 	public static Object invokeMethod(Method method, Object target, Object... args) {
 		return ReflectionUtils.invokeMethod(method, target, args);
+	}
+
+	/**
+	 * Find all {@linkplain Field fields} of the supplied class or interface
+	 * that match the specified {@code predicate}.
+	 *
+	 * <p>Fields declared in the same class or interface will be ordered using
+	 * an algorithm that is deterministic but intentionally nonobvious.
+	 *
+	 * <p>The results will not contain fields that are <em>hidden</em> or
+	 * {@linkplain Field#isSynthetic() synthetic}.
+	 *
+	 * @param clazz the class or interface in which to find the fields; never {@code null}
+	 * @param predicate the field filter; never {@code null}
+	 * @param traversalMode the hierarchy traversal mode; never {@code null}
+	 * @return an immutable list of all such fields found; never {@code null}
+	 * but potentially empty
+	 * @since 1.4
+	 */
+	@API(status = MAINTAINED, since = "1.4")
+	public static List<Field> findFields(Class<?> clazz, Predicate<Field> predicate,
+			HierarchyTraversalMode traversalMode) {
+
+		Preconditions.notNull(traversalMode, "HierarchyTraversalMode must not be null");
+
+		return ReflectionUtils.findFields(clazz, predicate,
+			ReflectionUtils.HierarchyTraversalMode.valueOf(traversalMode.name()));
+	}
+
+	/**
+	 * Try to read the value of a potentially inaccessible field.
+	 *
+	 * <p>If an exception occurs while reading the field, a failed {@link Try}
+	 * is returned that contains the corresponding exception.
+	 *
+	 * @param field the field to read; never {@code null}
+	 * @param instance the instance from which the value is to be read; may
+	 * be {@code null} for a static field
+	 * @since 1.4
+	 */
+	@API(status = MAINTAINED, since = "1.4")
+	public static Try<Object> tryToReadFieldValue(Field field, Object instance) {
+		return ReflectionUtils.tryToReadFieldValue(field, instance);
 	}
 
 	/**
@@ -213,6 +299,8 @@ public final class ReflectionSupport {
 	 */
 	public static List<Method> findMethods(Class<?> clazz, Predicate<Method> predicate,
 			HierarchyTraversalMode traversalMode) {
+
+		Preconditions.notNull(traversalMode, "HierarchyTraversalMode must not be null");
 
 		return ReflectionUtils.findMethods(clazz, predicate,
 			ReflectionUtils.HierarchyTraversalMode.valueOf(traversalMode.name()));

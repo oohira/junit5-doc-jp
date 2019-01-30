@@ -11,6 +11,7 @@
 package org.junit.jupiter.api;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.AssertionTestUtils.assertMessageEquals;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -181,6 +182,17 @@ class AssertAllAssertionsTests {
 		assertEquals("boom", outOfMemoryError.getMessage());
 	}
 
+	@Test
+	void assertAllWithParallelStream() {
+		Executable executable = () -> {
+			throw new RuntimeException();
+		};
+		MultipleFailuresError multipleFailuresError = assertThrows(MultipleFailuresError.class,
+			() -> assertAll(Stream.generate(() -> executable).parallel().limit(100)));
+
+		assertThat(multipleFailuresError.getFailures()).hasSize(100).doesNotContainNull();
+	}
+
 	private void assertPrecondition(String msg, Executable executable) {
 		PreconditionViolationException exception = assertThrows(PreconditionViolationException.class, executable);
 		assertMessageEquals(exception, msg);
@@ -194,8 +206,14 @@ class AssertAllAssertionsTests {
 		List<Throwable> failures = multipleFailuresError.getFailures();
 		assertEquals(exceptionTypes.length, failures.size(), "number of failures");
 
+		// Verify that exceptions are also present as suppressed exceptions.
+		// https://github.com/junit-team/junit5/issues/1602
+		Throwable[] suppressed = multipleFailuresError.getSuppressed();
+		assertEquals(exceptionTypes.length, suppressed.length, "number of suppressed exceptions");
+
 		for (int i = 0; i < exceptionTypes.length; i++) {
-			assertEquals(exceptionTypes[i], failures.get(i).getClass(), "exception type");
+			assertEquals(exceptionTypes[i], failures.get(i).getClass(), "exception type [" + i + "]");
+			assertEquals(exceptionTypes[i], suppressed[i].getClass(), "suppressed exception type [" + i + "]");
 		}
 	}
 

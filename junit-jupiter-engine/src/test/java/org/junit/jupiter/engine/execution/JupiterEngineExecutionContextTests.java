@@ -10,16 +10,23 @@
 
 package org.junit.jupiter.engine.execution;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.withSettings;
+
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.engine.descriptor.ClassExtensionContext;
-import org.junit.jupiter.engine.descriptor.ClassTestDescriptor;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.engine.TrackLogRecords;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
-import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.platform.commons.logging.LogRecordListener;
 import org.junit.platform.engine.EngineExecutionListener;
-import org.junit.platform.engine.UniqueId;
 
 /**
  * Unit tests for {@link JupiterEngineExecutionContext}.
@@ -28,12 +35,12 @@ import org.junit.platform.engine.UniqueId;
  */
 class JupiterEngineExecutionContextTests {
 
-	private final ConfigurationParameters configParams = mock(ConfigurationParameters.class);
+	private final JupiterConfiguration configuration = mock(JupiterConfiguration.class);
 
 	private final EngineExecutionListener engineExecutionListener = mock(EngineExecutionListener.class);
 
 	private final JupiterEngineExecutionContext originalContext = new JupiterEngineExecutionContext(
-		engineExecutionListener, configParams);
+		engineExecutionListener, configuration);
 
 	@Test
 	void executionListenerIsHandedOnWhenContextIsExtended() {
@@ -44,38 +51,31 @@ class JupiterEngineExecutionContextTests {
 
 	@Test
 	void extendWithAllAttributes() {
-		UniqueId uniqueId = UniqueId.parse("[engine:junit-jupiter]/[class:MyClass]");
-		ClassTestDescriptor classTestDescriptor = new ClassTestDescriptor(uniqueId, getClass(), configParams);
-		ClassExtensionContext extensionContext = new ClassExtensionContext(null, null, classTestDescriptor,
-			configParams, null);
-		ExtensionRegistry extensionRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(configParams);
-		TestInstanceProvider testInstanceProvider = mock(TestInstanceProvider.class);
+		ExtensionContext extensionContext = mock(ExtensionContext.class);
+		ExtensionRegistry extensionRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(configuration);
+		TestInstancesProvider testInstancesProvider = mock(TestInstancesProvider.class);
 		JupiterEngineExecutionContext newContext = originalContext.extend() //
 				.withExtensionContext(extensionContext) //
 				.withExtensionRegistry(extensionRegistry) //
-				.withTestInstanceProvider(testInstanceProvider) //
+				.withTestInstancesProvider(testInstancesProvider) //
 				.build();
 
 		assertSame(extensionContext, newContext.getExtensionContext());
 		assertSame(extensionRegistry, newContext.getExtensionRegistry());
-		assertSame(testInstanceProvider, newContext.getTestInstanceProvider());
+		assertSame(testInstancesProvider, newContext.getTestInstancesProvider());
 	}
 
 	@Test
 	void canOverrideAttributeWhenContextIsExtended() {
-		UniqueId uniqueId = UniqueId.parse("[engine:junit-jupiter]/[class:MyClass]");
-		ClassTestDescriptor classTestDescriptor = new ClassTestDescriptor(uniqueId, getClass(), configParams);
-		ClassExtensionContext extensionContext = new ClassExtensionContext(null, null, classTestDescriptor,
-			configParams, null);
-		ExtensionRegistry extensionRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(configParams);
-		TestInstanceProvider testInstanceProvider = mock(TestInstanceProvider.class);
-		ClassExtensionContext newExtensionContext = new ClassExtensionContext(extensionContext, null,
-			classTestDescriptor, configParams, null);
+		ExtensionContext extensionContext = mock(ExtensionContext.class);
+		ExtensionRegistry extensionRegistry = ExtensionRegistry.createRegistryWithDefaultExtensions(configuration);
+		TestInstancesProvider testInstancesProvider = mock(TestInstancesProvider.class);
+		ExtensionContext newExtensionContext = mock(ExtensionContext.class);
 
 		JupiterEngineExecutionContext newContext = originalContext.extend() //
 				.withExtensionContext(extensionContext) //
 				.withExtensionRegistry(extensionRegistry) //
-				.withTestInstanceProvider(testInstanceProvider) //
+				.withTestInstancesProvider(testInstancesProvider) //
 				.build() //
 				.extend() //
 				.withExtensionContext(newExtensionContext) //
@@ -83,7 +83,27 @@ class JupiterEngineExecutionContextTests {
 
 		assertSame(newExtensionContext, newContext.getExtensionContext());
 		assertSame(extensionRegistry, newContext.getExtensionRegistry());
-		assertSame(testInstanceProvider, newContext.getTestInstanceProvider());
+		assertSame(testInstancesProvider, newContext.getTestInstancesProvider());
+	}
+
+	@Test
+	@TrackLogRecords
+	void closeAttemptExceptionWillBeThrownDownTheCallStack(LogRecordListener logRecordListener) throws Exception {
+		ExtensionContext failingExtensionContext = mock(ExtensionContext.class,
+			withSettings().extraInterfaces(AutoCloseable.class));
+		Exception expectedException = new Exception("test message");
+		doThrow(expectedException).when(((AutoCloseable) failingExtensionContext)).close();
+
+		JupiterEngineExecutionContext newContext = originalContext.extend() //
+				.withExtensionContext(failingExtensionContext) //
+				.build();
+
+		Exception actualException = assertThrows(Exception.class, newContext::close);
+
+		assertSame(expectedException, actualException);
+		assertThat(logRecordListener.stream(JupiterEngineExecutionContext.class, Level.SEVERE)) //
+				.extracting(LogRecord::getMessage) //
+				.containsOnly("Caught exception while closing extension context: " + failingExtensionContext);
 	}
 
 }

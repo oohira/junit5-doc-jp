@@ -16,7 +16,8 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.platform.engine.ConfigurationParameters;
+import org.junit.jupiter.api.extension.TestInstances;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.engine.EngineExecutionListener;
 
 /**
@@ -24,14 +25,14 @@ import org.junit.platform.engine.EngineExecutionListener;
  */
 final class TestTemplateExtensionContext extends AbstractExtensionContext<TestTemplateTestDescriptor> {
 
-	private final Object testInstance;
+	private final TestInstances testInstances;
 
 	TestTemplateExtensionContext(ExtensionContext parent, EngineExecutionListener engineExecutionListener,
-			TestTemplateTestDescriptor testDescriptor, ConfigurationParameters configurationParameters,
-			Object testInstance) {
+			TestTemplateTestDescriptor testDescriptor, JupiterConfiguration configuration,
+			TestInstances testInstances) {
 
-		super(parent, engineExecutionListener, testDescriptor, configurationParameters);
-		this.testInstance = testInstance;
+		super(parent, engineExecutionListener, testDescriptor, configuration);
+		this.testInstances = testInstances;
 	}
 
 	@Override
@@ -51,7 +52,12 @@ final class TestTemplateExtensionContext extends AbstractExtensionContext<TestTe
 
 	@Override
 	public Optional<Object> getTestInstance() {
-		return Optional.ofNullable(this.testInstance);
+		return getTestInstances().map(TestInstances::getInnermostInstance);
+	}
+
+	@Override
+	public Optional<TestInstances> getTestInstances() {
+		return Optional.ofNullable(this.testInstances);
 	}
 
 	@Override

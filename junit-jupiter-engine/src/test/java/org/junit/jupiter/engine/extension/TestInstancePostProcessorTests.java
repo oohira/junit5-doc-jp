@@ -25,8 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.junit.jupiter.engine.AbstractJupiterTestEngineTests;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
 
 /**
  * Integration tests that verify support for {@link TestInstancePostProcessor}.
@@ -46,10 +46,10 @@ class TestInstancePostProcessorTests extends AbstractJupiterTestEngineTests {
 	void instancePostProcessorsInNestedClasses() {
 		LauncherDiscoveryRequest request = request().selectors(selectClass(OuterTestCase.class)).build();
 
-		ExecutionEventRecorder eventRecorder = executeTests(request);
+		EngineExecutionResults executionResults = executeTests(request);
 
-		assertEquals(2, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(2, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
+		assertEquals(2, executionResults.tests().started().count(), "# tests started");
+		assertEquals(2, executionResults.tests().succeeded().count(), "# tests succeeded");
 
 		// @formatter:off
 		assertThat(callSequence).containsExactly(
@@ -76,10 +76,10 @@ class TestInstancePostProcessorTests extends AbstractJupiterTestEngineTests {
 		LauncherDiscoveryRequest request = request().selectors(
 			selectClass(TestCaseWithTestSpecificTestInstancePostProcessor.class)).build();
 
-		ExecutionEventRecorder eventRecorder = executeTests(request);
+		EngineExecutionResults executionResults = executeTests(request);
 
-		assertEquals(1, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(1, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
+		assertEquals(1, executionResults.tests().started().count(), "# tests started");
+		assertEquals(1, executionResults.tests().succeeded().count(), "# tests succeeded");
 
 		assertThat(callSequence).containsExactly(
 			"fooPostProcessTestInstance:TestCaseWithTestSpecificTestInstancePostProcessor", "beforeEachMethod", "test");
@@ -159,7 +159,7 @@ class TestInstancePostProcessorTests extends AbstractJupiterTestEngineTests {
 	static class FooInstancePostProcessor implements TestInstancePostProcessor {
 
 		@Override
-		public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
+		public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
 			if (testInstance instanceof Named) {
 				((Named) testInstance).setName("foo:" + context.getRequiredTestClass().getSimpleName());
 			}
@@ -170,7 +170,7 @@ class TestInstancePostProcessorTests extends AbstractJupiterTestEngineTests {
 	static class BarInstancePostProcessor implements TestInstancePostProcessor {
 
 		@Override
-		public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
+		public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
 			if (testInstance instanceof Named) {
 				((Named) testInstance).setName("bar:" + context.getRequiredTestClass().getSimpleName());
 			}

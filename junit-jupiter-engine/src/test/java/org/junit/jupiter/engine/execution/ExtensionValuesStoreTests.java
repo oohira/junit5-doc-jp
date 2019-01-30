@@ -10,15 +10,24 @@
 
 package org.junit.jupiter.engine.execution;
 
+import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContextException;
@@ -27,9 +36,9 @@ import org.junit.jupiter.api.extension.ExtensionContextException;
  * Unit tests for {@link ExtensionValuesStore}.
  *
  * @since 5.0
- * @see ExtensionContextTests
+ * @see org.junit.jupiter.engine.descriptor.ExtensionContextTests
  */
-class ExtensionValuesStoreTests {
+public class ExtensionValuesStoreTests {
 
 	private final Object key = "key";
 	private final Object value = "value";
@@ -290,18 +299,41 @@ class ExtensionValuesStoreTests {
 			assertNull(store.get(namespace, key));
 		}
 
-		@RepeatedTest(23)
-		void simulateRaceConditionInGetOrComputeIfAbsent() throws Exception {
+		@Test
+		void simulateRaceConditionInGetOrComputeIfAbsent() {
+			int threads = 10;
+			AtomicInteger counter = new AtomicInteger();
 			ExtensionValuesStore localStore = new ExtensionValuesStore(null);
-			Thread t1 = new Thread(() -> localStore.getOrComputeIfAbsent(namespace, key, key -> value));
-			Thread t2 = new Thread(() -> localStore.getOrComputeIfAbsent(namespace, key, key -> value));
-			t1.start();
-			t2.start();
-			Thread.yield();
-			localStore.getOrComputeIfAbsent(namespace, key, key -> value); // use current thread as well
-			t1.join();
-			t2.join();
-			assertEquals(value, localStore.get(namespace, key));
+
+			List<Object> values = executeConcurrently(threads, //
+				() -> localStore.getOrComputeIfAbsent(namespace, key, it -> counter.incrementAndGet()));
+
+			assertEquals(1, counter.get());
+			assertThat(values).hasSize(threads).containsOnly(1);
+		}
+	}
+
+	private <T> List<T> executeConcurrently(int threads, Supplier<T> supplier) {
+		ExecutorService executorService = Executors.newFixedThreadPool(threads);
+		try {
+			CountDownLatch latch = new CountDownLatch(threads);
+			List<CompletableFuture<T>> futures = new ArrayList<>();
+			for (int i = 0; i < threads; i++) {
+				futures.add(CompletableFuture.supplyAsync(() -> {
+					latch.countDown();
+					try {
+						latch.await();
+					}
+					catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
+					return supplier.get();
+				}, executorService));
+			}
+			return futures.stream().map(CompletableFuture::join).collect(toList());
+		}
+		finally {
+			executorService.shutdown();
 		}
 	}
 

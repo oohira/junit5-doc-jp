@@ -13,6 +13,7 @@ package org.junit.platform.launcher.listeners;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.PrintWriter;
@@ -26,7 +27,7 @@ import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
-import org.junit.platform.engine.test.TestDescriptorStub;
+import org.junit.platform.fakes.TestDescriptorStub;
 import org.junit.platform.launcher.TestIdentifier;
 import org.junit.platform.launcher.TestPlan;
 
@@ -151,7 +152,10 @@ class SummaryGenerationTests {
 
 	@Test
 	void reportingCorrectFailures() {
-		RuntimeException failedException = new RuntimeException("failed");
+		IllegalArgumentException iaeCausedBy = new IllegalArgumentException("Illegal Argument Exception");
+		RuntimeException failedException = new RuntimeException("Runtime Exception", iaeCausedBy);
+		NullPointerException npeSuppressed = new NullPointerException("Null Pointer Exception");
+		failedException.addSuppressed(npeSuppressed);
 
 		TestDescriptorStub testDescriptor = new TestDescriptorStub(UniqueId.root("root", "2"), "failingTest") {
 
@@ -178,10 +182,46 @@ class SummaryGenerationTests {
 			() -> assertTrue(failuresString.contains("Failures (1)"), "test failures"), //
 			() -> assertTrue(failuresString.contains(Object.class.getName()), "source"), //
 			() -> assertTrue(failuresString.contains("failingTest"), "display name"), //
-			() -> assertTrue(failuresString.contains("=> " + failedException), "exception") //
+			() -> assertTrue(failuresString.contains("=> " + failedException), "main exception"), //
+			() -> assertTrue(failuresString.contains("Caused by: " + iaeCausedBy), "Caused by exception"), //
+			() -> assertTrue(failuresString.contains("Suppressed: " + npeSuppressed), "Suppressed exception") //
 		);
 	}
 
+	@Test
+	public void reportingCircularFailure() {
+		IllegalArgumentException iaeCausedBy = new IllegalArgumentException("Illegal Argument Exception");
+		RuntimeException failedException = new RuntimeException("Runtime Exception", iaeCausedBy);
+		NullPointerException npeSuppressed = new NullPointerException("Null Pointer Exception");
+		failedException.addSuppressed(npeSuppressed);
+		npeSuppressed.addSuppressed(iaeCausedBy);
+
+		TestDescriptorStub testDescriptor = new TestDescriptorStub(UniqueId.root("root", "2"), "failingTest") {
+
+			@Override
+			public Optional<TestSource> getSource() {
+				return Optional.of(ClassSource.from(Object.class));
+			}
+		};
+		TestIdentifier failed = TestIdentifier.from(testDescriptor);
+
+		listener.testPlanExecutionStarted(testPlan);
+		listener.executionStarted(failed);
+		listener.executionFinished(failed, TestExecutionResult.failed(failedException));
+		listener.testPlanExecutionFinished(testPlan);
+
+		assertEquals(1, listener.getSummary().getTestsFailedCount());
+
+		String failuresString = failuresAsString();
+		assertAll("failures", //
+			() -> assertTrue(failuresString.contains("Suppressed: " + npeSuppressed), "Suppressed exception"), //
+			() -> assertTrue(failuresString.contains("Circular reference: " + iaeCausedBy), "Circular reference"), //
+			() -> assertFalse(failuresString.contains("Caused by: "),
+				"'Caused by: ' omitted because of Circular reference") //
+		);
+	}
+
+	@SuppressWarnings("deprecation")
 	private TestIdentifier createTestIdentifier(String uniqueId) {
 		TestIdentifier identifier = TestIdentifier.from(
 			new TestDescriptorStub(UniqueId.root("test", uniqueId), uniqueId));
@@ -189,6 +229,7 @@ class SummaryGenerationTests {
 		return identifier;
 	}
 
+	@SuppressWarnings("deprecation")
 	private TestIdentifier createContainerIdentifier(String uniqueId) {
 		TestIdentifier identifier = TestIdentifier.from(
 			new TestDescriptorStub(UniqueId.root("container", uniqueId), uniqueId) {

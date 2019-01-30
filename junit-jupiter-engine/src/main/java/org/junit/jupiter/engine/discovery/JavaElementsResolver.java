@@ -11,8 +11,10 @@
 package org.junit.jupiter.engine.discovery;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 import static org.junit.platform.commons.util.BlacklistedExceptions.rethrowIfBlacklisted;
 import static org.junit.platform.commons.util.ClassUtils.nullSafeToString;
 import static org.junit.platform.commons.util.ReflectionUtils.findAllClassesInClasspathRoot;
@@ -23,6 +25,7 @@ import static org.junit.platform.commons.util.ReflectionUtils.findNestedClasses;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -33,9 +36,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.jupiter.engine.JupiterTestEngine;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.ClassTestDescriptor;
 import org.junit.jupiter.engine.descriptor.Filterable;
+import org.junit.jupiter.engine.descriptor.JupiterEngineDescriptor;
+import org.junit.jupiter.engine.descriptor.JupiterTestDescriptor;
+import org.junit.jupiter.engine.descriptor.MethodBasedTestDescriptor;
 import org.junit.jupiter.engine.discovery.predicates.IsInnerClass;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
@@ -74,11 +81,15 @@ class JavaElementsResolver {
 	private static final IsInnerClass isInnerClass = new IsInnerClass();
 
 	private final TestDescriptor engineDescriptor;
+	private final JupiterConfiguration configuration;
 	private final ClassFilter classFilter;
 	private final Set<ElementResolver> resolvers;
 
-	JavaElementsResolver(TestDescriptor engineDescriptor, ClassFilter classFilter, Set<ElementResolver> resolvers) {
+	JavaElementsResolver(TestDescriptor engineDescriptor, JupiterConfiguration configuration, ClassFilter classFilter,
+			Set<ElementResolver> resolvers) {
+
 		this.engineDescriptor = engineDescriptor;
+		this.configuration = configuration;
 		this.classFilter = classFilter;
 		this.resolvers = resolvers;
 	}
@@ -167,7 +178,7 @@ class JavaElementsResolver {
 		UniqueId uniqueId = selector.getUniqueId();
 
 		// Ignore Unique IDs from other test engines.
-		if (JupiterTestEngine.ENGINE_ID.equals(uniqueId.getEngineId().orElse(null))) {
+		if (JupiterEngineDescriptor.ENGINE_ID.equals(uniqueId.getEngineId().orElse(null))) {
 			try {
 				Deque<TestDescriptor> resolvedDescriptors = resolveAllSegments(uniqueId);
 				handleResolvedDescriptorsForUniqueId(uniqueId, resolvedDescriptors);
@@ -268,10 +279,64 @@ class JavaElementsResolver {
 
 	private void resolveChildren(TestDescriptor descriptor) {
 		if (descriptor instanceof ClassTestDescriptor) {
-			Class<?> testClass = ((ClassTestDescriptor) descriptor).getTestClass();
-			resolveContainedMethods(descriptor, testClass);
-			resolveContainedNestedClasses(descriptor, testClass);
+			ClassTestDescriptor classTestDescriptor = (ClassTestDescriptor) descriptor;
+			Class<?> testClass = classTestDescriptor.getTestClass();
+
+			resolveContainedMethods(classTestDescriptor, testClass);
+			orderContainedMethods(classTestDescriptor, testClass);
+			resolveContainedNestedClasses(classTestDescriptor, testClass);
 		}
+	}
+
+	/**
+	 * @since 5.4
+	 */
+	private void orderContainedMethods(ClassTestDescriptor classTestDescriptor, Class<?> testClass) {
+		findAnnotation(testClass, TestMethodOrder.class)//
+				.map(TestMethodOrder::value)//
+				.map(ReflectionUtils::newInstance)//
+				.ifPresent(methodOrderer -> {
+
+					List<DefaultMethodDescriptor> methodDescriptors = classTestDescriptor.getChildren().stream()//
+							.filter(MethodBasedTestDescriptor.class::isInstance)//
+							.map(MethodBasedTestDescriptor.class::cast)//
+							.map(DefaultMethodDescriptor::new)//
+							.collect(toCollection(ArrayList::new));
+
+					// Make a local copy for later validation
+					Set<DefaultMethodDescriptor> originalMethodDescriptors = new LinkedHashSet<>(methodDescriptors);
+
+					methodOrderer.orderMethods(
+						new DefaultMethodOrdererContext(methodDescriptors, testClass, this.configuration));
+
+					int difference = methodDescriptors.size() - originalMethodDescriptors.size();
+
+					if (difference > 0) {
+						logger.warn(() -> String.format(
+							"MethodOrderer [%s] added %s MethodDescriptor(s) for test class [%s] which will be ignored.",
+							methodOrderer.getClass().getName(), difference, testClass.getName()));
+					}
+					else if (difference < 0) {
+						logger.warn(() -> String.format(
+							"MethodOrderer [%s] removed %s MethodDescriptor(s) for test class [%s] which will be retained with arbitrary ordering.",
+							methodOrderer.getClass().getName(), -difference, testClass.getName()));
+					}
+
+					Set<TestDescriptor> sortedTestDescriptors = methodDescriptors.stream()//
+							.filter(originalMethodDescriptors::contains)//
+							.map(DefaultMethodDescriptor::getTestDescriptor)//
+							.collect(toCollection(LinkedHashSet::new));
+
+					// Currently no way to removeAll or addAll children at once.
+					sortedTestDescriptors.forEach(classTestDescriptor::removeChild);
+					sortedTestDescriptors.forEach(classTestDescriptor::addChild);
+
+					// Note: MethodOrderer#getDefaultExecutionMode() is guaranteed
+					// to be invoked after MethodOrderer#orderMethods().
+					methodOrderer.getDefaultExecutionMode()//
+							.map(JupiterTestDescriptor::toExecutionMode)//
+							.ifPresent(classTestDescriptor::setDefaultChildExecutionMode);
+				});
 	}
 
 	private void resolveContainedNestedClasses(TestDescriptor containerDescriptor, Class<?> clazz) {

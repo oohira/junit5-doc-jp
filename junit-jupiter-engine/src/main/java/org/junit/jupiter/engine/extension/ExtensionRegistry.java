@@ -14,7 +14,6 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
 import static org.apiguardian.api.API.Status.INTERNAL;
-import static org.junit.jupiter.engine.Constants.EXTENSIONS_AUTODETECTION_ENABLED_PROPERTY_NAME;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,13 +27,12 @@ import java.util.stream.StreamSupport;
 
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.extension.Extension;
-import org.junit.jupiter.engine.Constants;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 import org.junit.platform.commons.util.ClassLoaderUtils;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.commons.util.ReflectionUtils;
-import org.junit.platform.engine.ConfigurationParameters;
 
 /**
  * An {@code ExtensionRegistry} holds all registered extensions (i.e.
@@ -63,16 +61,16 @@ public class ExtensionRegistry {
 	 * Factory for creating and populating a new root registry with the default
 	 * extensions.
 	 *
-	 * <p>If the {@link Constants#EXTENSIONS_AUTODETECTION_ENABLED_PROPERTY_NAME}
+	 * <p>If the {@link org.junit.jupiter.engine.Constants#EXTENSIONS_AUTODETECTION_ENABLED_PROPERTY_NAME}
 	 * configuration parameter has been set to {@code true}, extensions will be
 	 * auto-detected using Java's {@link ServiceLoader} mechanism and automatically
 	 * registered after the default extensions.
 	 *
-	 * @param configParams configuration parameters used to retrieve the extension
+	 * @param configuration configuration parameters used to retrieve the extension
 	 * auto-detection flag; never {@code null}
 	 * @return a new {@code ExtensionRegistry}; never {@code null}
 	 */
-	public static ExtensionRegistry createRegistryWithDefaultExtensions(ConfigurationParameters configParams) {
+	public static ExtensionRegistry createRegistryWithDefaultExtensions(JupiterConfiguration configuration) {
 		ExtensionRegistry extensionRegistry = new ExtensionRegistry(null);
 
 		// @formatter:off
@@ -83,7 +81,7 @@ public class ExtensionRegistry {
 
 		DEFAULT_EXTENSIONS.forEach(extensionRegistry::registerDefaultExtension);
 
-		if (configParams.getBoolean(EXTENSIONS_AUTODETECTION_ENABLED_PROPERTY_NAME).orElse(Boolean.FALSE)) {
+		if (configuration.isExtensionAutoDetectionEnabled()) {
 			registerAutoDetectedExtensions(extensionRegistry);
 		}
 
@@ -241,11 +239,15 @@ public class ExtensionRegistry {
 	 * or method reference, the {@code source} object should be the underlying
 	 * {@link java.lang.reflect.Method} that implements the extension API.
 	 *
-	 * @param extension the extension to register
-	 * @param source the source of the extension
+	 * @param extension the extension to register; never {@code null}
+	 * @param source the source of the extension; never {@code null}
 	 */
 	public void registerExtension(Extension extension, Object source) {
+		Preconditions.notNull(extension, "Extension must not be null");
+		Preconditions.notNull(source, "source must not be null");
+
 		logger.trace(() -> String.format("Registering extension [%s] from source [%s].", extension, source));
+
 		this.registeredExtensions.add(extension);
 	}
 

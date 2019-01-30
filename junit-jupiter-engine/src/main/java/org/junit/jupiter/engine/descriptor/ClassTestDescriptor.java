@@ -12,6 +12,7 @@ package org.junit.jupiter.engine.descriptor;
 
 import static java.util.stream.Collectors.joining;
 import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.junit.jupiter.engine.descriptor.DisplayNameUtils.createDisplayNameSupplierForClass;
 import static org.junit.jupiter.engine.descriptor.ExtensionUtils.populateNewExtensionRegistryFromExtendWithAnnotation;
 import static org.junit.jupiter.engine.descriptor.ExtensionUtils.registerExtensionsFromFields;
 import static org.junit.jupiter.engine.descriptor.LifecycleMethodUtils.findAfterAllMethods;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.engine.descriptor.LifecycleMethodUtils.findAfter
 import static org.junit.jupiter.engine.descriptor.LifecycleMethodUtils.findBeforeAllMethods;
 import static org.junit.jupiter.engine.descriptor.LifecycleMethodUtils.findBeforeEachMethods;
 import static org.junit.jupiter.engine.descriptor.TestInstanceLifecycleUtils.getTestInstanceLifecycle;
+import static org.junit.jupiter.engine.support.JupiterThrowableCollectorFactory.createThrowableCollector;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -39,25 +42,25 @@ import org.junit.jupiter.api.extension.ExtensionConfigurationException;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstanceFactory;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
+import org.junit.jupiter.api.extension.TestInstances;
 import org.junit.jupiter.api.extension.TestInstantiationException;
+import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.AfterEachMethodAdapter;
 import org.junit.jupiter.engine.execution.BeforeEachMethodAdapter;
+import org.junit.jupiter.engine.execution.DefaultTestInstances;
 import org.junit.jupiter.engine.execution.ExecutableInvoker;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
-import org.junit.jupiter.engine.execution.TestInstanceProvider;
+import org.junit.jupiter.engine.execution.TestInstancesProvider;
 import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.JUnitException;
 import org.junit.platform.commons.util.BlacklistedExceptions;
-import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.junit.platform.commons.util.StringUtils;
-import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestTag;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 import org.junit.platform.engine.support.hierarchical.ExclusiveResource;
-import org.junit.platform.engine.support.hierarchical.OpenTest4JAwareThrowableCollector;
 import org.junit.platform.engine.support.hierarchical.ThrowableCollector;
 
 /**
@@ -80,23 +83,23 @@ public class ClassTestDescriptor extends JupiterTestDescriptor {
 	private final Set<TestTag> tags;
 	protected final Lifecycle lifecycle;
 
+	private ExecutionMode defaultChildExecutionMode;
 	private TestInstanceFactory testInstanceFactory;
 	private List<Method> beforeAllMethods;
 	private List<Method> afterAllMethods;
 
-	public ClassTestDescriptor(UniqueId uniqueId, Class<?> testClass, ConfigurationParameters configurationParameters) {
-		this(uniqueId, ClassTestDescriptor::generateDefaultDisplayName, testClass, configurationParameters);
+	public ClassTestDescriptor(UniqueId uniqueId, Class<?> testClass, JupiterConfiguration configuration) {
+		this(uniqueId, testClass, createDisplayNameSupplierForClass(testClass), configuration);
 	}
 
-	protected ClassTestDescriptor(UniqueId uniqueId, Function<Class<?>, String> defaultDisplayNameGenerator,
-			Class<?> testClass, ConfigurationParameters configurationParameters) {
-
-		super(uniqueId, determineDisplayName(Preconditions.notNull(testClass, "Class must not be null"),
-			defaultDisplayNameGenerator), ClassSource.from(testClass));
+	ClassTestDescriptor(UniqueId uniqueId, Class<?> testClass, Supplier<String> displayNameSupplier,
+			JupiterConfiguration configuration) {
+		super(uniqueId, testClass, displayNameSupplier, ClassSource.from(testClass), configuration);
 
 		this.testClass = testClass;
 		this.tags = getTags(testClass);
-		this.lifecycle = getTestInstanceLifecycle(testClass, configurationParameters);
+		this.lifecycle = getTestInstanceLifecycle(testClass, configuration);
+		this.defaultChildExecutionMode = (this.lifecycle == Lifecycle.PER_CLASS ? ExecutionMode.SAME_THREAD : null);
 	}
 
 	// --- TestDescriptor ------------------------------------------------------
@@ -121,12 +124,6 @@ public class ClassTestDescriptor extends JupiterTestDescriptor {
 		return this.testClass.getName();
 	}
 
-	private static String generateDefaultDisplayName(Class<?> testClass) {
-		String name = testClass.getName();
-		int index = name.lastIndexOf('.');
-		return name.substring(index + 1);
-	}
-
 	// --- Node ----------------------------------------------------------------
 
 	@Override
@@ -136,7 +133,11 @@ public class ClassTestDescriptor extends JupiterTestDescriptor {
 
 	@Override
 	protected Optional<ExecutionMode> getDefaultChildExecutionMode() {
-		return this.lifecycle == Lifecycle.PER_CLASS ? Optional.of(ExecutionMode.SAME_THREAD) : Optional.empty();
+		return Optional.ofNullable(this.defaultChildExecutionMode);
+	}
+
+	public void setDefaultChildExecutionMode(ExecutionMode defaultChildExecutionMode) {
+		this.defaultChildExecutionMode = defaultChildExecutionMode;
 	}
 
 	@Override
@@ -161,17 +162,16 @@ public class ClassTestDescriptor extends JupiterTestDescriptor {
 		registerBeforeEachMethodAdapters(registry);
 		registerAfterEachMethodAdapters(registry);
 
-		ThrowableCollector throwableCollector = new OpenTest4JAwareThrowableCollector();
+		ThrowableCollector throwableCollector = createThrowableCollector();
 		ClassExtensionContext extensionContext = new ClassExtensionContext(context.getExtensionContext(),
-			context.getExecutionListener(), this, this.lifecycle, context.getConfigurationParameters(),
-			throwableCollector);
+			context.getExecutionListener(), this, this.lifecycle, context.getConfiguration(), throwableCollector);
 
 		this.beforeAllMethods = findBeforeAllMethods(this.testClass, this.lifecycle == Lifecycle.PER_METHOD);
 		this.afterAllMethods = findAfterAllMethods(this.testClass, this.lifecycle == Lifecycle.PER_METHOD);
 
 		// @formatter:off
 		return context.extend()
-				.withTestInstanceProvider(testInstanceProvider(context, registry, extensionContext))
+				.withTestInstancesProvider(testInstancesProvider(context, registry, extensionContext))
 				.withExtensionRegistry(registry)
 				.withExtensionContext(extensionContext)
 				.withThrowableCollector(throwableCollector)
@@ -188,8 +188,8 @@ public class ClassTestDescriptor extends JupiterTestDescriptor {
 			// Eagerly load test instance for BeforeAllCallbacks, if necessary,
 			// and store the instance in the ExtensionContext.
 			ClassExtensionContext extensionContext = (ClassExtensionContext) context.getExtensionContext();
-			throwableCollector.execute(() -> extensionContext.setTestInstance(
-				context.getTestInstanceProvider().getTestInstance(Optional.empty())));
+			throwableCollector.execute(() -> extensionContext.setTestInstances(
+				context.getTestInstancesProvider().getTestInstances(Optional.empty())));
 		}
 
 		if (throwableCollector.isEmpty()) {
@@ -253,40 +253,43 @@ public class ClassTestDescriptor extends JupiterTestDescriptor {
 		return null;
 	}
 
-	private TestInstanceProvider testInstanceProvider(JupiterEngineExecutionContext parentExecutionContext,
+	private TestInstancesProvider testInstancesProvider(JupiterEngineExecutionContext parentExecutionContext,
 			ExtensionRegistry registry, ClassExtensionContext extensionContext) {
 
-		TestInstanceProvider testInstanceProvider = childRegistry -> instantiateAndPostProcessTestInstance(
+		TestInstancesProvider testInstancesProvider = childRegistry -> instantiateAndPostProcessTestInstance(
 			parentExecutionContext, extensionContext, childRegistry.orElse(registry));
 
-		return childRegistry -> extensionContext.getTestInstance().orElseGet(
-			() -> testInstanceProvider.getTestInstance(childRegistry));
+		return childRegistry -> extensionContext.getTestInstances().orElseGet(
+			() -> testInstancesProvider.getTestInstances(childRegistry));
 	}
 
-	private Object instantiateAndPostProcessTestInstance(JupiterEngineExecutionContext parentExecutionContext,
+	private TestInstances instantiateAndPostProcessTestInstance(JupiterEngineExecutionContext parentExecutionContext,
 			ExtensionContext extensionContext, ExtensionRegistry registry) {
 
-		Object instance = instantiateTestClass(parentExecutionContext, registry, extensionContext);
-		invokeTestInstancePostProcessors(instance, registry, extensionContext);
+		TestInstances instances = instantiateTestClass(parentExecutionContext, registry, extensionContext);
+		invokeTestInstancePostProcessors(instances.getInnermostInstance(), registry, extensionContext);
 		// In addition, we register extensions from instance fields here since the
 		// best time to do that is immediately following test class instantiation
 		// and post processing.
-		registerExtensionsFromFields(registry, this.testClass, instance);
-		return instance;
+		registerExtensionsFromFields(registry, this.testClass, instances.getInnermostInstance());
+		return instances;
 	}
 
-	protected Object instantiateTestClass(JupiterEngineExecutionContext parentExecutionContext,
+	protected TestInstances instantiateTestClass(JupiterEngineExecutionContext parentExecutionContext,
 			ExtensionRegistry registry, ExtensionContext extensionContext) {
 
 		return instantiateTestClass(Optional.empty(), registry, extensionContext);
 	}
 
-	protected Object instantiateTestClass(Optional<Object> outerInstance, ExtensionRegistry registry,
+	protected TestInstances instantiateTestClass(Optional<TestInstances> outerInstances, ExtensionRegistry registry,
 			ExtensionContext extensionContext) {
 
-		return this.testInstanceFactory != null //
+		Optional<Object> outerInstance = outerInstances.map(TestInstances::getInnermostInstance);
+		Object instance = this.testInstanceFactory != null //
 				? invokeTestInstanceFactory(outerInstance, extensionContext) //
 				: invokeTestClassConstructor(outerInstance, registry, extensionContext);
+		return outerInstances.map(instances -> DefaultTestInstances.of(instances, instance)).orElse(
+			DefaultTestInstances.of(instance));
 	}
 
 	private Object invokeTestInstanceFactory(Optional<Object> outerInstance, ExtensionContext extensionContext) {
@@ -429,11 +432,11 @@ public class ClassTestDescriptor extends JupiterTestDescriptor {
 	}
 
 	private void invokeMethodInExtensionContext(Method method, ExtensionContext context, ExtensionRegistry registry) {
-		Object testInstance = context.getRequiredTestInstance();
-		testInstance = ReflectionUtils.getOutermostInstance(testInstance, method.getDeclaringClass()).orElseThrow(
+		TestInstances testInstances = context.getRequiredTestInstances();
+		Object target = testInstances.findInstance(method.getDeclaringClass()).orElseThrow(
 			() -> new JUnitException("Failed to find instance for method: " + method.toGenericString()));
 
-		executableInvoker.invoke(method, testInstance, context, registry);
+		executableInvoker.invoke(method, target, context, registry);
 	}
 
 }

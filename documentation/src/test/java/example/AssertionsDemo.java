@@ -22,28 +22,32 @@ import static org.junit.jupiter.api.Assertions.assertTimeout;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import example.domain.Person;
+import example.util.Calculator;
+
 import org.junit.jupiter.api.Test;
 
 class AssertionsDemo {
 
-	// end::user_guide[]
-	Person person = new Person("John", "Doe");
+	private final Calculator calculator = new Calculator();
 
-	// tag::user_guide[]
+	private final Person person = new Person("Jane", "Doe");
+
 	@Test
 	void standardAssertions() {
-		assertEquals(2, 2);
-		assertEquals(4, 4, "The optional assertion message is now the last parameter.");
+		assertEquals(2, calculator.add(1, 1));
+		assertEquals(4, calculator.multiply(2, 2),
+				"The optional failure message is now the last parameter");
 		assertTrue('a' < 'b', () -> "Assertion messages can be lazily evaluated -- "
 				+ "to avoid constructing complex messages unnecessarily.");
 	}
 
 	@Test
 	void groupedAssertions() {
-		// In a grouped assertion all assertions are executed, and any
+		// In a grouped assertion all assertions are executed, and all
 		// failures will be reported together.
 		assertAll("person",
-			() -> assertEquals("John", person.getFirstName()),
+			() -> assertEquals("Jane", person.getFirstName()),
 			() -> assertEquals("Doe", person.getLastName())
 		);
 	}
@@ -60,7 +64,7 @@ class AssertionsDemo {
 				// Executed only if the previous assertion is valid.
 				assertAll("first name",
 					() -> assertTrue(firstName.startsWith("J")),
-					() -> assertTrue(firstName.endsWith("n"))
+					() -> assertTrue(firstName.endsWith("e"))
 				);
 			},
 			() -> {
@@ -80,10 +84,9 @@ class AssertionsDemo {
 
 	@Test
 	void exceptionTesting() {
-		Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-			throw new IllegalArgumentException("a message");
-		});
-		assertEquals("a message", exception.getMessage());
+		Exception exception = assertThrows(ArithmeticException.class, () ->
+			calculator.divide(1, 0));
+		assertEquals("/ by zero", exception.getMessage());
 	}
 
 	@Test

@@ -11,7 +11,6 @@
 package org.junit.jupiter.params.aggregator;
 
 import static java.util.stream.Collectors.toMap;
-import static org.assertj.core.api.Assertions.allOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -19,18 +18,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectMethod;
-import static org.junit.platform.engine.test.event.ExecutionEventConditions.event;
-import static org.junit.platform.engine.test.event.ExecutionEventConditions.finishedWithFailure;
-import static org.junit.platform.engine.test.event.ExecutionEventConditions.test;
-import static org.junit.platform.engine.test.event.TestExecutionResultConditions.isA;
-import static org.junit.platform.engine.test.event.TestExecutionResultConditions.message;
 import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request;
+import static org.junit.platform.testkit.engine.EventConditions.event;
+import static org.junit.platform.testkit.engine.EventConditions.finishedWithFailure;
+import static org.junit.platform.testkit.engine.EventConditions.test;
+import static org.junit.platform.testkit.engine.TestExecutionResultConditions.instanceOf;
+import static org.junit.platform.testkit.engine.TestExecutionResultConditions.message;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -40,7 +40,6 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.parallel.ResourceLock;
-import org.junit.jupiter.engine.JupiterTestEngine;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.ArgumentConverter;
@@ -49,8 +48,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.engine.DiscoverySelector;
-import org.junit.platform.engine.test.event.ExecutionEvent;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
+import org.junit.platform.testkit.engine.EngineTestKit;
 
 /**
  * Integration tests for {@link ArgumentsAccessor}, {@link AggregateWith},
@@ -61,13 +60,19 @@ import org.junit.platform.engine.test.event.ExecutionEventRecorder;
 public class AggregatorIntegrationTests {
 
 	@ParameterizedTest
-	@CsvSource({ "Jane, Doe, 1980-04-16, F, red", "Jack, Smith, 2000-11-22, M, blue" })
+	@CsvSource({ //
+			"Jane, Doe, 1980-04-16, F, red", //
+			"Jack, Smith, 2000-11-22, M, blue" //
+	})
 	void personAggregator(@AggregateWith(PersonAggregator.class) Person person) {
 		testPersonAggregator(person);
 	}
 
 	@ParameterizedTest
-	@CsvSource({ "Jane, Doe, 1980-04-16, F, red", "Jack, Smith, 2000-11-22, M, blue" })
+	@CsvSource({ //
+			"Jane, Doe, 1980-04-16, F, red", //
+			"Jack, Smith, 2000-11-22, M, blue" //
+	})
 	void personAggregatorRegisteredViaCustomAnnotation(@CsvToPerson Person person) {
 		testPersonAggregator(person);
 	}
@@ -171,11 +176,12 @@ public class AggregatorIntegrationTests {
 
 	@Test
 	void reportsExceptionForErroneousAggregator() {
-		List<ExecutionEvent> executionEvents = execute(
+		var results = execute(
 			selectMethod(ErroneousTestCases.class, "testWithErroneousAggregator", Object.class.getName()));
-		assertThat(executionEvents) //
-				.haveExactly(1, event(test(), finishedWithFailure(allOf(isA(ParameterResolutionException.class), //
-					message("Error aggregating arguments for parameter at index 0: something went horribly wrong")))));
+
+		results.tests().assertThatEvents()//
+				.haveExactly(1, event(test(), finishedWithFailure(instanceOf(ParameterResolutionException.class), //
+					message("Error aggregating arguments for parameter at index 0: something went horribly wrong"))));
 	}
 
 	private void testPersonAggregator(Person person) {
@@ -198,8 +204,8 @@ public class AggregatorIntegrationTests {
 		assertEquals(30318, address.zipCode);
 	}
 
-	private List<ExecutionEvent> execute(DiscoverySelector... selectors) {
-		return ExecutionEventRecorder.execute(new JupiterTestEngine(), request().selectors(selectors).build());
+	private EngineExecutionResults execute(DiscoverySelector... selectors) {
+		return EngineTestKit.execute("junit-jupiter", request().selectors(selectors).build());
 	}
 
 	// -------------------------------------------------------------------------
@@ -335,22 +341,28 @@ public class AggregatorIntegrationTests {
 	@ResourceLock("InstanceCountingConverter.instanceCount")
 	void aggregatorIsInstantiatedOnlyOnce() {
 		InstanceCountingAggregator.instanceCount = 0;
+		CountingTestCase.output.clear();
 
 		execute(selectMethod(CountingTestCase.class, "testWithCountingConverterAggregator",
 			int.class.getName() + "," + Object.class.getName()));
 
 		assertThat(InstanceCountingAggregator.instanceCount).isEqualTo(1);
+		assertThat(CountingTestCase.output)//
+				.containsExactly("noisy test(1, enigma)", "noisy test(2, enigma)", "noisy test(3, enigma)");
 	}
 
 	@Test
 	@ResourceLock("InstanceCountingConverter.instanceCount")
 	void converterIsInstantiatedOnlyOnce() {
 		InstanceCountingConverter.instanceCount = 0;
+		CountingTestCase.output.clear();
 
 		execute(selectMethod(CountingTestCase.class, "testWithCountingConverterAggregator",
 			int.class.getName() + "," + Object.class.getName()));
 
 		assertThat(InstanceCountingConverter.instanceCount).isEqualTo(1);
+		assertThat(CountingTestCase.output)//
+				.containsExactly("noisy test(1, enigma)", "noisy test(2, enigma)", "noisy test(3, enigma)");
 	}
 
 	static class InstanceCountingConverter implements ArgumentConverter {
@@ -376,16 +388,21 @@ public class AggregatorIntegrationTests {
 		@Override
 		public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context)
 				throws ArgumentsAggregationException {
-			return null;
+			return "enigma";
 		}
 	}
 
 	static class CountingTestCase {
+
+		static final List<String> output = new ArrayList<>();
+
 		@ParameterizedTest
 		@ValueSource(ints = { 1, 2, 3 })
 		void testWithCountingConverterAggregator(@ConvertWith(InstanceCountingConverter.class) int i,
 				@AggregateWith(InstanceCountingAggregator.class) Object o) {
-			System.out.println("noisy test(" + i + ", " + o + ")");
+
+			output.add("noisy test(" + i + ", " + o + ")");
 		}
 	}
+
 }

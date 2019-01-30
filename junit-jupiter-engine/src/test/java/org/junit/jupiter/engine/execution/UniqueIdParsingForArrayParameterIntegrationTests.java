@@ -20,8 +20,8 @@ import org.junit.jupiter.engine.AbstractJupiterTestEngineTests;
 import org.junit.jupiter.engine.execution.injection.sample.PrimitiveArrayParameterResolver;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
-import org.junit.platform.engine.test.event.ExecutionEvent;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
+import org.junit.platform.testkit.engine.Event;
 
 /**
  * Integration tests for {@link UniqueId#parse(String)} for methods
@@ -36,15 +36,15 @@ class UniqueIdParsingForArrayParameterIntegrationTests extends AbstractJupiterTe
 
 	@Test
 	void executeTestsForPrimitiveArrayMethodInjectionCases() {
-		ExecutionEventRecorder eventRecorder = executeTestsForClass(PrimitiveArrayMethodInjectionTestCase.class);
+		EngineExecutionResults executionResults = executeTestsForClass(PrimitiveArrayMethodInjectionTestCase.class);
 
-		assertEquals(1, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(1, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
-		assertEquals(0, eventRecorder.getTestFailedCount(), "# tests failed");
+		assertEquals(1, executionResults.tests().started().count(), "# tests started");
+		assertEquals(1, executionResults.tests().succeeded().count(), "# tests succeeded");
+		assertEquals(0, executionResults.tests().failed().count(), "# tests failed");
 
 		// @formatter:off
-		UniqueId uniqueId = eventRecorder.getExecutionEvents().stream()
-				.map(ExecutionEvent::getTestDescriptor)
+		UniqueId uniqueId = executionResults.all()
+				.map(Event::getTestDescriptor)
 				.distinct()
 				.skip(2)
 				.map(TestDescriptor::getUniqueId)

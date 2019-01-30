@@ -20,6 +20,7 @@ import java.util.Set;
 import org.apiguardian.api.API;
 import org.junit.platform.commons.util.ToStringBuilder;
 import org.junit.platform.engine.TestDescriptor;
+import org.junit.platform.engine.TestExecutionResult;
 
 /**
  * A <em>node</em> within the execution hierarchy.
@@ -118,6 +119,48 @@ public interface Node<C extends EngineExecutionContext> {
 	 * @see #execute
 	 */
 	default void after(C context) throws Exception {
+	}
+
+	/**
+	 * Wraps around the invocation of {@link #before(EngineExecutionContext)},
+	 * {@link #execute(EngineExecutionContext, DynamicTestExecutor)}, and
+	 * {@link #after(EngineExecutionContext)}.
+	 *
+	 * @param context context the context to execute in
+	 * @param invocation the wrapped invocation (must be invoked exactly once)
+	 * @since 1.4
+	 */
+	@API(status = EXPERIMENTAL, since = "1.4")
+	default void around(C context, Invocation<C> invocation) throws Exception {
+		invocation.invoke(context);
+	}
+
+	/**
+	 * Callback invoked when the execution of this node has been skipped.
+	 *
+	 * <p>The default implementation does nothing.
+	 *
+	 * @param context the execution context
+	 * @param testDescriptor the test descriptor that was skipped
+	 * @param result the result of skipped execution
+	 * @since 1.4
+	 */
+	@API(status = EXPERIMENTAL, since = "1.4", consumers = "org.junit.platform.engine.support.hierarchical")
+	default void nodeSkipped(C context, TestDescriptor testDescriptor, SkipResult result) {
+	}
+
+	/**
+	 * Callback invoked when the execution of this node has finished.
+	 *
+	 * <p>The default implementation does nothing.
+	 *
+	 * @param context the execution context
+	 * @param testDescriptor the test descriptor that was executed
+	 * @param result the result of the execution
+	 * @since 1.4
+	 */
+	@API(status = EXPERIMENTAL, since = "1.4", consumers = "org.junit.platform.engine.support.hierarchical")
+	default void nodeFinished(C context, TestDescriptor testDescriptor, TestExecutionResult result) {
 	}
 
 	/**
@@ -243,6 +286,17 @@ public interface Node<C extends EngineExecutionContext> {
 		 */
 		void execute(TestDescriptor testDescriptor);
 
+		/**
+		 * Block until all dynamic test descriptors submitted to this executor
+		 * are finished.
+		 *
+		 * <p>This method is useful if the node needs to perform actions in its
+		 * {@link #execute(EngineExecutionContext, DynamicTestExecutor)} method
+		 * after all its dynamic children have finished.
+		 *
+		 * @throws InterruptedException if interrupted while waiting
+		 */
+		void awaitFinished() throws InterruptedException;
 	}
 
 	/**
@@ -271,4 +325,20 @@ public interface Node<C extends EngineExecutionContext> {
 		CONCURRENT
 	}
 
+	/**
+	 * Represents an invocation that runs with the supplied context.
+	 *
+	 * @param <C> the type of {@code EngineExecutionContext} used by the {@code HierarchicalTestEngine}
+	 * @since 1.4
+	 */
+	@API(status = EXPERIMENTAL, since = "1.4")
+	interface Invocation<C extends EngineExecutionContext> {
+
+		/**
+		 * Invoke this invocation with the supplied context.
+		 *
+		 * @param context the context to invoke in
+		 */
+		void invoke(C context) throws Exception;
+	}
 }

@@ -18,38 +18,36 @@ import static org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.r
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.engine.TestDescriptor;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
+import org.junit.platform.testkit.engine.Events;
 import org.opentest4j.TestAbortedException;
 
 /**
- * Testing execution in standard test cases {@link JupiterTestEngine}.
+ * Tests for discovery and execution of standard test cases for the
+ * {@link JupiterTestEngine}.
  *
  * @since 5.0
  */
 class StandardTestClassTests extends AbstractJupiterTestEngineTests {
 
-	@BeforeEach
-	public void init() {
-		MyStandardTestCase.countBefore1 = 0;
-		MyStandardTestCase.countBefore2 = 0;
-		MyStandardTestCase.countAfter = 0;
-	}
-
 	@Test
 	void standardTestClassIsCorrectlyDiscovered() {
 		LauncherDiscoveryRequest request = request().selectors(selectClass(MyStandardTestCase.class)).build();
 		TestDescriptor engineDescriptor = discoverTests(request);
-		assertEquals(5, engineDescriptor.getDescendants().size(), "# resolved test descriptors");
+		assertEquals(1 /*class*/ + 6 /*methods*/, engineDescriptor.getDescendants().size(),
+			"# resolved test descriptors");
 	}
 
 	@Test
 	void moreThanOneTestClassIsCorrectlyDiscovered() {
 		LauncherDiscoveryRequest request = request().selectors(selectClass(SecondOfTwoTestCases.class)).build();
 		TestDescriptor engineDescriptor = discoverTests(request);
-		assertEquals(2 + 2, engineDescriptor.getDescendants().size(), "# resolved test descriptors");
+		assertEquals(1 /*class*/ + 3 /*methods*/, engineDescriptor.getDescendants().size(),
+			"# resolved test descriptors");
 	}
 
 	@Test
@@ -57,67 +55,65 @@ class StandardTestClassTests extends AbstractJupiterTestEngineTests {
 		LauncherDiscoveryRequest request = request().selectors(selectClass(FirstOfTwoTestCases.class),
 			selectClass(SecondOfTwoTestCases.class)).build();
 
-		ExecutionEventRecorder eventRecorder = executeTests(request);
+		EngineExecutionResults executionResults = executeTests(request);
+		Events containers = executionResults.containers();
+		Events tests = executionResults.tests();
 
-		assertEquals(6, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(5, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
-		assertEquals(1, eventRecorder.getTestFailedCount(), "# tests failed");
+		assertEquals(6, tests.started().count(), "# tests started");
+		assertEquals(5, tests.succeeded().count(), "# tests succeeded");
+		assertEquals(1, tests.failed().count(), "# tests failed");
 
-		assertEquals(3, eventRecorder.getContainerStartedCount(), "# containers started");
-		assertEquals(3, eventRecorder.getContainerFinishedCount(), "# containers finished");
+		assertEquals(3, containers.started().count(), "# containers started");
+		assertEquals(3, containers.finished().count(), "# containers finished");
 	}
 
 	@Test
-	void allTestsInClassAreRunWithBeforeEach() {
-		ExecutionEventRecorder eventRecorder = executeTestsForClass(MyStandardTestCase.class);
+	void allTestsInClassAreRunWithBeforeEachAndAfterEachMethods() {
+		EngineExecutionResults executionResults = executeTestsForClass(MyStandardTestCase.class);
+		Events containers = executionResults.containers();
+		Events tests = executionResults.tests();
 
-		assertEquals(4, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(2, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
-		assertEquals(1, eventRecorder.getTestAbortedCount(), "# tests aborted");
-		assertEquals(1, eventRecorder.getTestFailedCount(), "# tests failed");
+		assertEquals(2, containers.started().count(), "# containers started");
+		assertEquals(2, containers.finished().count(), "# containers finished");
 
-		assertEquals(2, eventRecorder.getContainerStartedCount(), "# containers started");
-		assertEquals(2, eventRecorder.getContainerFinishedCount(), "# containers finished");
+		assertEquals(6, tests.started().count(), "# tests started");
+		assertEquals(2, tests.succeeded().count(), "# tests succeeded");
+		assertEquals(3, tests.aborted().count(), "# tests aborted");
+		assertEquals(1, tests.failed().count(), "# tests failed");
 
-		assertEquals(4, MyStandardTestCase.countBefore1, "# before1 calls");
-		assertEquals(4, MyStandardTestCase.countBefore2, "# before2 calls");
-	}
-
-	@Test
-	void allTestsInClassAreRunWithAfterEach() {
-		ExecutionEventRecorder eventRecorder = executeTestsForClass(MyStandardTestCase.class);
-
-		assertEquals(4, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(4, MyStandardTestCase.countAfter, "# after each calls");
-
-		assertEquals(2, eventRecorder.getContainerStartedCount(), "# containers started");
-		assertEquals(2, eventRecorder.getContainerFinishedCount(), "# containers finished");
+		assertEquals(6, MyStandardTestCase.countBefore1, "# before1 calls");
+		assertEquals(6, MyStandardTestCase.countBefore2, "# before2 calls");
+		assertEquals(6, MyStandardTestCase.countAfter, "# after each calls");
 	}
 
 	@Test
 	void testsFailWhenBeforeEachFails() {
-		ExecutionEventRecorder eventRecorder = executeTestsForClass(TestCaseWithFailingBefore.class);
+		EngineExecutionResults executionResults = executeTestsForClass(TestCaseWithFailingBefore.class);
+		Events containers = executionResults.containers();
+		Events tests = executionResults.tests();
 
-		assertEquals(2, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(0, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
-		assertEquals(2, eventRecorder.getTestFailedCount(), "# tests failed");
+		assertEquals(2, tests.started().count(), "# tests started");
+		assertEquals(0, tests.succeeded().count(), "# tests succeeded");
+		assertEquals(2, tests.failed().count(), "# tests failed");
 
-		assertEquals(2, eventRecorder.getContainerStartedCount(), "# containers started");
-		assertEquals(2, eventRecorder.getContainerFinishedCount(), "# containers finished");
+		assertEquals(2, containers.started().count(), "# containers started");
+		assertEquals(2, containers.finished().count(), "# containers finished");
 
 		assertEquals(2, TestCaseWithFailingBefore.countBefore, "# before each calls");
 	}
 
 	@Test
 	void testsFailWhenAfterEachFails() {
-		ExecutionEventRecorder eventRecorder = executeTestsForClass(TestCaseWithFailingAfter.class);
+		EngineExecutionResults executionResults = executeTestsForClass(TestCaseWithFailingAfter.class);
+		Events containers = executionResults.containers();
+		Events tests = executionResults.tests();
 
-		assertEquals(1, eventRecorder.getTestStartedCount(), "# tests started");
-		assertEquals(0, eventRecorder.getTestSuccessfulCount(), "# tests succeeded");
-		assertEquals(1, eventRecorder.getTestFailedCount(), "# tests failed");
+		assertEquals(1, tests.started().count(), "# tests started");
+		assertEquals(0, tests.succeeded().count(), "# tests succeeded");
+		assertEquals(1, tests.failed().count(), "# tests failed");
 
-		assertEquals(2, eventRecorder.getContainerStartedCount(), "# containers started");
-		assertEquals(2, eventRecorder.getContainerFinishedCount(), "# containers finished");
+		assertEquals(2, containers.started().count(), "# containers started");
+		assertEquals(2, containers.finished().count(), "# containers finished");
 
 		assertTrue(TestCaseWithFailingAfter.testExecuted, "test executed?");
 	}
@@ -159,8 +155,22 @@ class StandardTestClassTests extends AbstractJupiterTestEngineTests {
 		}
 
 		@Test
-		void abortedTest() {
+		@DisplayName("Test aborted via the OTA's TestAbortedException")
+		void testAbortedOpenTest4J() {
 			throw new TestAbortedException("aborted!");
+		}
+
+		@Test
+		@DisplayName("Test aborted via JUnit 4's AssumptionViolatedException")
+		void testAbortedJUnit4() {
+			throw new org.junit.AssumptionViolatedException("aborted!");
+		}
+
+		@Test
+		@DisplayName("Test aborted via JUnit 4's legacy, deprecated AssumptionViolatedException")
+		@SuppressWarnings("deprecation")
+		void testAbortedJUnit4Legacy() {
+			throw new org.junit.internal.AssumptionViolatedException("aborted!");
 		}
 
 	}

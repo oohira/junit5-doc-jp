@@ -50,16 +50,17 @@ class SharedResourcesDemo {
 
 	@Test
 	@ResourceLock(value = SYSTEM_PROPERTIES, mode = READ_WRITE)
-	void canSetCustomPropertyToFoo() {
-		System.setProperty("my.prop", "foo");
-		assertEquals("foo", System.getProperty("my.prop"));
+	void canSetCustomPropertyToApple() {
+		System.setProperty("my.prop", "apple");
+		assertEquals("apple", System.getProperty("my.prop"));
 	}
 
 	@Test
 	@ResourceLock(value = SYSTEM_PROPERTIES, mode = READ_WRITE)
-	void canSetCustomPropertyToBar() {
-		System.setProperty("my.prop", "bar");
-		assertEquals("bar", System.getProperty("my.prop"));
+	void canSetCustomPropertyToBanana() {
+		System.setProperty("my.prop", "banana");
+		assertEquals("banana", System.getProperty("my.prop"));
 	}
+
 }
 // end::user_guide[]

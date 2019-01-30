@@ -12,7 +12,6 @@ package org.junit.jupiter.engine;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonMap;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_METHOD;
@@ -32,8 +31,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.platform.engine.ConfigurationParameters;
-import org.junit.platform.engine.test.event.ExecutionEventRecorder;
 import org.junit.platform.launcher.Launcher;
+import org.junit.platform.testkit.engine.EngineExecutionResults;
 
 /**
  * Integration tests for {@link TestInstance @TestInstance} lifecycle
@@ -122,26 +121,24 @@ class TestInstanceLifecycleConfigurationTests extends AbstractJupiterTestEngineT
 		performAssertions(testClass, emptyMap(), containers, containersFailed, tests, methods);
 	}
 
-	private void performAssertions(Class<?> testClass, Map<String, String> configParams, int containers,
-			int failedContainers, int tests, String... methods) {
+	private void performAssertions(Class<?> testClass, Map<String, String> configParams, int numContainers,
+			int numFailedContainers, int numTests, String... methods) {
 
 		// @formatter:off
-		ExecutionEventRecorder eventRecorder = executeTests(
+		EngineExecutionResults executionResults = executeTests(
 			request()
 				.selectors(selectClass(testClass))
 				.configurationParameters(configParams)
 				.build()
 		);
-
-		assertAll(
-			() -> assertEquals(containers, eventRecorder.getContainerStartedCount(), "# containers started"),
-			() -> assertEquals(containers, eventRecorder.getContainerFinishedCount(), "# containers finished"),
-			() -> assertEquals(failedContainers, eventRecorder.getContainerFailedCount(), "# containers failed"),
-			() -> assertEquals(tests, eventRecorder.getTestStartedCount(), "# tests started"),
-			() -> assertEquals(tests, eventRecorder.getTestSuccessfulCount(), "# tests succeeded"),
-			() -> assertEquals(Arrays.asList(methods), methodsInvoked)
-		);
 		// @formatter:on
+
+		executionResults.containers().assertStatistics(//
+			stats -> stats.started(numContainers).finished(numContainers).failed(numFailedContainers));
+		executionResults.tests().assertStatistics(//
+			stats -> stats.started(numTests).finished(numTests));
+
+		assertEquals(Arrays.asList(methods), methodsInvoked);
 	}
 
 	// -------------------------------------------------------------------------
