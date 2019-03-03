@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -128,10 +128,8 @@ public final class StringUtils {
 	 * will be used to convert it to a String.</li>
 	 * <li>Otherwise, the result of invoking {@code toString()} on the object
 	 * will be returned.</li>
-	 * <li>If any of the above results in an exception, the String returned by
-	 * this method will be generated using the supplied object's class name and
-	 * hash code as follows:
-	 * {@code obj.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(obj))}</li>
+	 * <li>If any of the above results in an exception, this method delegates to
+	 * {@link #defaultToString(Object)}</li>
 	 * </ul>
 	 *
 	 * @param obj the object to convert to a String; may be {@code null}
@@ -181,17 +179,42 @@ public final class StringUtils {
 		catch (Throwable throwable) {
 			BlacklistedExceptions.rethrowIfBlacklisted(throwable);
 
-			return obj.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(obj));
+			return defaultToString(obj);
 		}
+	}
+
+	/**
+	 * Convert the supplied {@code Object} to a <em>default</em> {@code String}
+	 * representation using the following algorithm.
+	 *
+	 * <ul>
+	 * <li>If the supplied object is {@code null}, this method returns {@code "null"}.</li>
+	 * <li>Otherwise, the String returned by this method will be generated analogous
+	 * to the default implementation of {@link Object#toString()} by using the supplied
+	 * object's class name and hash code as follows:
+	 * {@code obj.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(obj))}</li>
+	 * </ul>
+	 *
+	 * @param obj the object to convert to a String; may be {@code null}
+	 * @return the default String representation of the supplied object; never {@code null}
+	 * @see #nullSafeToString(Object)
+	 * @see ClassUtils#nullSafeToString(Class...)
+	 */
+	public static String defaultToString(Object obj) {
+		if (obj == null) {
+			return "null";
+		}
+
+		return obj.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(obj));
 	}
 
 	/**
 	 * Replace all ISO control characters in the supplied {@link String}.
 	 *
-	 * @param str the string to check; may be {@code null}
+	 * @param str the string in which to perform the replacement; may be {@code null}
 	 * @param replacement the replacement string; never {@code null}
-	 * @return The supplied string with all control characters replaced.
-	 *
+	 * @return the supplied string with all control characters replaced, or
+	 * {@code null} if the supplied string was {@code null}
 	 * @since 1.4
 	 */
 	@API(status = INTERNAL, since = "1.4")
@@ -203,10 +226,10 @@ public final class StringUtils {
 	/**
 	 * Replace all whitespace characters in the supplied {@link String}.
 	 *
-	 * @param str the string to check; may be {@code null}
+	 * @param str the string in which to perform the replacement; may be {@code null}
 	 * @param replacement the replacement string; never {@code null}
-	 * @return The supplied string with all whitespace characters replaced.
-	 *
+	 * @return the supplied string with all whitespace characters replaced, or
+	 * {@code null} if the supplied string was {@code null}
 	 * @since 1.4
 	 */
 	@API(status = INTERNAL, since = "1.4")
@@ -214,4 +237,5 @@ public final class StringUtils {
 		Preconditions.notNull(replacement, "replacement must not be null");
 		return str == null ? null : WHITESPACE_PATTERN.matcher(str).replaceAll(replacement);
 	}
+
 }

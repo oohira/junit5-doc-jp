@@ -208,10 +208,6 @@ subprojects {
 
 		apply(from = "$rootDir/gradle/publishing.gradle.kts")
 
-		dependencies {
-			api("org.apiguardian:apiguardian-api:${Versions.apiGuardian}")
-		}
-
 		tasks.javadoc {
 			options {
 				memberLevel = JavadocMemberLevel.PROTECTED
@@ -233,13 +229,13 @@ subprojects {
 
 		val sourcesJar by tasks.creating(Jar::class) {
 			dependsOn(tasks.classes)
-			classifier = "sources"
+			archiveClassifier.set("sources")
 			from(sourceSets.main.get().allSource)
 			duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 		}
 
 		val javadocJar by tasks.creating(Jar::class) {
-			classifier = "javadoc"
+			archiveClassifier.set("javadoc")
 			from(tasks.javadoc)
 		}
 

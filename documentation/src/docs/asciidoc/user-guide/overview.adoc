@@ -30,7 +30,6 @@ https://github.com/oohira/junit5-doc-jp[GitHub] または https://twitter.com/oo
 
 **JUnit 5 = _JUnit Platform_ + _JUnit Jupiter_ + _JUnit Vintage_**
 
-// FIXME: to be translated
 **JUnit Platform** は、JVM上で <<launcher-api,テストフレームワークを起動する>>
 ための基盤となります。また、このプラットフォーム上で動作するテストフレームワークを開発するための
 `{TestEngine}` APIも定義しています。加えて、コマンドラインからプラットフォームを起動するための
@@ -38,7 +37,8 @@ https://github.com/oohira/junit5-doc-jp[GitHub] または https://twitter.com/oo
 プラットフォームを起動して任意の `TestEngine` を実行するための
 <<running-tests-junit-platform-runner,JUnit 4ベースのテストランナー>>
 などを提供します。主要なIDE (<<running-tests-ide-intellij-idea>> や
-<<running-tests-ide-eclipse>> を参照) やビルドツール (<<running-tests-build-gradle>>
+<<running-tests-ide-eclipse>>, <<running-tests-ide-netbeans>>,
+<<running-tests-ide-vscode>> を参照) やビルドツール (<<running-tests-build-gradle>>
 や <<running-tests-build-maven>>, <<running-tests-build-ant>> を参照) で
 JUnit Platformがサポートされています。
 

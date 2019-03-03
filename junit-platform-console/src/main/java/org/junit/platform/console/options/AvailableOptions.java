@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -49,6 +49,12 @@ class AvailableOptions {
 
 	@Option(names = "-disable-ansi-colors", hidden = true)
 	private boolean disableAnsiColors2;
+
+	@Option(names = "--disable-banner", description = "Disable print out of the welcome message.")
+	private boolean disableBanner;
+
+	@Option(names = "-disable-banner", hidden = true)
+	private boolean disableBanner2;
 
 	@Option(names = "--details", paramLabel = "MODE", description = "Select an output details mode for when tests are executed. " //
 			+ "Use one of: ${COMPLETION-CANDIDATES}. If 'none' is selected, " //
@@ -286,6 +292,7 @@ class AvailableOptions {
 		// General Purpose
 		result.setDisplayHelp(this.helpRequested || this.helpRequested2);
 		result.setAnsiColorOutputDisabled(this.disableAnsiColors || this.disableAnsiColors2);
+		result.setBannerDisabled(this.disableBanner || this.disableBanner2);
 		result.setDetails(choose(this.details, this.details2, CommandLineOptions.DEFAULT_DETAILS));
 		result.setTheme(choose(this.theme, this.theme2, CommandLineOptions.DEFAULT_THEME));
 		result.setAdditionalClasspathEntries(merge(this.additionalClasspathEntries, this.additionalClasspathEntries2));

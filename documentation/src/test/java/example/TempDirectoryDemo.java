@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -20,15 +20,12 @@ import java.nio.file.Path;
 import example.util.ListWriter;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.support.io.TempDirectory;
-import org.junit.jupiter.api.support.io.TempDirectory.TempDir;
+import org.junit.jupiter.api.io.TempDir;
 
 class TempDirectoryDemo {
 
 	// tag::user_guide_parameter_injection[]
 	@Test
-	@ExtendWith(TempDirectory.class)
 	void writeItemsToFile(@TempDir Path tempDir) throws IOException {
 		Path file = tempDir.resolve("test.txt");
 
@@ -38,9 +35,6 @@ class TempDirectoryDemo {
 	}
 	// end::user_guide_parameter_injection[]
 
-	// tag::user_guide_field_injection[]
-	@ExtendWith(TempDirectory.class)
-	// end::user_guide_field_injection[]
 	static
 	// tag::user_guide_field_injection[]
 	class SharedTempDirectoryDemo {

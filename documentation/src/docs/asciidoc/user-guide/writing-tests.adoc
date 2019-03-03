@@ -1,6 +1,10 @@
 [[writing-tests]]
 == テストを書く
 
+The following example provides a glimpse at the minimum requirements for writing a test in
+JUnit Jupiter. Subsequent sections of this chapter will provide further details on all
+available features.
+
 [source,java,indent=0]
 .最初のテストケース
 ----
@@ -12,7 +16,7 @@ include::{testDir}/example/MyFirstJUnitJupiterTests.java[tags=user_guide]
 
 JUnit Jupiterは、テストを構成し、フレームワークを拡張するために、次のアノテーションをサポートします。
 
-中心となるすべてのアノテーションは、 `junit-jupiter-api` モジュールの `{api-package}` パッケージに含まれます。
+特に断りがない限り、中心となるすべてのアノテーションは、 `junit-jupiter-api` モジュールの `{api-package}` パッケージに含まれます。
 
 [cols="20,80"]
 |===
@@ -36,10 +40,8 @@ JUnit Jupiterは、テストを構成し、フレームワークを拡張する�
 | `@Disabled`              | Used to <<writing-tests-disabling,disable>> a test class or test method; analogous to JUnit 4's `@Ignore`. Such annotations are not _inherited_.
 | `@ExtendWith`            | Used to <<extensions-registration-declarative,register extensions declaratively>>. Such annotations are _inherited_.
 | `@RegisterExtension`     | Used to <<extensions-registration-programmatic,register extensions programmatically>> via fields. Such fields are _inherited_ unless they are _shadowed_.
+| `@TempDir`               | Used to supply a <<writing-tests-built-in-extensions-TempDirectory,temporary directory>> via field injection or parameter injection in a lifecycle method or test method; located in the `org.junit.jupiter.api.io` package.
 |===
-
-Any method annotated with `@Test`, `@TestTemplate`, `@RepeatedTest`, `@ParameterizedTest`,
-`@BeforeAll`, `@AfterAll`, `@BeforeEach`, or `@AfterEach` must not return a value.
 
 WARNING: いくつかのアノテーションは現在 _実験中_ です。詳細は、
 <<api-evolution-experimental-apis>> のテーブルを参照してください。
@@ -93,19 +95,35 @@ void myFastTest() {
 [[writing-tests-classes-and-methods]]
 === テストクラスとテストメソッド
 
-A _test method_ is any instance method that is directly annotated or meta-annotated with
-`@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory`, or `@TestTemplate`. A
-_test class_ is any top-level or `static` member class that contains at least one _test
-method_.
+**Test Class**: any top-level class, `static` member class, or <<writing-tests-nested,
+`@Nested` class>> that contains at least one _test method_.
+
+Test classes must not be `abstract` and must have a single constructor.
+
+**Test Method**: any instance method that is directly annotated or meta-annotated with
+`@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory`, or `@TestTemplate`.
+
+**Lifecycle Method**: any method that is directly annotated or meta-annotated with
+`@BeforeAll`, `@AfterAll`, `@BeforeEach`, or `@AfterEach`.
+
+Test methods and lifecycle methods may be declared locally within the current test class,
+inherited from superclasses, or inherited from interfaces (see
+<<writing-tests-test-interfaces-and-default-methods>>). In addition, test methods and
+lifecycle methods must not be `abstract` and must not return a value.
+
+NOTE: Test classes, test methods, and lifecycle methods are not required to be `public`,
+but they must _not_ be `private`.
+
+The following test class demonstrates the use of `@Test` methods and all supported
+lifecycle methods. For further information on runtime semantics, see
+<<writing-tests-test-execution-order>> and
+<<extensions-execution-order-wrapping-behavior>>.
 
 [source,java,indent=0]
 .標準的なテストクラス
 ----
 include::{testDir}/example/StandardTests.java[tags=user_guide]
 ----
-
-NOTE: Test classes and test methods are not required to be `public`, but they must _not_
-be `private`.
 
 [[writing-tests-display-names]]
 === 表示名
@@ -437,9 +455,7 @@ By default, test methods will be ordered using an algorithm that is deterministi
 intentionally nonobvious. This ensures that subsequent runs of a test suite execute test
 methods in the same order, thereby allowing for repeatable builds.
 
-NOTE: In this context, a _test method_ is any instance method that is directly annotated
-or meta-annotated with `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory`, or
-`@TestTemplate`.
+NOTE: See <<writing-tests-classes-and-methods>> for a definition of _test method_.
 
 Although true _unit tests_ typically should not rely on the order in which they are
 executed, there are times when it is necessary to enforce a specific test method execution
@@ -458,6 +474,8 @@ following built-in `MethodOrderer` implementations.
   `{Order}` annotation.
 * `{Random}`: orders test methods _pseudo-randomly_ and supports configuration of a custom
   _seed_.
+
+NOTE: See also: <<extensions-execution-order-wrapping-behavior>>
 
 The following example demonstrates how to guarantee that test methods are executed in the
 order specified via the `@Order` annotation.
@@ -536,7 +554,7 @@ WARNING: テストインスタンスの _デフォルト_ のライフサイク�
 [[writing-tests-nested]]
 === ネストしたテスト
 
-ネストしたテストは、テスト作成者がテストのグループ関係を表現しやすくします。
+`@Nested` テストは、テスト作成者がテストのグループ関係を表現しやすくします。
 詳しい例は次の通りです。
 
 [source,java,indent=0]
@@ -563,10 +581,9 @@ JUnit Jupiterの大きな変更点の1つは、テストのコンストラクタ
 _依存性注入_ を可能にします。
 
 `{ParameterResolver}` defines the API for test extensions that wish to _dynamically_
-resolve parameters at runtime. If a test class constructor or a `@Test`, `@RepeatedTest`,
-`@ParameterizedTest`, `@TestFactory`, `@TestTemplate`, `@BeforeEach`, `@AfterEach`,
-`@BeforeAll`, or `@AfterAll` method accepts a parameter, the parameter must be resolved at
-runtime by a registered `ParameterResolver`.
+resolve parameters at runtime. If a _test class_ constructor, a _test method_, or a
+_lifecycle method_ (see <<writing-tests-classes-and-methods>>) accepts a parameter, the
+parameter must be resolved at runtime by a registered `ParameterResolver`.
 
 現状、自動的に登録される組み込みのResolverが3つあります。
 
@@ -1659,14 +1676,19 @@ another dependency.
 [[writing-tests-built-in-extensions-TempDirectory]]
 ==== The TempDirectory Extension
 
-The `{TempDirectory}` extension can be used to create and clean up a temporary directory
-for an individual test or all tests in a test class. To use it, register the extension and
-then annotate a field of type `java.nio.file.Path` or `java.io.File` with `@TempDir` or
-add a parameter of type `java.nio.file.Path` or `java.io.File` annotated with `@TempDir`
-to a test method, lifecycle method, or test class constructor.
+.`@TempDir` is an experimental feature
+WARNING: You're invited to give it a try and provide feedback to the JUnit team so they
+can improve and eventually <<api-evolution, promote>> this feature.
 
-For example, the following test registers the `TempDirectory` extension for a single test
-method, creates and writes to a file in the temporary directory, and checks its content.
+The built-in `{TempDirectory}` extension is used to create and clean up a temporary
+directory for an individual test or all tests in a test class. It is registered by
+default. To use it, annotate a field of type `java.nio.file.Path` or `java.io.File` with
+`{TempDir}` or add a parameter of type `java.nio.file.Path` or `java.io.File` annotated
+with `@TempDir` to a lifecycle method or test method.
+
+For example, the following test declares a parameter annotated with `@TempDir` for a
+single test method, creates and writes to a file in the temporary directory, and checks
+its content.
 
 [source,java,indent=0]
 .A test method that requires a temporary directory
@@ -1674,31 +1696,16 @@ method, creates and writes to a file in the temporary directory, and checks its 
 include::{testDir}/example/TempDirectoryDemo.java[tags=user_guide_parameter_injection]
 ----
 
-The following example registers the `TempDirectory` extension for the entire class and
-then stores a _shared_ temporary directory in a `static` field. This allows the same
-`sharedTempDir` to be used in all lifecycle methods and test methods of the test class.
+WARNING: `@TempDir` is not supported on constructor parameters. If you wish to retain a
+single reference to a temp directory across lifecycle methods and the current test method,
+please use field injection, by annotating an instance field with `@TempDir`.
+
+The following example stores a _shared_ temporary directory in a `static` field. This
+allows the same `sharedTempDir` to be used in all lifecycle methods and test methods of
+the test class.
 
 [source,java,indent=0]
 .A test class that shares a temporary directory across test methods
 ----
 include::{testDir}/example/TempDirectoryDemo.java[tags=user_guide_field_injection]
 ----
-
-In addition to the default file system for the local operating system, the `TempDirectory`
-extension can also be used with any `FileSystem` implementation -- for example,
-https://github.com/google/jimfs[Jimfs]. In order to use a custom file system, register the
-extension _programmatically_ via `@RegisterExtension` and supply a provider of a custom
-parent directory of type `Path`. The following example uses the Jimfs `FileSystem` and
-passes a custom `tmp` parent directory to the `createInCustomDirectory()` static factory
-method.
-
-[source,java]
-.A test class that configures the TempDirectory extension to use a custom file system
-----
-include::{testDir}/example/TempDirectoryWithCustomFileSystemDemo.java[tags=user_guide]
-----
-
-WARNING: If you configure a `FileSystem` that is not based on the default file system for
-the current operating system, declaring a field or parameter of type `File` for your
-temporary directory may result in an exception. If that occurs you will need to use `Path`
-instead of `File`.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -29,7 +29,7 @@ import org.apiguardian.api.API;
  *
  * <h3>Method Signatures</h3>
  *
- * {@code @AfterAll} methods must have a {@code void} return type,
+ * <p>{@code @AfterAll} methods must have a {@code void} return type,
  * must not be {@code private}, and must be {@code static} by default.
  * Consequently, {@code @AfterAll} methods are not
  * supported in {@link Nested @Nested} test classes or as <em>interface default
@@ -38,12 +38,38 @@ import org.apiguardian.api.API;
  * methods may optionally declare parameters to be resolved by
  * {@link org.junit.jupiter.api.extension.ParameterResolver ParameterResolvers}.
  *
- * <h3>Inheritance</h3>
+ * <h3>Inheritance and Execution Order</h3>
  *
  * <p>{@code @AfterAll} methods are inherited from superclasses as long as
  * they are not <em>hidden</em> or <em>overridden</em>. Furthermore,
- * {@code @AfterAll} methods from superclasses will be executed before
+ * {@code @AfterAll} methods from superclasses will be executed after
  * {@code @AfterAll} methods in subclasses.
+ *
+ * <p>Similarly, {@code @AfterAll} methods declared in an interface are
+ * inherited as long as they are not <em>hidden</em> or <em>overridden</em>,
+ * and {@code @AfterAll} methods from an interface will be executed after
+ * {@code @AfterAll} methods in the class that implements the interface.
+ *
+ * <p>JUnit Jupiter does not guarantee the execution order of multiple
+ * {@code @AfterAll} methods that are declared within a single test class or
+ * test interface. While it may at times appear that these methods are invoked
+ * in alphabetical order, they are in fact sorted using an algorithm that is
+ * deterministic but intentionally non-obvious.
+ *
+ * <p>In addition, {@code @AfterAll} methods are in no way linked to
+ * {@code @BeforeAll} methods. Consequently, there are no guarantees with regard
+ * to their <em>wrapping</em> behavior. For example, given two
+ * {@code @BeforeAll} methods {@code createA()} and {@code createB()} as well as
+ * two {@code @AfterAll} methods {@code destroyA()} and {@code destroyB()}, the
+ * order in which the {@code @BeforeAll} methods are executed (e.g.
+ * {@code createA()} before {@code createB()}) does not imply any order for the
+ * seemingly corresponding {@code @AfterAll} methods. In other words,
+ * {@code destroyA()} might be called before <em>or</em> after
+ * {@code destroyB()}. The JUnit Team therefore recommends that developers
+ * declare at most one {@code @BeforeAll} method and at most one
+ * {@code @AfterAll} method per test class or test interface unless there are no
+ * dependencies between the {@code @BeforeAll} methods or between the
+ * {@code @AfterAll} methods.
  *
  * <h3>Composition</h3>
  *

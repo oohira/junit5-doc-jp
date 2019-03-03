@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -34,6 +34,7 @@ class MultiReleaseJarTests {
 	void checkDefault() throws Exception {
 		var variant = "default";
 		var expectedLines = List.of( //
+			">> BANNER >>", //
 			".", //
 			"'-- JUnit Jupiter [OK]", //
 			"  '-- JupiterIntegrationTests [OK]", //
@@ -70,7 +71,7 @@ class MultiReleaseJarTests {
 	void checkNoScripting() throws Exception {
 		var variant = "no-scripting";
 		var expectedLines = List.of( //
-			".", //
+			">> BANNER >>", ".", //
 			"'-- JUnit Jupiter [OK]", //
 			"  '-- JupiterIntegrationTests [OK]", //
 			"    +-- javaPlatformModuleSystemIsAvailable() [OK]", //

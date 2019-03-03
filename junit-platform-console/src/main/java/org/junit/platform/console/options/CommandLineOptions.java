@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -39,6 +39,7 @@ public class CommandLineOptions {
 
 	private boolean displayHelp;
 	private boolean ansiColorOutputDisabled;
+	private boolean bannerDisabled;
 	private Details details = DEFAULT_DETAILS;
 	private Theme theme = DEFAULT_THEME;
 	private List<Path> additionalClasspathEntries = emptyList();
@@ -85,6 +86,14 @@ public class CommandLineOptions {
 
 	public void setAnsiColorOutputDisabled(boolean ansiColorOutputDisabled) {
 		this.ansiColorOutputDisabled = ansiColorOutputDisabled;
+	}
+
+	public boolean isBannerDisabled() {
+		return this.bannerDisabled;
+	}
+
+	public void setBannerDisabled(boolean bannerDisabled) {
+		this.bannerDisabled = bannerDisabled;
 	}
 
 	public boolean isScanModulepath() {

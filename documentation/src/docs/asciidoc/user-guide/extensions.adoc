@@ -325,8 +325,8 @@ APIを定めています。
 
 `{ParameterResolver}` は、実行時に動的に引数を解決するための `Extension` APIを定めています。
 
-テストコンストラクタや `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory`,
-`@BeforeEach`, `@AfterEach`, `@BeforeAll`, `@AfterAll` メソッドが引数をもつ場合、
+_テストクラス_ のコンストラクタや _テストメソッド_, _ライフサイクルメソッド_
+(<<writing-tests-classes-and-methods>> 参照) が引数をもつ場合、
 その引数は `ParameterResolver` によって実行時に _解決_ されなければいけません。
 `ParameterResolver` は、ビルトインのもの (`{TestInfoParameterResolver}` 参照) または
 <<extensions-registration, ユーザーが登録したもの>> のどちらかです。一般的に言うと、
@@ -362,8 +362,10 @@ information for the following events.
 * `testAborted`: invoked after a _test method_ has been aborted
 * `testFailed`: invoked after a _test method_ has failed
 
-NOTE: In this context, _test method_ refers to any `@Test` method or `@TestTemplate`
-method (for example, a `@RepeatedTest` or `@ParameterizedTest`).
+NOTE: In contrast to the definition of "test method" presented in
+<<writing-tests-classes-and-methods>>, in this context _test method_ refers to any
+`@Test` method or `@TestTemplate` method (for example, a `@RepeatedTest` or
+`@ParameterizedTest`).
 
 Extensions implementing this interface can be registered at the method level or at the
 class level. In the latter case they will be invoked for any contained _test method_
@@ -555,17 +557,22 @@ details.
 === ユーザーコードと拡張機能の相対的な実行順序
 
 1つ以上のテストメソッドを含むテストクラスを実行する場合、ユーザーが指定するテストメソッドと
-ライフサイクルメソッドに加えて、多くの拡張機能コールバックが呼び出されます。次の図は、
-ユーザーコードと拡張機能コードの相対的な実行順序を示しています。
+ライフサイクルメソッドに加えて、多くの拡張機能コールバックが呼び出されます。
+
+NOTE: See also: <<writing-tests-test-execution-order>>
+
+[[extensions-execution-order-overview]]
+==== User and Extension Code
+
+次の図は、ユーザーコードと拡張機能コードの相対的な実行順序を示しています。
+User-supplied test and lifecycle methods are shown in orange, with callback code
+implemented by extensions shown in blue. The grey box denotes the execution of a single
+test method and will be repeated for every test method in the test class.
 
 :figure-caption: ユーザーコードと拡張機能コード
 
 [#extensions-execution-order-diagram,reftext='{figure-caption}']
 image::extensions_lifecycle.png[caption='',title='{figure-caption}']
-
-ユーザーが提供するテストメソッドとライフサイクルメソッドはオレンジ色、
-拡張機能が提供するコールバックコードは青色で示されています。灰色のボックスは、
-単一のテストメソッドの実行を表し、テストクラス内のテストメソッド毎に繰り返されます。
 
 次の表は、<<extensions-execution-order-diagram>> の図の12ステップをさらに説明しています。
 
@@ -627,3 +634,169 @@ image::extensions_lifecycle.png[caption='',title='{figure-caption}']
 ほかのすべてのステップは、ライフサイクルコールバックに対するユーザーコードや拡張機能コードの
 有無によって省略可能です。様々なライフサイクルコールバックに関する詳細については、
 各アノテーションや拡張機能に対する Javadoc を参照してください。
+
+[[extensions-execution-order-wrapping-behavior]]
+==== Wrapping Behavior of Callbacks
+
+JUnit Jupiter always guarantees _wrapping_ behavior for multiple registered extensions
+that implement lifecycle callbacks such as `BeforeAllCallback`, `AfterAllCallback`,
+`BeforeEachCallback`, `AfterEachCallback`, `BeforeTestExecutionCallback`, and
+`AfterTestExecutionCallback`.
+
+That means that, given two extensions `Extension1` and `Extension2` with `Extension1`
+registered before `Extension2`, any "before" callbacks implemented by `Extension1` are
+guaranteed to execute **before** any "before" callbacks implemented by `Extension2`.
+Similarly, given the two same two extensions registered in the same order, any "after"
+callbacks implemented by `Extension1` are guaranteed to execute **after** any "after"
+callbacks implemented by `Extension2`. `Extension1` is therefore said to _wrap_
+`Extension2`.
+
+JUnit Jupiter also guarantees _wrapping_ behavior within class and interface hierarchies
+for user-supplied _lifecycle methods_ (see <<writing-tests-classes-and-methods>>).
+
+* `@BeforeAll` methods are inherited from superclasses as long as they are not _hidden_ or
+  _overridden_. Furthermore, `@BeforeAll` methods from superclasses will be executed
+  **before** `@BeforeAll` methods in subclasses.
+** Similarly, `@BeforeAll` methods declared in an interface are inherited as long as they
+   are not _hidden_ or _overridden_, and `@BeforeAll` methods from an interface will be
+   executed **before** `@BeforeAll` methods in the class that implements the interface.
+* `@AfterAll` methods are inherited from superclasses as long as they are not _hidden_ or
+  _overridden_. Furthermore, `@AfterAll` methods from superclasses will be executed
+  **after** `@AfterAll` methods in subclasses.
+** Similarly, `@AfterAll` methods declared in an interface are inherited as long as they
+   are not _hidden_ or _overridden_, and `@AfterAll` methods from an interface will be
+   executed **after** `@AfterAll` methods in the class that implements the interface.
+* `@BeforeEach` methods are inherited from superclasses as long as they are not
+  _overridden_. Furthermore, `@BeforeEach` methods from superclasses will be executed
+  **before** `@BeforeEach` methods in subclasses.
+** Similarly, `@BeforeEach` methods declared as interface default methods are inherited as
+   long as they are not _overridden_, and `@BeforeEach` default methods will be executed
+   **before** `@BeforeEach` methods in the class that implements the interface.
+* `@AfterEach` methods are inherited from superclasses as long as they are not
+  _overridden_. Furthermore, `@AfterEach` methods from superclasses will be executed
+  **after** `@AfterEach` methods in subclasses.
+** Similarly, `@AfterEach` methods declared as interface default methods are inherited as
+   long as they are not _overridden_, and `@AfterEach` default methods will be executed
+   **after** `@AfterEach` methods in the class that implements the interface.
+
+The following examples demonstrate this behavior. Please note that the examples do not
+actually do anything realistic. Instead, they mimic common scenarios for testing
+interactions with the database. All methods imported statically from the `Logger` class
+simply log contextual information in order to help us better understand the execution
+order of user-supplied callback methods and callback methods in extensions.
+
+[source,java,indent=0]
+.Extension1
+----
+include::{testDir}/example/callbacks/Extension1.java[tags=user_guide]
+----
+
+[source,java,indent=0]
+.Extension2
+----
+include::{testDir}/example/callbacks/Extension2.java[tags=user_guide]
+----
+
+[source,java,indent=0]
+.AbstractDatabaseTests
+----
+include::{testDir}/example/callbacks/AbstractDatabaseTests.java[tags=user_guide]
+----
+
+[source,java,indent=0]
+.DatabaseTestsDemo
+----
+include::{testDir}/example/callbacks/DatabaseTestsDemo.java[tags=user_guide]
+----
+
+When the `DatabaseTestsDemo` test class is executed, the following is logged.
+
+----
+@BeforeAll AbstractDatabaseTests.createDatabase()
+@BeforeAll DatabaseTestsDemo.beforeAll()
+  Extension1.beforeEach()
+  Extension2.beforeEach()
+    @BeforeEach AbstractDatabaseTests.connectToDatabase()
+    @BeforeEach DatabaseTestsDemo.insertTestDataIntoDatabase()
+      @Test DatabaseTestsDemo.testDatabaseFunctionality()
+    @AfterEach DatabaseTestsDemo.deleteTestDataFromDatabase()
+    @AfterEach AbstractDatabaseTests.disconnectFromDatabase()
+  Extension2.afterEach()
+  Extension1.afterEach()
+@BeforeAll DatabaseTestsDemo.afterAll()
+@AfterAll AbstractDatabaseTests.destroyDatabase()
+----
+
+The following sequence diagram helps to shed further light on what actually goes on within
+the `JupiterTestEngine` when the `DatabaseTestsDemo` test class is executed.
+
+////
+PNG generated using ZenUML: https://app.zenuml.com
+
+See corresponding *.txt file in images folder for the source.
+////
+image::extensions_DatabaseTestsDemo.png[caption='',title='DatabaseTestsDemo']
+
+JUnit Jupiter does **not** guarantee the execution order of multiple lifecycle methods
+that are declared within a _single_ test class or test interface. It may at times appear
+that JUnit Jupiter invokes such methods in alphabetical order. However, that is not
+precisely true. The ordering is analogous to the ordering for `@Test` methods within a
+single test class.
+
+[NOTE]
+====
+Lifecycle methods that are declared within a _single_ test class or test interface will be
+ordered using an algorithm that is deterministic but intentionally non-obvious. This
+ensures that subsequent runs of a test suite execute lifecycle methods in the same order,
+thereby allowing for repeatable builds.
+====
+
+In addition, JUnit Jupiter does **not** support _wrapping_ behavior for multiple lifecycle
+methods declared within a single test class or test interface.
+
+The following example demonstrates this behavior. Specifically, the lifecycle method
+configuration is _broken_ due to the order in which the locally declared lifecycle methods
+are executed.
+
+* Test data is inserted _before_ the database connection has been opened, which results in
+  a failure to connect to the database.
+* The database connection is closed _before_ deleting the test data, which results in a
+  failure to connect to the database.
+
+[source,java,indent=0]
+.BrokenLifecycleMethodConfigDemo
+----
+include::{testDir}/example/callbacks/BrokenLifecycleMethodConfigDemo.java[tags=user_guide]
+----
+
+When the `BrokenLifecycleMethodConfigDemo` test class is executed, the following is logged.
+
+----
+Extension1.beforeEach()
+Extension2.beforeEach()
+  @BeforeEach BrokenLifecycleMethodConfigDemo.insertTestDataIntoDatabase()
+  @BeforeEach BrokenLifecycleMethodConfigDemo.connectToDatabase()
+    @Test BrokenLifecycleMethodConfigDemo.testDatabaseFunctionality()
+  @AfterEach BrokenLifecycleMethodConfigDemo.disconnectFromDatabase()
+  @AfterEach BrokenLifecycleMethodConfigDemo.deleteTestDataFromDatabase()
+Extension2.afterEach()
+Extension1.afterEach()
+----
+
+The following sequence diagram helps to shed further light on what actually goes on within
+the `JupiterTestEngine` when the `BrokenLifecycleMethodConfigDemo` test class is executed.
+
+////
+PNG generated using ZenUML: https://app.zenuml.com
+
+See corresponding *.txt file in images folder for the source.
+////
+image::extensions_BrokenLifecycleMethodConfigDemo.png[caption='',title='BrokenLifecycleMethodConfigDemo']
+
+[TIP]
+====
+Due to the aforementioned behavior, the JUnit Team recommends that developers declare at
+most one of each type of _lifecycle method_ (see <<writing-tests-classes-and-methods>>)
+per test class or test interface unless there are no dependencies between such lifecycle
+methods.
+====

@@ -240,16 +240,16 @@ JUnit Platform 1.3で非推奨となり、JUnit Platform 1.4で廃止されま�
 ====
 
 https://issues.apache.org/jira/browse/SUREFIRE-1330[バージョン 2.22.0] から、
-Maven SurefireはJUnit Platform上でテストを実行するための
+Maven SurefireとMaven Failsafeは、JUnit Platform上でテストを実行するための
 http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html[ネイティブサポート]
 を提供しています。 `{junit5-jupiter-starter-maven}` プロジェクトの `pom.xml`
-ファイルがその使い方を示すとともに、Mavenビルドを設定するための出発点となるでしょう。
+ファイルがMaven Surefireプラグインの使い方を示すとともに、Mavenビルドを設定するための出発点となるでしょう。
 
 [[running-tests-build-maven-engines-configure]]
 ===== テストエンジンを設定する
 
-Maven Surefireにテストを実行させるためには、`TestEngine` の実装が少なくとも1つ
-実行時のクラスパスに必要です。
+Maven SurefireまたはMaven Failsafeにテストを実行させるためには、
+`TestEngine` の実装が少なくとも1つ実行時のクラスパスに必要です。
 
 JUnit Jupiterベースのテストをサポートするためには、JUnit Jupiter APIと
 JUnit Jupiter `TestEngine` 実装に対する `test` スコープの依存を
@@ -264,11 +264,15 @@ JUnit Jupiter `TestEngine` 実装に対する `test` スコープの依存を
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>{surefire-version}</version>
 			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>{surefire-version}</version>
+			</plugin>
 		</plugins>
 	</build>
-	...
+	<!-- ... -->
 	<dependencies>
-		...
+		<!-- ... -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
@@ -281,30 +285,34 @@ JUnit Jupiter `TestEngine` 実装に対する `test` スコープの依存を
 			<version>{jupiter-version}</version>
 			<scope>test</scope>
 		</dependency>
-		...
+		<!-- ... -->
 	</dependencies>
-	...
+	<!-- ... -->
 ----
 
-Maven Surefireは、JUnit 4ベースのテストも実行することができます。
+Maven SurefireとMaven Failsafeは、JUnit 4ベースのテストも実行することができます。
 そのためには、次のようにJUnit 4とJUnit Vintage `TestEngine` 実装に対する `test`
 スコープの依存が必要です。
 
 [source,xml,indent=0]
 [subs=attributes+]
 ----
-	...
+	<!-- ... -->
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>{surefire-version}</version>
 			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>{surefire-version}</version>
+			</plugin>
 		</plugins>
 	</build>
-	...
+	<!-- ... -->
 	<dependencies>
-		...
+		<!-- ... -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -317,9 +325,9 @@ Maven Surefireは、JUnit 4ベースのテストも実行することができ�
 			<version>{vintage-version}</version>
 			<scope>test</scope>
 		</dependency>
-		...
+		<!-- ... -->
 	</dependencies>
-	...
+	<!-- ... -->
 ----
 
 [[running-tests-build-maven-filter-test-class-names]]
@@ -342,7 +350,7 @@ Maven Surefireプラグインは、完全修飾名が次のパターンにマッ
 [subs=attributes+]
 .Maven Surefireのexcludeルールを上書きする
 ----
-	...
+	<!-- ... -->
 	<build>
 		<plugins>
 			<plugin>
@@ -356,7 +364,7 @@ Maven Surefireプラグインは、完全修飾名が次のパターンにマッ
 			</plugin>
 		</plugins>
 	</build>
-	...
+	<!-- ... -->
 ----
 
 詳細は、 Maven Surefireのドキュメント
@@ -375,7 +383,7 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 [source,xml,indent=0]
 [subs=attributes+]
 ----
-	...
+	<!-- ... -->
 	<build>
 		<plugins>
 			<plugin>
@@ -388,7 +396,7 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 			</plugin>
 		</plugins>
 	</build>
-	...
+	<!-- ... -->
 ----
 
 [[running-tests-build-maven-config-params]]
@@ -402,7 +410,7 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 [source,xml,indent=0]
 [subs=attributes+]
 ----
-	...
+	<!-- ... -->
 	<build>
 		<plugins>
 			<plugin>
@@ -420,7 +428,7 @@ https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclu
 			</plugin>
 		</plugins>
 	</build>
-	...
+	<!-- ... -->
 ----
 
 [[running-tests-build-ant]]
@@ -480,7 +488,7 @@ JUnit Platformを起動する基本的かつ最低限のサポートだけを提
 		<!-- The location where you have your compiled classes -->
 		<pathelement location="${build.classes.dir}" />
 	</path>
-	....
+	<!-- ... -->
 	<junitlauncher>
 		<classpath refid="test.classpath" />
 		<testclasses outputdir="${output.dir}">

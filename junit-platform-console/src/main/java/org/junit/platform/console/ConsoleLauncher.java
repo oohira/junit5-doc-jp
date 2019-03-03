@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -80,6 +80,9 @@ public class ConsoleLauncher {
 			return ConsoleLauncherExecutionResult.failed();
 		}
 		try (PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(outStream, charset)))) {
+			if (!options.isBannerDisabled()) {
+				displayBanner(out);
+			}
 			if (options.isDisplayHelp()) {
 				commandLineOptionsParser.printHelp(out);
 				return ConsoleLauncherExecutionResult.success();
@@ -90,6 +93,12 @@ public class ConsoleLauncher {
 			outStream.flush();
 			errStream.flush();
 		}
+	}
+
+	void displayBanner(PrintWriter out) {
+		out.println();
+		out.println("Thanks for using JUnit! Support its development at https://junit.org/sponsoring");
+		out.println();
 	}
 
 	private ConsoleLauncherExecutionResult executeTests(CommandLineOptions options, PrintWriter out) {
