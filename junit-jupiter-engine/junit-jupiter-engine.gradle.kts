@@ -19,7 +19,7 @@ val testArtifacts by configurations.creating {
 }
 
 val testJar by tasks.creating(Jar::class) {
-	classifier = "test"
+	archiveClassifier.set("test")
 	from(sourceSets.getByName("test").output)
 }
 
@@ -28,6 +28,8 @@ artifacts {
 }
 
 dependencies {
+	api("org.apiguardian:apiguardian-api:${Versions.apiGuardian}")
+
 	api(project(":junit-platform-engine"))
 	api(project(":junit-jupiter-api"))
 
@@ -36,7 +38,4 @@ dependencies {
 	testImplementation(project(":junit-platform-testkit"))
 	testImplementation("org.jetbrains.kotlin:kotlin-stdlib")
 	testImplementation(localGroovy())
-	testImplementation("com.google.jimfs:jimfs:${Versions.jimfs}") {
-		because("used to test TempDirectory extension")
-	}
 }

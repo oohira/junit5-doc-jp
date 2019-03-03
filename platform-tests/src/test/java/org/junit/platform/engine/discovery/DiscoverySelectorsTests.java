@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -39,9 +39,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.support.io.TempDirectory;
-import org.junit.jupiter.api.support.io.TempDirectory.TempDir;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -574,7 +572,6 @@ class DiscoverySelectorsTests {
 	}
 
 	@Test
-	@ExtendWith(TempDirectory.class)
 	void selectClasspathRootsWithExistingDirectory(@TempDir Path tempDir) {
 		List<ClasspathRootSelector> selectors = selectClasspathRoots(singleton(tempDir));
 

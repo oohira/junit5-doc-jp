@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -48,9 +48,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.support.io.TempDirectory;
-import org.junit.jupiter.api.support.io.TempDirectory.TempDir;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.engine.TrackLogRecords;
 import org.junit.platform.commons.JUnitException;
 import org.junit.platform.commons.logging.LogRecordListener;
@@ -611,7 +609,6 @@ class ReflectionUtilsTests {
 	}
 
 	@Test
-	@ExtendWith(TempDirectory.class)
 	void getAllClasspathRootDirectories(@TempDir Path tempDirectory) throws Exception {
 		Path root1 = tempDirectory.resolve("root1").toAbsolutePath();
 		Path root2 = tempDirectory.resolve("root2").toAbsolutePath();

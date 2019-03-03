@@ -35,9 +35,6 @@ dependencies {
 			.forEach { testImplementation(it) }
 
 	testImplementation("org.jetbrains.kotlin:kotlin-stdlib")
-	testImplementation("com.google.jimfs:jimfs:${Versions.jimfs}") {
-		because("used to demo TempDirectory extension")
-	}
 
 	testRuntimeOnly("org.apache.logging.log4j:log4j-core:${Versions.log4j}")
 	testRuntimeOnly("org.apache.logging.log4j:log4j-jul:${Versions.log4j}")
@@ -111,16 +108,13 @@ tasks {
 		resources(delegateClosureOf<CopySpec> {
 			from(sourceDir) {
 				include("**/images/**")
+				include("tocbot-*/**")
 			}
 		})
 
 		backends("html5")
-
-		// does currently not work on Java 11, see https://github.com/junit-team/junit5/issues/1608
-		if (JavaVersion.current() < JavaVersion.VERSION_11) {
-			backends("pdf")
-			attributes(mapOf("linkToPdf" to "true"))
-		}
+		backends("pdf")
+		attributes(mapOf("linkToPdf" to "true"))
 
 		attributes(mapOf(
 				"jupiter-version" to version,
@@ -141,9 +135,7 @@ tasks {
 				"source-highlighter" to "coderay@", // TODO switch to "rouge" once supported by the html5 backend and on MS Windows
 				"tabsize" to "4",
 				"toc" to "left",
-				"toclevels" to "3",
 				"icons" to "font",
-				"sectnums" to true,
 				"sectanchors" to true,
 				"idprefix" to "",
 				"idseparator" to "-"

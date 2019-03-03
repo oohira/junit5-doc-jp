@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -115,15 +115,14 @@ class ProgrammaticExtensionRegistrationTests extends AbstractJupiterTestEngineTe
 
 	@Test
 	void propagatesCheckedExceptionThrownDuringInitializationOfStaticField() {
-		assertClassFails(ClassLevelExplosiveCheckedExceptionTestCase.class, allOf(
-			instanceOf(ExceptionInInitializerError.class), cause(allOf(instanceOf(Exception.class), message("boom")))));
+		assertClassFails(ClassLevelExplosiveCheckedExceptionTestCase.class,
+			allOf(instanceOf(ExceptionInInitializerError.class), cause(instanceOf(Exception.class), message("boom"))));
 	}
 
 	@Test
 	void propagatesUncheckedExceptionThrownDuringInitializationOfStaticField() {
-		assertClassFails(ClassLevelExplosiveUncheckedExceptionTestCase.class,
-			allOf(instanceOf(ExceptionInInitializerError.class),
-				cause(allOf(instanceOf(RuntimeException.class), message("boom")))));
+		assertClassFails(ClassLevelExplosiveUncheckedExceptionTestCase.class, allOf(
+			instanceOf(ExceptionInInitializerError.class), cause(instanceOf(RuntimeException.class), message("boom"))));
 	}
 
 	@Test

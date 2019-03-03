@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2018 the original author or authors.
+ * Copyright 2015-2019 the original author or authors.
  *
  * All rights reserved. This program and the accompanying materials are
  * made available under the terms of the Eclipse Public License v2.0 which
@@ -67,6 +67,7 @@ class StandaloneTests {
 				.addArguments("-Djava.util.logging.config.file=logging.properties") //
 				.addArguments("-jar", jar) //
 				.addArguments("--scan-class-path") //
+				.addArguments("--disable-banner") //
 				.addArguments("--include-classname", "standalone.*") //
 				.addArguments("--classpath", "bin").build() //
 				.run(false);
