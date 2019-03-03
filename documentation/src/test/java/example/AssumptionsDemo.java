@@ -28,25 +28,25 @@ class AssumptionsDemo {
 	@Test
 	void testOnlyOnCiServer() {
 		assumeTrue("CI".equals(System.getenv("ENV")));
-		// remainder of test
+		// 残りのテスト
 	}
 
 	@Test
 	void testOnlyOnDeveloperWorkstation() {
 		assumeTrue("DEV".equals(System.getenv("ENV")),
-			() -> "Aborting test: not on developer workstation");
-		// remainder of test
+			() -> "テストを中断: 開発者マシンではない");
+		// 残りのテスト
 	}
 
 	@Test
 	void testInAllEnvironments() {
 		assumingThat("CI".equals(System.getenv("ENV")),
 			() -> {
-				// perform these assertions only on the CI server
+                // これらのアサーションはCIサーバーでのみ実行する
 				assertEquals(2, calculator.divide(4, 2));
 			});
 
-		// perform these assertions in all environments
+        // これらのアサーションはすべての環境で実行する
 		assertEquals(42, calculator.multiply(6, 7));
 	}
 

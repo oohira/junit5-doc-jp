@@ -121,19 +121,19 @@ class ConditionalTestExecutionDemo {
 	// end::user_guide_environment_variable[]
 
 	// tag::user_guide_scripts[]
-	@Test // Static JavaScript expression.
+	@Test // 静的なJavaScriptの式
 	@EnabledIf("2 * 3 == 6")
 	void willBeExecuted() {
 		// ...
 	}
 
-	@RepeatedTest(10) // Dynamic JavaScript expression.
-	@DisabledIf("Math.random() < 0.314159")
+	@RepeatedTest(10) // 動的なJavaScriptの式
+	@DisabledIf("Math.random() < 0.214159")
 	void mightNotBeExecuted() {
 		// ...
 	}
 
-	@Test // Regular expression testing bound system property.
+	@Test // システムプロパティをテストする正規表現
 	@DisabledIf("/32/.test(systemProperty.get('os.arch'))")
 	void disabledOn32BitArchitectures() {
 		assertFalse(System.getProperty("os.arch").contains("32"));
@@ -145,7 +145,7 @@ class ConditionalTestExecutionDemo {
 		assertTrue("CI".equals(System.getenv("ENV")));
 	}
 
-	@Test // Multi-line script, custom engine name and custom reason.
+	@Test // 複数行のスクリプト、カスタムのエンジン名、カスタムの理由（訳注：テストが無効化された場合に表示される）
 	// end::user_guide_scripts[]
 	// @formatter:off
 	// tag::user_guide_scripts[]

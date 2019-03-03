@@ -40,13 +40,13 @@ class StandardTests {
 	// tag::user_guide[]
 	@Test
 	void failingTest() {
-		fail("a failing test");
+		fail("失敗するテスト");
 	}
 
 	@Test
-	@Disabled("for demonstration purposes")
+	@Disabled("デモ用")
 	void skippedTest() {
-		// not executed
+		// 実行されない
 	}
 
 	@Test

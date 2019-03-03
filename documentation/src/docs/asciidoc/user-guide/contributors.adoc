@@ -1,4 +1,4 @@
 [[contributors]]
-== Contributors
+== コントリビューター
 
-Browse the {junit5-repo}/graphs/contributors[current list of contributors] directly on GitHub.
+GitHubで直接 {junit5-repo}/graphs/contributors[現在のコントリビューター] を参照してください。
