@@ -61,35 +61,34 @@ JUnit 5を実行するには、Java 8（またはそれ以上）が必要とな�
 
 {StackOverflow} で質問するか、 {Gitter} で私たちにチャットしてください。
 
-// FIXME: to be translated
 [[overview-getting-started]]
-=== Getting Started
+=== 始めるには
 
 [[overview-getting-started-junit-artifacts]]
-==== Downloading JUnit Artifacts
+==== JUnit 成果物のダウンロード
 
-To find out what artifacts are available for download and inclusion in your project, refer
-to <<dependency-metadata>>. To set up dependency management for your build, refer to
-<<running-tests-build>> and the <<overview-getting-started-example-projects>>.
+ダウンロードしてプロジェクトに取り込める成果物を見つけるためには、<<dependency-metadata>>
+を参照してください。ビルドの依存管理を設定するには、<<running-tests-build>> と
+<<overview-getting-started-example-projects>> を参照してください。
 
 [[overview-getting-started-features]]
-==== JUnit 5 Features
+==== JUnit 5 の機能
 
-To find out what features are available in JUnit 5 and how to use them, read the
-corresponding sections of this User Guide, organized by topic.
+JUnit 5 で利用可能な機能とその使い方を知るためには、トピックごとに構成されている
+このユーザーガイドの該当セクションを読んでください。
 
-* <<writing-tests, Writing Tests in JUnit Jupiter>>
-* <<migrating-from-junit4, Migrating from JUnit 4 to JUnit Jupiter>>
+* <<writing-tests, JUnit Jupiter でテストを書く>>
+* <<migrating-from-junit4, JUnit 4 から JUnit Jupiter に移行する>>
 * <<running-tests>>
-* <<extensions, Extension Model for JUnit Jupiter>>
-* Advanced Topics
+* <<extensions, JUnit Jupiter の拡張モデル>>
+* 高度なトピック
   - <<launcher-api>>
   - <<testkit>>
 
 [[overview-getting-started-example-projects]]
 ==== サンプルプロジェクト
 
-コピーして試せる完全に動作するプロジェクトの例としては、{junit5-samples-repo}[`junit5-samples`]
+コピーして試せる完全に動作するプロジェクトの例としては、 {junit5-samples-repo}[`junit5-samples`]
 リポジトリがよい出発点となるでしょう。`junit5-samples` リポジトリは、JUnit JupiterやJUnit Vintage、
 その他のテストフレームワークをベースとした、様々なプロジェクトのサンプルを提供します。
 サンプルプロジェクトから適切なビルドスクリプト（例えば、`build.gradle` や `pom.xml` など）
