@@ -1,9 +1,8 @@
 [[writing-tests]]
 == テストを書く
 
-The following example provides a glimpse at the minimum requirements for writing a test in
-JUnit Jupiter. Subsequent sections of this chapter will provide further details on all
-available features.
+次の例では、JUnit Jupiter でテストを書くための最小の要件をうかがうことができます。
+この章の後続の節では、利用可能なすべての機能をさらに詳しく説明します。
 
 [source,java,indent=0]
 .最初のテストケース
@@ -22,25 +21,25 @@ JUnit Jupiterは、テストを構成し、フレームワークを拡張する�
 |===
 | アノテーション             | 説明
 
-| `@Test`                  | Denotes that a method is a test method. Unlike JUnit 4's `@Test` annotation, this annotation does not declare any attributes, since test extensions in JUnit Jupiter operate based on their own dedicated annotations. Such methods are _inherited_ unless they are _overridden_.
-| `@ParameterizedTest`     | Denotes that a method is a <<writing-tests-parameterized-tests, parameterized test>>. Such methods are _inherited_ unless they are _overridden_.
-| `@RepeatedTest`          | Denotes that a method is a test template for a <<writing-tests-repeated-tests, repeated test>>. Such methods are _inherited_ unless they are _overridden_.
-| `@TestFactory`           | Denotes that a method is a test factory for <<writing-tests-dynamic-tests, dynamic tests>>. Such methods are _inherited_ unless they are _overridden_.
-| `@TestTemplate`          | Denotes that a method is a <<writing-tests-test-templates, template for test cases>> designed to be invoked multiple times depending on the number of invocation contexts returned by the registered <<extensions-test-templates, providers>>. Such methods are _inherited_ unless they are _overridden_.
-| `@TestMethodOrder`       | Used to configure the <<writing-tests-test-execution-order, test method execution order>> for the annotated test class; similar to JUnit 4's `@FixMethodOrder`. Such annotations are _inherited_.
-| `@TestInstance`          | Used to configure the <<writing-tests-test-instance-lifecycle, test instance lifecycle>> for the annotated test class. Such annotations are _inherited_.
-| `@DisplayName`           | Declares a custom <<writing-tests-display-names,display name>> for the test class or test method. Such annotations are not _inherited_.
-| `@DisplayNameGeneration` | Declares a custom <<writing-tests-display-name-generator,display name generator>> for the test class. Such annotations are _inherited_.
-| `@BeforeEach`            | Denotes that the annotated method should be executed _before_ *each* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, or `@TestFactory` method in the current class; analogous to JUnit 4's `@Before`. Such methods are _inherited_ unless they are _overridden_.
-| `@AfterEach`             | Denotes that the annotated method should be executed _after_ *each* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, or `@TestFactory` method in the current class; analogous to JUnit 4's `@After`. Such methods are _inherited_ unless they are _overridden_.
-| `@BeforeAll`             | Denotes that the annotated method should be executed _before_ *all* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, and `@TestFactory` methods in the current class; analogous to JUnit 4's `@BeforeClass`. Such methods are _inherited_ (unless they are _hidden_ or _overridden_) and must be `static` (unless the "per-class" <<writing-tests-test-instance-lifecycle, test instance lifecycle>> is used).
-| `@AfterAll`              | Denotes that the annotated method should be executed _after_ *all* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, and `@TestFactory` methods in the current class; analogous to JUnit 4's `@AfterClass`. Such methods are _inherited_ (unless they are _hidden_ or _overridden_) and must be `static` (unless the "per-class" <<writing-tests-test-instance-lifecycle, test instance lifecycle>> is used).
-| `@Nested`                | Denotes that the annotated class is a non-static <<writing-tests-nested,nested test class>>. `@BeforeAll` and `@AfterAll` methods cannot be used directly in a `@Nested` test class unless the "per-class" <<writing-tests-test-instance-lifecycle, test instance lifecycle>> is used. Such annotations are not _inherited_.
-| `@Tag`                   | Used to declare <<writing-tests-tagging-and-filtering,tags for filtering tests>>, either at the class or method level; analogous to test groups in TestNG or Categories in JUnit 4. Such annotations are _inherited_ at the class level but not at the method level.
-| `@Disabled`              | Used to <<writing-tests-disabling,disable>> a test class or test method; analogous to JUnit 4's `@Ignore`. Such annotations are not _inherited_.
-| `@ExtendWith`            | Used to <<extensions-registration-declarative,register extensions declaratively>>. Such annotations are _inherited_.
-| `@RegisterExtension`     | Used to <<extensions-registration-programmatic,register extensions programmatically>> via fields. Such fields are _inherited_ unless they are _shadowed_.
-| `@TempDir`               | Used to supply a <<writing-tests-built-in-extensions-TempDirectory,temporary directory>> via field injection or parameter injection in a lifecycle method or test method; located in the `org.junit.jupiter.api.io` package.
+| `@Test`                  | このメソッドが、テストメソッドであることを示します。JUnit 4 の `@Test` アノテーションとは異なり、このアノテーションはどんな属性も宣言しません。というのも、JUnit Jupiter のテスト拡張は、それ専用のアノテーションベースで行われるからです。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@ParameterizedTest`     | このメソッドが、<<writing-tests-parameterized-tests, パラメーター化テスト>> であることを示します。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@RepeatedTest`          | このメソッドが、<<writing-tests-repeated-tests, 繰り返しテスト>> のためのテストテンプレートであることを示します。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@TestFactory`           | このメソッドが、<<writing-tests-dynamic-tests, 動的テスト>> のためのテストファクトリであることを示します。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@TestTemplate`          | このメソッドが、<<writing-tests-test-templates, テストケースのテンプレート>> であることを示します。このメソッドは、登録した <<extensions-test-templates, プロバイダ>> が返す実行コンテキストの数に応じて、複数回呼び出されます。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@TestMethodOrder`       | アノテーションを付与したテストクラスに対して、<<writing-tests-test-execution-order, テストメソッドの実行順序>> を設定するために使われます。JUnit 4　の `@FixMethodOrder` に似ています。このアノテーションは、_継承_ されます。
+| `@TestInstance`          | アノテーションを付与したテストクラスに対して、<<writing-tests-test-instance-lifecycle, テストインスタンスのライフサイクル>> を設定するために使われます。このアノテーションは、_継承_ されます。
+| `@DisplayName`           | テストクラスやテストメソッドにカスタムの <<writing-tests-display-names, 表示名>> を指定します。このアノテーションは、_継承_ されません。
+| `@DisplayNameGeneration` | テストクラスにカスタムの <<writing-tests-display-name-generator, 表示名ジェネレーター>> を指定します。このアノテーションは、_継承_ されます。
+| `@BeforeEach`            | このメソッドが、現在のクラスの `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory` メソッドの _前に毎回_ 実行されるよう指定します。JUnit 4の `@Before` と同じです。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@AfterEach`             | このメソッドが、現在のクラスの `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory` メソッドの _後に毎回_ 実行されるよう指定します。JUnit 4の `@After` と同じです。このメソッドは、_オーバーライド_ されない限り、_継承_ されます。
+| `@BeforeAll`             | このメソッドが、現在のクラスの *すべての* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory` メソッドの _前に一度だけ_ 実行されるよう指定します。JUnit 4 の `@BeforeClass` と同じです。 このメソッドは、（_隠す_ か _オーバーライドする_ かしない限り）_継承_ されますが、（<<writing-tests-test-instance-lifecycle, テストインスタンスのライフサイクル>> に "per-class" が使われない限り）`static` でなければいけません。
+| `@AfterAll`              | このメソッドが、現在のクラスの *すべての* `@Test`, `@RepeatedTest`, `@ParameterizedTest`, `@TestFactory` メソッドの _後に一度だけ_ 実行されるよう指定します。JUnit 4 の `@AfterClass` と同じです。このメソッドは、（_隠す_ か _オーバーライドする_ かしない限り）_継承_ されますが、（<<writing-tests-test-instance-lifecycle, テストインスタンスのライフサイクル>> に "per-class" が使われない限り）`static` でなければいけません。
+| `@Nested`                | このクラスが、非 static の <<writing-tests-nested, ネストしたテストクラス>> であることを示します。 `@BeforeAll` および `@AfterAll` メソッドは、<<writing-tests-test-instance-lifecycle, テストインスタンスのライフサイクル>> に "per-class" が使われない限り、`@Nested` テストクラスの中で直接使うことはできません。このアノテーションは、_継承_ されません。
+| `@Tag`                   | クラスまたはメソッドレベルで <<writing-tests-tagging-and-filtering, テストをフィルタリングするためのタグ>> を宣言するのに使われます。TestNG のテストグループや JUnit 4 の Category と同じです。このアノテーションは、クラスレベルでは _継承_ されますが、メソッドレベルでは _継承_ されません。
+| `@Disabled`              | テストクラスやテストメソッドを <<writing-tests-disabling, 無効化>> するのに使われます。JUnit 4 の `@Ignore` と同じです。このアノテーションは、_継承_ されません。
+| `@ExtendWith`            | <<extensions-registration-declarative, 拡張機能を宣言的に登録する>> ために使われます。このアノテーションは、_継承_ されます。
+| `@RegisterExtension`     | フィールド経由で <<extensions-registration-programmatic, 拡張機能を手続き的に登録する>> ために使われます。このフィールドは、_隠さ_ れない限り、_継承_ されます。
+| `@TempDir`               | ライフサイクルメソッドまたはテストメソッドでフィールド注入またはパラメーター注入を使って <<writing-tests-built-in-extensions-TempDirectory, 一時ディレクトリ>> を提供するために使われます。`org.junit.jupiter.api.io` パッケージにあります。
 |===
 
 WARNING: いくつかのアノテーションは現在 _実験中_ です。詳細は、
@@ -62,7 +61,7 @@ JUnit Jupiterアノテーションは、_メタアノテーション_ として�
 include::{testDir}/example/Fast.java[tags=user_guide]
 ----
 
-The following `@Test` method demonstrates usage of the `@Fast` annotation.
+次の `@Test` メソッドは、`@Fast` アノテーションの使い方を示しています。
 
 [source,java,indent=0]
 ----
@@ -73,16 +72,15 @@ void myFastTest() {
 }
 ----
 
-You can even take that one step further by introducing a custom `@FastTest` annotation
-that can be used as a drop-in replacement for `@Tag("fast")` _and_ `@Test`.
+さらに一歩進めて、 `@Tag("fast")` _かつ_ `@Test` の代わりに使える `@FastTest`
+アノテーションを導入することもできます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/FastTest.java[tags=user_guide]
 ----
 
-JUnit automatically recognizes the following as a `@Test` method that is tagged with
-"fast".
+JUnit は、以下を "fast" でタグ付けされた `@Test` メソッドであると自動的に認識します。
 
 [source,java,indent=0]
 ----
@@ -1528,7 +1526,7 @@ WARNING: 動的テストは現在 _実験中_ の機能です。詳細は、
 示しています。
 
 その次のメソッドは、真に動的な性質のものです。`generateRandomNumberOfTests()`
-は、乱数を生成する `Iterator`、表示名の生成器、テストの実行器の3つを実装し、
+は、乱数を生成する `Iterator`、表示名ジェネレーター、テストの実行器の3つを実装し、
 これらを `DynamicTest.stream()` に渡しています。
 `generateRandomNumberOfTests()` の非決定的な振る舞いは、
 もちろんテストの再現性に反するため注意して使うべきですが、
