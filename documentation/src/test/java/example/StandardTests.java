@@ -52,7 +52,7 @@ class StandardTests {
 	@Test
 	void abortedTest() {
 		assumeTrue("abc".contains("Z"));
-		fail("test should have been aborted");
+		fail("テストは中断されるはず");
 	}
 
 	@AfterEach
