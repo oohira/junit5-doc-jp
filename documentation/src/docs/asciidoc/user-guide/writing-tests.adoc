@@ -173,28 +173,27 @@ include::{testDir}/example/AssertionsDemo.java[tags=user_guide]
 
 [[writing-tests-assertions-preemptive-timeouts]]
 [WARNING]
-.Preemptive Timeouts
+.プリエンプティブなタイムアウト
 ====
-The various `assertTimeoutPreemptively()` methods in the `Assertions` class execute the
-provided `executable` or `supplier` in a different thread than that of the calling code.
-This behavior can lead to undesirable side effects if the code that is executed within the
-`executable` or `supplier` relies on `java.lang.ThreadLocal` storage.
+`Assertions` クラスの `assertTimeoutPreemptively()` メソッドは、与えられた
+`executable` や `supplier` を呼び出し元のコードとは異なるスレッドで実行します。
+これは、`executable` や `supplier` 内で実行されるコードが `java.lang.ThreadLocal`
+ストレージに依存していると、望ましくない副作用を引き起こす可能性があります。
 
-One common example of this is the transactional testing support in the Spring Framework.
-Specifically, Spring's testing support binds transaction state to the current thread (via
-a `ThreadLocal`) before a test method is invoked. Consequently, if an `executable` or
-`supplier` provided to `assertTimeoutPreemptively()` invokes Spring-managed components
-that participate in transactions, any actions taken by those components will not be rolled
-back with the test-managed transaction. On the contrary, such actions will be committed to
-the persistent store (e.g., relational database) even though the test-managed transaction
-is rolled back.
+よくある例の1つに Spring Framework のトランザクションテストのサポートがあります。
+Spring のテストサポートは、テストメソッドが呼び出される前に、トランザクションの状態を
+カレントスレッドに (`ThreadLocal` 経由で) バインドします。そのため、
+`assertTimeoutPreemptively()` に与えられる `executable` や `supplier`
+がトランザクションに関わる Spring 管理のコンポーネントを呼び出すと、それらのコンポーネントで
+実行されたアクションはテストが管理するトランザクションでロールバックされません。
+それどころか、そのようなアクションは、テストが管理するトランザクションがロールバックされても、
+永続ストア (例えば、リレーショナル・データベース) にコミットされてしまいます。
 
-Similar side side effects may be encountered with other frameworks that rely on
-`ThreadLocal` storage.
+同様の副作用は、`ThreadLocal` ストレージに依存するほかのフレームワークでも起こりえます。
 ====
 
 [[writing-tests-assertions-kotlin]]
-==== Kotlin Assertion Support
+==== Kotlin のアサーションサポート
 
 JUnit Jupiterは、 https://kotlinlang.org/[Kotlin]
 と一緒に使いやすいアサーションもいくつか含んでいます。すべてのJUnit Jupiter Kotlinアサーションは、
