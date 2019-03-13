@@ -239,20 +239,19 @@ include::{testDir}/example/HamcrestAssertionsDemo.java[tags=user_guide]
 [[writing-tests-assumptions]]
 === 前提条件
 
-JUnit Jupiter comes with a subset of the assumption methods that JUnit 4 provides and
-adds a few that lend themselves well to being used with Java 8 lambda expressions and
-method references. All JUnit Jupiter assumptions are static methods in the
-`{Assumptions}` class.
+JUnit Jupiter は、JUnit 4 が提供している前提条件用メソッドのサブセットを備え、
+Java 8 のラムダ式やメソッド参照と一緒に使いやすくするものをいくつか追加しています。
+JUnit Jupiter の前提条件メソッドは、すべて `{Assumptions}` クラスの static メソッドです。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/AssumptionsDemo.java[tags=user_guide]
 ----
 
-NOTE: As of JUnit Jupiter 5.4, it is also possible to use methods from JUnit 4's
-`org.junit.Assume` class for assumptions. Specifically, JUnit Jupiter supports JUnit 4's
-`AssumptionViolatedException` to signal that a test should be aborted instead of marked
-as a failure.
+NOTE: JUnit Jupiter 5.4 から、前提条件のために JUnit 4 の `org.junit.Assume`
+クラスにあるメソッドを使うことも可能になりました。厳密に言うと、JUnit Jupiter
+は JUnit 4 がテストを失敗とマークするのではなく中断すべきと知らせるための
+`AssumptionViolatedException` をサポートします。
 
 [[writing-tests-disabling]]
 === テストの無効化
@@ -276,12 +275,11 @@ include::{testDir}/example/DisabledClassDemo.java[tags=user_guide]
 include::{testDir}/example/DisabledTestsDemo.java[tags=user_guide]
 ----
 
-NOTE: `@Disabled` may be declared without providing a _reason_; however, the JUnit team
-recommends that developers provide a short explanation for why a test class or test
-method has been disabled. Consequently, the above examples both show the use of a reason
--- for example, `@Disabled("Disabled until bug #42 has been resolved")`. Some development
-teams even require the presence of issue tracking numbers in the _reason_ for automated
-traceability, etc.
+NOTE: `@Disabled` は、_理由_ を指定せずに宣言することができます; しかし、JUnit
+チームは、開発者がテストクラスやテストメソッドが無効になっている短い説明の記述を推奨します。
+そのため、上の例では -- 例えば、`@Disabled("Disabled until bug #42 has been resolved")`
+のように、理由を記述する方法を示しています。開発チームによっては、自動的な追跡を可能にするために
+Issue 番号の指定を要求することさえあります。
 
 [[writing-tests-conditional-execution]]
 === 条件付きテスト実行
