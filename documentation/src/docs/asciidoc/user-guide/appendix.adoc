@@ -1,12 +1,12 @@
 [[appendix]]
-== Appendix
+== 付録
 
 [[dependency-metadata]]
-=== Dependency Metadata
+=== 依存関係メタデータ
 
-Artifacts for final releases and milestones are deployed to {Maven_Central}, and snapshot
-artifacts are deployed to Sonatype's {snapshot-repo}[snapshots repository] under
-{snapshot-repo}/org/junit/[/org/junit].
+最終リリースや各マイルストーンでの成果物は {Maven_Central} にデプロイされ、
+スナップショットは Sonatype {snapshot-repo}[スナップショットリポジトリ] の
+{snapshot-repo}/org/junit/[/org/junit] 以下にデプロイされています。
 
 [[dependency-metadata-junit-platform]]
 ==== JUnit Platform
@@ -15,34 +15,34 @@ artifacts are deployed to Sonatype's {snapshot-repo}[snapshots repository] under
 * *Version*: `{platform-version}`
 * *Artifact IDs*:
   `junit-platform-commons`::
-    Common APIs and support utilities for the JUnit Platform. Any API annotated with
-    `@API(status = INTERNAL)` is intended solely for usage within the JUnit framework
-    itself. _Any usage of internal APIs by external parties is not supported!_
+    JUnit Platform のための共通 API とサポートユーティリティです。`@API(status = INTERNAL)`
+    アノテーションの付与された API は、JUnit フレームワーク自身で使われることだけを想定しています。
+    _外部のプログラムからの内部 API の利用はサポートされていません！_
   `junit-platform-console`::
-    Support for discovering and executing tests on the JUnit Platform from the console.
-    See <<running-tests-console-launcher>> for details.
+    コンソールから JUnit Platform 上でテストを見つけて実行する機能を提供します。
+    詳細は、<<running-tests-console-launcher>> を参照してください。
   `junit-platform-console-standalone`::
-    An executable JAR with all dependencies included is provided in Maven Central under the
+    すべての依存関係を含む実行可能な JAR は、Maven Central リポジトリの
     https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone[junit-platform-console-standalone]
-    directory. See <<running-tests-console-launcher>> for details.
+    ディレクトリで提供されています。詳細は、<<running-tests-console-launcher>> を参照してください。
   `junit-platform-engine`::
-    Public API for test engines. See <<launcher-api-engines-custom>> for details.
+    テストエンジンの公開 API です。詳細は、<<launcher-api-engines-custom>> を参照してください。
   `junit-platform-launcher`::
-    Public API for configuring and launching test plans -- typically used by IDEs and
-    build tools. See <<launcher-api>> for details.
+    テストプランを構成して起動するための公開 API です。通常は、IDE やビルドツールに使われます。
+    詳細は、<<launcher-api>> を参照してください。
   `junit-platform-reporting`::
-    `TestExecutionListener` implementations that generate test reports -- typically used
-    by IDEs and build tools. See <<launcher-api-listeners-reporting>> for details.
+    テストレポートを生成するための `TestExecutionListener` 実装です。通常は、IDE やビルドツールに使われます。
+    詳細は、<<launcher-api-listeners-reporting>> を参照してください。
   `junit-platform-runner`::
-    Runner for executing tests and test suites on the JUnit Platform in a JUnit 4
-    environment. See <<running-tests-junit-platform-runner>> for details.
+    JUnit Platform 上のテストおよびテストスイートを JUnit 4 環境で実行するテストランナーです。
+    詳細は、<<running-tests-junit-platform-runner>> を参照してください。
   `junit-platform-suite-api`::
-    Annotations for configuring test suites on the JUnit Platform. Supported by the
-    <<running-tests-junit-platform-runner,JUnitPlatform runner>> and possibly by
-    third-party `TestEngine` implementations.
+    JUnit Platform 上でテストスイートを構成するためのアノテーションです。
+    <<running-tests-junit-platform-runner,JUnitPlatform ランナー>> と（おそらく）
+    サードパーティーの `TestEngine` 実装にもサポートされます。
   `junit-platform-testkit`::
-     Provides support for executing a test plan for a given `TestEngine` and then
-     accessing the results via a fluent API to verify the expected results.
+     与えられた `TestEngine` でテストプランを実行し、流れるような API を使って
+     テスト結果が期待通りかを検証するためのサポートを提供します。
 
 [[dependency-metadata-junit-jupiter]]
 ==== JUnit Jupiter
@@ -51,18 +51,18 @@ artifacts are deployed to Sonatype's {snapshot-repo}[snapshots repository] under
 * *Version*: `{jupiter-version}`
 * *Artifact IDs*:
   `junit-jupiter`::
-    JUnit Jupiter aggregator artifact that transitively pulls in dependencies on
-    `junit-jupiter-api`, `junit-jupiter-params`, and `junit-jupiter-engine` for
-    simplified dependency management in build tools such as Gradle and Maven.
+    Gradle や Maven のようなビルドツールで依存関係の管理を簡易化するために、
+    `junit-jupiter-api` と `junit-jupiter-params`、`junit-jupiter-engine`
+    への依存をまとめて追加するための JUnit Jupiter 集約アーティファクトです。
   `junit-jupiter-api`::
-    JUnit Jupiter API for <<writing-tests,writing tests>> and <<extensions,extensions>>.
+    <<writing-tests,テスト>> や <<extensions,拡張機能>> を書くための JUnit Jupiter API です。
   `junit-jupiter-engine`::
-    JUnit Jupiter test engine implementation; only required at runtime.
+    JUnit Jupiter のテストエンジン実装です。実行時だけ必要になります。
   `junit-jupiter-params`::
-    Support for <<writing-tests-parameterized-tests,parameterized tests>> in JUnit Jupiter.
+    JUnit Jupiter で <<writing-tests-parameterized-tests,パラメーター化テスト>> をサポートします。
   `junit-jupiter-migrationsupport`::
-    Support for migrating from JUnit 4 to JUnit Jupiter; only required for support for
-    JUnit 4's `@Ignore` annotation and for running selected JUnit 4 rules.
+    JUnit 4 から JUnit Jupiter への移行をサポートします。JUnit 4 の `@Ignore`
+    アノテーションと選択した JUnit 4 ルールを実行したいときだけ必要になります。
 
 [[dependency-metadata-junit-vintage]]
 ==== JUnit Vintage
@@ -71,41 +71,40 @@ artifacts are deployed to Sonatype's {snapshot-repo}[snapshots repository] under
 * *Version*: `{vintage-version}`
 * *Artifact ID*:
   `junit-vintage-engine`::
-    JUnit Vintage test engine implementation that allows one to run _vintage_ JUnit tests
-    on the JUnit Platform. _Vintage_ tests include those written using JUnit 3 or JUnit 4
-    APIs or tests written using testing frameworks built on those APIs.
+    JUnit Platform 上で _昔の (vintage)_ JUnit テストを実行できるようにする JUnit Vintage
+    のテストエンジン実装です。_昔の_ テストとは、JUnit 3 または JUnit 4 API で書かれたテストや、
+    それらの API に依存するテスティングフレームワークを使って書かれたテストを指します。
 
 [[dependency-metadata-junit-bom]]
 ==== Bill of Materials (BOM)
 
-The _Bill of Materials_ POM provided under the following Maven coordinates can be used to
-ease dependency management when referencing multiple of the above artifacts using
+_Bill of Materials_ POM を使うと、
 https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Importing_Dependencies[Maven]
-or https://docs.gradle.org/current/userguide/managing_transitive_dependencies.html#sec:bom_import[Gradle].
+または
+https://docs.gradle.org/current/userguide/managing_transitive_dependencies.html#sec:bom_import[Gradle]
+で前述のライブラリを複数参照するときに依存関係の管理を容易にすることができます。
 
 * *Group ID*: `org.junit`
 * *Artifact ID*: `junit-bom`
 * *Version*: `{bom-version}`
 
 [[dependency-metadata-dependencies]]
-==== Dependencies
+==== 依存関係
 
-Most of the above artifacts have a dependency in their published Maven POMs on the
-following _@API Guardian_ JAR.
+前述のすべての JAR が次の _@API Guardian_ JAR に依存しています。
 
 * *Group ID*: `org.apiguardian`
 * *Artifact ID*: `apiguardian-api`
 * *Version*: `{apiguardian-version}`
 
-In addition, most of the above artifacts have a direct or transitive dependency on the
-following _OpenTest4J_ JAR.
+加えて、ほとんどの JAR が次の _OpenTest4J_ JAR に直接または間接的に依存しています。
 
 * *Group ID*: `org.opentest4j`
 * *Artifact ID*: `opentest4j`
 * *Version*: `{ota4j-version}`
 
 [[dependency-diagram]]
-=== Dependency Diagram
+=== 依存関係図
 
 [plantuml, component-diagram, svg]
 ----
