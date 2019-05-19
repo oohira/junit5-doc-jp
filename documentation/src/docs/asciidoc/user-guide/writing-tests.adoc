@@ -437,40 +437,37 @@ NOTE: 上のコンテキストで "トリミングした" とは、先頭およ�
 include::{testDir}/example/TaggingDemo.java[tags=user_guide]
 ----
 
-TIP: See <<writing-tests-meta-annotations>> for examples demonstrating how to create
-custom annotations for tags.
+TIP: タグに対する独自アノテーションの作り方は、<<writing-tests-meta-annotations>>
+を参照してください。
 
 [[writing-tests-test-execution-order]]
-=== Test Execution Order
+=== テストの実行順序
 
-By default, test methods will be ordered using an algorithm that is deterministic but
-intentionally nonobvious. This ensures that subsequent runs of a test suite execute test
-methods in the same order, thereby allowing for repeatable builds.
+デフォルトでは、テストメソッドは決定的だが（意図的に）明白ではないアルゴリズムを使って
+順序付けられます。これにより、後続のテストスイートではテストメソッドが同じ順序で実行されるため、
+再現可能なビルドになります。
 
-NOTE: See <<writing-tests-classes-and-methods>> for a definition of _test method_.
+NOTE: _テストメソッド_ の定義は、<<writing-tests-classes-and-methods>> を参照してください。
 
-Although true _unit tests_ typically should not rely on the order in which they are
-executed, there are times when it is necessary to enforce a specific test method execution
-order -- for example, when writing _integration tests_ or _functional tests_ where the
-sequence of the tests is important, especially in conjunction with
-`@TestInstance(Lifecycle.PER_CLASS)`.
+理想的な _ユニットテスト_ では実行される順序に依存すべきではありませんが、テストメソッドを
+特定の実行順序に強制する必要がある場合もあります。例えば、テストの順番が重要となる
+_統合テスト_ や _機能テスト_ を書くときです。`@TestInstance(Lifecycle.PER_CLASS)`
+と組み合わせる場合は、特にそうです。
 
-To control the order in which test methods are executed, annotate your test class or test
-interface with `{TestMethodOrder}` and specify the desired `{MethodOrderer}`
-implementation. You can implement your own custom `MethodOrderer` or use one of the
-following built-in `MethodOrderer` implementations.
+テストメソッドが実行される順序を制御するには、テストクラスやテストインターフェースに
+`{TestMethodOrder}` アノテーションを付与し、期待する `{MethodOrderer}` 実装を指定してください。
+独自の `MethodOrderer` を実装することも、以下の組み込み `MethodOrderer` 実装を使うこともできます。
 
-* `{Alphanumeric}`: sorts test methods _alphanumerically_ based on their names and formal
-  parameter lists.
-* `{OrderAnnotation}`: sorts test methods _numerically_ based on values specified via the
-  `{Order}` annotation.
-* `{Random}`: orders test methods _pseudo-randomly_ and supports configuration of a custom
-  _seed_.
+* `{Alphanumeric}`: テストメソッドを名前と引数リストに基づいて _辞書順で_ ソートします。
+* `{OrderAnnotation}`: テストメソッドを `{Order}` アノテーションで指定した値に基づいて、
+  _数値順に_ ソートします。
+* `{Random}`: テストメソッドを _疑似的なランダム順に_ 並べます。独自の _シード (seed)_
+  の設定もサポートします。
 
-NOTE: See also: <<extensions-execution-order-wrapping-behavior>>
+NOTE: 参照: <<extensions-execution-order-wrapping-behavior>>
 
-The following example demonstrates how to guarantee that test methods are executed in the
-order specified via the `@Order` annotation.
+次の例は、テストメソッドが `@Order` アノテーションで指定した順序どおりに実行されることを
+保証する方法を示しています。
 
 [source,java,indent=0]
 ----
