@@ -569,20 +569,18 @@ JUnit Jupiterの大きな変更点の1つは、テストのコンストラクタ
 引数をもてるようになったことです。これは大きな柔軟性をもたらし、
 _依存性注入_ を可能にします。
 
-`{ParameterResolver}` defines the API for test extensions that wish to _dynamically_
-resolve parameters at runtime. If a _test class_ constructor, a _test method_, or a
-_lifecycle method_ (see <<writing-tests-classes-and-methods>>) accepts a parameter, the
-parameter must be resolved at runtime by a registered `ParameterResolver`.
+`{ParameterResolver}` は、実行時に _動的に_ 引数を解決したいテスト拡張のための
+APIを定義しています。もし _テストクラスの_ コンストラクタや _テストメソッド_、
+_ライフサイクルメソッド_ (<<writing-tests-classes-and-methods>> 参照) が引数をもつ場合、
+その引数は登録済みの `ParameterResolver` によって実行時に解決されなければなりません。
 
 現状、自動的に登録される組み込みのResolverが3つあります。
 
-* `{TestInfoParameterResolver}`: if a constructor or method parameter is of type
-  `{TestInfo}`, the `TestInfoParameterResolver` will supply an instance of `TestInfo`
-  corresponding to the current container or test as the value for the parameter. The
-  `TestInfo` can then be used to retrieve information about the current container or test
-  such as the display name, the test class, the test method, and associated tags. The
-  display name is either a technical name, such as the name of the test class or test
-  method, or a custom name configured via `@DisplayName`.
+* `{TestInfoParameterResolver}`: もしコンストラクタやメソッドの引数の型が `{TestInfo}` の場合、
+  `TestInfoParameterResolver` が現在のテストに応じた `TestInfo` をその引数の値として与えます。
+  `{TestInfo}` は、テストの表示名やテストクラス、テストメソッド、付与されたタグなど、
+  現在のコンテナやテストに関する情報を取得するために使用できます。表示名は、テストクラスやテストメソッドの名前か、
+  `@DisplayName` で設定されたカスタムの名前か、どちらかになります。
 +
 `{TestInfo}` は、JUnit 4の `TestName` ルールの代替として使えます。
 次の例は、`TestInfo` をテストのコンストラクタ、`@BeforeEach` メソッド、および
@@ -601,16 +599,16 @@ include::{testDir}/example/TestInfoDemo.java[tags=user_guide]
   `@RepeatedTest` 以外では登録されないことに注意してください。
   <<writing-tests-repeated-tests-examples>> を参照。
 
-* `{TestReporterParameterResolver}`: if a constructor or method parameter is of type
-  `{TestReporter}`, the `TestReporterParameterResolver` will supply an instance of
-  `TestReporter`. The `TestReporter` can be used to publish additional data about the
-  current test run. The data can be consumed via the `reportingEntryPublished()` method in
-  a `{TestExecutionListener}`, allowing it to be viewed in IDEs or included in reports.
+* `{TestReporterParameterResolver}`: もしコンストラクタやメソッドの引数の型が `{TestReporter}`
+  の場合、`TestReporterParameterResolver` が `TestReporter` インスタンスを与えます。
+  `TestReporter` は、現在のテスト実行に関する追加のデータを出力するために使用できます。
+  このデータは、`{TestExecutionListener}` の `reportingEntryPublished()`
+  メソッドを通して取得できるので、IDEで参照したり、レポートに含めたりできます。
 +
-In JUnit Jupiter you should use `TestReporter` where you used to print information to
-`stdout` or `stderr` in JUnit 4. Using `@RunWith(JUnitPlatform.class)` will output all
-reported entries to `stdout`. In addition, some IDEs print report entries to `stdout` or
-display them in the user interface for test results.
+JUnit 4 では `stdout` や `stderr` に情報を出力していましたが、JUnit Jupiter では
+`TestReporter` を使うべきです。`@RunWith(JUnitPlatform.class)` を使うときも、
+すべてのレポート情報が `stdout` に出力されます。加えて、いくつかの IDE では、
+レポート情報を `stdout` に表示したり、テスト結果のためのユーザーインターフェースに表示したりします。
 
 [source,java,indent=0]
 ----
