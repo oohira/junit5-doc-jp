@@ -967,49 +967,46 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=ValueSource_example]
 ----
 
 [[writing-tests-parameterized-tests-sources-null-and-empty]]
-===== Null and Empty Sources
+===== null と空のソース
 
-In order to check corner cases and verify proper behavior of our software when it is
-supplied _bad input_, it can be useful to have `null` and _empty_ values supplied to our
-parameterized tests. The following annotations serve as sources of `null` and empty values
-for parameterized tests that accept a single argument.
+エッジケースを確認し、_まずい入力_ が与えられたときのソフトウェアの正しい振る舞いを検証するために、
+パラメーター化テストに `null` や _空の_ 値を与えることは役に立ちます。
+以下のアノテーションは、1 引数のパラメーター化テストに `null` や空値を与える
+ソースになります。
 
-* `{NullSource}`: provides a single `null` argument to the annotated `@ParameterizedTest`
-  method.
-   - `@NullSource` cannot be used for a parameter that has a primitive type.
-* `{EmptySource}`: provides a single _empty_ argument to the annotated `@ParameterizedTest`
-  method for parameters of the following types: `java.lang.String`, `java.util.List`,
-  `java.util.Set`, `java.util.Map`, primitive arrays (e.g., `int[]`, `char[][]`, etc.),
-  object arrays (e.g.,`String[]`, `Integer[][]`, etc.).
-   - Subtypes of the supported types are not supported.
-* `{NullAndEmptySource}`: a _composed annotation_ that combines the functionality of
-  `@NullSource` and `@EmptySource`.
+* `{NullSource}`: 単一の `null` パラメーターを `@ParameterizedTest` メソッドに与えます。
+   - `@NullSource` は、プリミティブ型のパラメーターとしては使うことができません。
+* `{EmptySource}`: 単一の _空値_ を次の型のパラメーターとして `@ParameterizedTest`
+  メソッドに与えます: `java.lang.String`, `java.util.List`,
+  `java.util.Set`, `java.util.Map`, プリミティブ型の配列 (例えば、`int[]`, `char[][]` など),
+  オブジェクトの配列 (例えば、`String[]`, `Integer[][]` など)
+   - これらのサブタイプはサポートされません。
+* `{NullAndEmptySource}`: `@NullSource` と `@EmptySource` の機能を組み合わせた
+  _合成アノテーション_ です。
 
-If you need to supply multiple varying types of _empty_ or _blank_ strings to a
-parameterized test, you can achieve that using
-<<writing-tests-parameterized-tests-sources-ValueSource>> -- for example,
-`@ValueSource(strings = {" ", " ", "\t", "\n"})`.
+パラメーター化テストに複数の _空文字列_ や _空白文字列_ を与える必要がある場合、
+<<writing-tests-parameterized-tests-sources-ValueSource>> を使って実現できます。
+-- 例えば、`@ValueSource(strings = {" ", " ", "\t", "\n"})` のようにです。
 
-You can also combine `@NullSource`, `@EmptySource`, and `@ValueSource` to test a wider
-range of `null`, _empty_, and _blank_ input. The following example demonstrates how to
-achieve this for strings.
+`null` と _空文字列_、_空白文字列_ などより広い範囲の入力をテストするためには、
+`@NullSource` と `@EmptySource`、`@ValueSource` を組み合わせることもできます。
+次の例は、その実現方法を示しています。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=NullAndEmptySource_example1]
 ----
 
-Making use of the composed `@NullAndEmptySource` annotation simplifies the above as
-follows.
+合成アノテーションの `@NullAndEmptySource` を使えば、上の例は次のようにシンプルにできます。
 
 [source,java,indent=0]
 ----
 include::{testDir}/example/ParameterizedTestDemo.java[tags=NullAndEmptySource_example2]
 ----
 
-NOTE: Both variants of the `nullEmptyAndBlankStrings(String)` parameterized test method
-result in six invocations: 1 for `null`, 1 for the empty string, and 4 for the explicit
-blank strings supplied via `@ValueSource`.
+NOTE: どちらの `nullEmptyAndBlankStrings(String)` パラメーター化テストメソッドも、
+6 回呼び出されます: 1 回は `null` に対して、1 回は空文字列に対して、4 回は
+`@ValueSource` で明示的に与えられた空白文字列に対してです。
 
 [[writing-tests-parameterized-tests-sources-EnumSource]]
 ===== @EnumSource
