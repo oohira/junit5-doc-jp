@@ -1163,9 +1163,8 @@ NOTE: `@CsvSource` のシンタックスとは異なり、`@CsvFileSource` は�
 ===== @ArgumentsSource
 
 `@ArgumentsSource` は、カスタムの再利用可能な `ArgumentsProvider`
-を指定する場合に使えます。Note
-that an implementation of `ArgumentsProvider` must be declared as either a top-level
-class or as a `static` nested class.
+を指定する場合に使えます。`ArgumentsProvider` 実装は、トップレベルのクラスまたは
+`static` なネストクラスとして宣言しなければならない点に注意してください。
 
 [source,java,indent=0]
 ----
@@ -1208,8 +1207,8 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=implicit_conversion_e
 
 `String` インスタンスは、次のようなターゲット型に暗黙的に変換されます。
 
-NOTE: Decimal, hexadecimal, and octal `String` literals will be converted to their
-integral types: `byte`, `short`, `int`, `long`, and their boxed counterparts.
+NOTE: 10 進数および 16 進数、8 進数の `String` リテラルは、それぞれの整数型に変換されます:
+`byte`, `short`, `int`, `long`, そして対応するラッパー型です。
 
 [[writing-tests-parameterized-tests-argument-conversion-implicit-table]]
 [cols="10,90"]
@@ -1257,12 +1256,12 @@ integral types: `byte`, `short`, `int`, `long`, and their boxed counterparts.
 この変換は、ターゲット型が以下に示す _ファクトリメソッド_ か _ファクトリコンストラクタ_
 を1つだけ宣言している場合に機能します。
 
-- __factory method__: a non-private, `static` method declared in the target type that
-  accepts a single `String` argument and returns an instance of the target type. The name
-  of the method can be arbitrary and need not follow any particular convention.
-- __factory constructor__: a non-private constructor in the target type that accepts a
-  single `String` argument. Note that the target type must be declared as either a
-  top-level class or as a `static` nested class.
+- __ファクトリメソッド__: ターゲット型に宣言された非 private の `static` メソッドで、
+  `String` 型の引数を 1 つだけ受け取ってターゲット型のインスタンスを返します。
+  メソッドの名前は任意で、特定のルールに従う必要はありません。
+- __ファクトリコンストラクタ__: ターゲット型に宣言された非 private のコンストラクタで、
+  `String` 型の引数を 1 つだけ受け取ります。ターゲット型は、トップレベルのクラスか
+  `static` なネストクラスとして宣言しなければならない点に注意してください。
 
 NOTE: 複数の _ファクトリメソッド_ が見つかった場合、それらは無視されます。
 _ファクトリメソッド_ と _ファクトリコンストラクタ_ が両方見つかった場合は、
@@ -1285,10 +1284,9 @@ include::{testDir}/example/ParameterizedTestDemo.java[tags=implicit_fallback_con
 [[writing-tests-parameterized-tests-argument-conversion-explicit]]
 ===== 明示的な変換
 
-Instead of relying on implicit argument conversion you may explicitly specify an
-`ArgumentConverter` to use for a certain parameter using the `@ConvertWith` annotation
-like in the following example. Note that an implementation of `ArgumentConverter` must be
-declared as either a top-level class or as a `static` nested class.
+暗黙的な変換を使う代わりに、次の例のように `@ConvertWith` アノテーションを使って仮引数のための
+`ArgumentConverter` を明示的に指定することもできます。`ArgumentConverter` 実装は、
+トップレベルのクラスか `static` なネストクラスとして宣言しなければならない点に注意してください。
 
 [source,java,indent=0]
 ----
