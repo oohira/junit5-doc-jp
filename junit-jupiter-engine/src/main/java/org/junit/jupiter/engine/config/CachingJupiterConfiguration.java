@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.config;
@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import org.apiguardian.api.API;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -60,6 +61,12 @@ public class CachingJupiterConfiguration implements JupiterConfiguration {
 	}
 
 	@Override
+	public ExecutionMode getDefaultClassesExecutionMode() {
+		return (ExecutionMode) cache.computeIfAbsent(DEFAULT_CLASSES_EXECUTION_MODE_PROPERTY_NAME,
+			key -> delegate.getDefaultClassesExecutionMode());
+	}
+
+	@Override
 	public TestInstance.Lifecycle getDefaultTestInstanceLifecycle() {
 		return (TestInstance.Lifecycle) cache.computeIfAbsent(DEFAULT_TEST_INSTANCE_LIFECYCLE_PROPERTY_NAME,
 			key -> delegate.getDefaultTestInstanceLifecycle());
@@ -72,4 +79,9 @@ public class CachingJupiterConfiguration implements JupiterConfiguration {
 			key -> delegate.getExecutionConditionFilter());
 	}
 
+	@Override
+	public DisplayNameGenerator getDefaultDisplayNameGenerator() {
+		return (DisplayNameGenerator) cache.computeIfAbsent(DEFAULT_DISPLAY_NAME_GENERATOR_PROPERTY_NAME,
+			key -> delegate.getDefaultDisplayNameGenerator());
+	}
 }

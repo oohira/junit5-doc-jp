@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.descriptor;
@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -24,16 +25,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.DefaultTestInstances;
-import org.junit.platform.commons.util.PreconditionViolationException;
+import org.junit.platform.commons.PreconditionViolationException;
 import org.junit.platform.engine.ConfigurationParameters;
 import org.junit.platform.engine.EngineExecutionListener;
 import org.junit.platform.engine.TestDescriptor;
@@ -55,6 +59,12 @@ import org.mockito.Mockito;
 public class ExtensionContextTests {
 
 	private final JupiterConfiguration configuration = mock(JupiterConfiguration.class);
+
+	@BeforeEach
+	void setUp() {
+		when(configuration.getDefaultDisplayNameGenerator()).thenReturn(new DisplayNameGenerator.Standard());
+		when(configuration.getDefaultExecutionMode()).thenReturn(ExecutionMode.SAME_THREAD);
+	}
 
 	@Test
 	void fromJupiterEngineDescriptor() {
@@ -83,7 +93,7 @@ public class ExtensionContextTests {
 	@Test
 	@SuppressWarnings("resource")
 	void fromClassTestDescriptor() {
-		ClassTestDescriptor nestedClassDescriptor = nestedClassDescriptor();
+		NestedClassTestDescriptor nestedClassDescriptor = nestedClassDescriptor();
 		ClassTestDescriptor outerClassDescriptor = outerClassDescriptor(nestedClassDescriptor);
 
 		ClassExtensionContext outerExtensionContext = new ClassExtensionContext(null, null, outerClassDescriptor,
@@ -111,7 +121,7 @@ public class ExtensionContextTests {
 	@Test
 	@SuppressWarnings("resource")
 	void tagsCanBeRetrievedInExtensionContext() {
-		ClassTestDescriptor nestedClassDescriptor = nestedClassDescriptor();
+		NestedClassTestDescriptor nestedClassDescriptor = nestedClassDescriptor();
 		ClassTestDescriptor outerClassDescriptor = outerClassDescriptor(nestedClassDescriptor);
 		TestMethodTestDescriptor methodTestDescriptor = methodDescriptor();
 		outerClassDescriptor.addChild(methodTestDescriptor);
@@ -266,7 +276,7 @@ public class ExtensionContextTests {
 			() -> assertEquals(expected, context.getConfigurationParameter(key))));
 	}
 
-	private ClassTestDescriptor nestedClassDescriptor() {
+	private NestedClassTestDescriptor nestedClassDescriptor() {
 		return new NestedClassTestDescriptor(UniqueId.root("nested-class", "NestedClass"), OuterClass.NestedClass.class,
 			configuration);
 	}

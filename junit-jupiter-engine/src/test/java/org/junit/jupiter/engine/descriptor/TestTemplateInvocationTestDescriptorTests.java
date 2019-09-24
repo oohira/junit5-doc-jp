@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.descriptor;
@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
@@ -31,6 +32,7 @@ class TestTemplateInvocationTestDescriptorTests {
 		Class<MyTestCase> testClass = MyTestCase.class;
 		Method testTemplateMethod = testClass.getDeclaredMethod("testTemplate");
 		JupiterConfiguration configuration = mock(JupiterConfiguration.class);
+		when(configuration.getDefaultDisplayNameGenerator()).thenReturn(new DisplayNameGenerator.Standard());
 		TestTemplateTestDescriptor parent = new TestTemplateTestDescriptor(UniqueId.root("segment", "template"),
 			testClass, testTemplateMethod, configuration);
 		TestTemplateInvocationContext invocationContext = mock(TestTemplateInvocationContext.class);

@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.platform.commons.util;
@@ -51,6 +51,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.engine.TrackLogRecords;
 import org.junit.platform.commons.JUnitException;
+import org.junit.platform.commons.PreconditionViolationException;
 import org.junit.platform.commons.logging.LogRecordListener;
 import org.junit.platform.commons.util.ReflectionUtilsTests.ClassWithNestedClasses.Nested1;
 import org.junit.platform.commons.util.ReflectionUtilsTests.ClassWithNestedClasses.Nested2;
@@ -134,6 +135,24 @@ class ReflectionUtilsTests {
 
 		assertFalse(ReflectionUtils.isNotStatic(StaticClass.class));
 		assertFalse(ReflectionUtils.isNotStatic(StaticClass.class.getDeclaredMethod("staticMethod")));
+	}
+
+	@Test
+	void isFinal() throws Exception {
+		assertTrue(ReflectionUtils.isFinal(FinalClass.class));
+		assertTrue(ReflectionUtils.isFinal(FinalClass.class.getDeclaredMethod("finalMethod")));
+
+		assertFalse(ReflectionUtils.isFinal(PublicClass.class));
+		assertFalse(ReflectionUtils.isFinal(PublicClass.class.getDeclaredMethod("publicMethod")));
+	}
+
+	@Test
+	void isNotFinal() throws Exception {
+		assertTrue(ReflectionUtils.isNotFinal(PublicClass.class));
+		assertTrue(ReflectionUtils.isNotFinal(PublicClass.class.getDeclaredMethod("publicMethod")));
+
+		assertFalse(ReflectionUtils.isNotFinal(FinalClass.class));
+		assertFalse(ReflectionUtils.isNotFinal(FinalClass.class.getDeclaredMethod("finalMethod")));
 	}
 
 	@Test
@@ -1404,6 +1423,13 @@ class ReflectionUtilsTests {
 
 		@SuppressWarnings("unused")
 		void packageVisibleMethod() {
+		}
+	}
+
+	final class FinalClass {
+
+		@SuppressWarnings("unused")
+		final void finalMethod() {
 		}
 	}
 

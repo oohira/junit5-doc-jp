@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.platform.commons.util;
@@ -28,6 +28,7 @@ import static org.junit.platform.commons.util.StringUtils.replaceIsoControlChara
 import static org.junit.platform.commons.util.StringUtils.replaceWhitespaceCharacters;
 
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.PreconditionViolationException;
 
 /**
  * Unit tests for {@link StringUtils}.
@@ -108,7 +109,7 @@ class StringUtilsTests {
 	}
 
 	@Test
-	void replacWhitespaceCharacters() {
+	void replaceWhitespaces() {
 		assertNull(replaceWhitespaceCharacters(null, ""));
 		assertEquals("", replaceWhitespaceCharacters("", "."));
 		assertEquals("", replaceWhitespaceCharacters("\t\n\r", ""));

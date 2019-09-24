@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.descriptor;
@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,9 +30,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.descriptor.JupiterTestDescriptorTests.StaticTestCase.StaticTestCaseLevel2;
 import org.junit.platform.engine.TestSource;
@@ -51,6 +54,12 @@ class JupiterTestDescriptorTests {
 	private static final UniqueId uniqueId = UniqueId.root("enigma", "foo");
 
 	private final JupiterConfiguration configuration = mock(JupiterConfiguration.class);
+
+	@BeforeEach
+	void setUp() {
+		when(configuration.getDefaultDisplayNameGenerator()).thenReturn(new DisplayNameGenerator.Standard());
+		when(configuration.getDefaultExecutionMode()).thenReturn(ExecutionMode.SAME_THREAD);
+	}
 
 	@Test
 	void constructFromClass() {
@@ -215,8 +224,29 @@ class JupiterTestDescriptorTests {
 	}
 
 	@Test
+	void shouldTakeCustomMethodNameDescriptorFromConfigurationIfPresent() {
+		when(configuration.getDefaultDisplayNameGenerator()).thenReturn(new CustomDisplayNameGenerator());
+
+		ClassBasedTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, getClass(), configuration);
+		assertEquals("class-display-name", descriptor.getDisplayName());
+		assertEquals(getClass().getName(), descriptor.getLegacyReportingName());
+
+		descriptor = new NestedClassTestDescriptor(uniqueId, NestedTestCase.class, configuration);
+		assertEquals("nested-class-display-name", descriptor.getDisplayName());
+		assertEquals(NestedTestCase.class.getName(), descriptor.getLegacyReportingName());
+
+		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCase.class, configuration);
+		assertEquals("class-display-name", descriptor.getDisplayName());
+		assertEquals(StaticTestCase.class.getName(), descriptor.getLegacyReportingName());
+
+		descriptor = new ClassTestDescriptor(uniqueId, StaticTestCaseLevel2.class, configuration);
+		assertEquals("class-display-name", descriptor.getDisplayName());
+		assertEquals(StaticTestCaseLevel2.class.getName(), descriptor.getLegacyReportingName());
+	}
+
+	@Test
 	void defaultDisplayNamesForTestClasses() {
-		ClassTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, getClass(), configuration);
+		ClassBasedTestDescriptor descriptor = new ClassTestDescriptor(uniqueId, getClass(), configuration);
 		assertEquals(getClass().getSimpleName(), descriptor.getDisplayName());
 		assertEquals(getClass().getName(), descriptor.getLegacyReportingName());
 
@@ -233,6 +263,20 @@ class JupiterTestDescriptorTests {
 		staticDisplayName += "$" + StaticTestCaseLevel2.class.getSimpleName();
 		assertEquals(staticDisplayName, descriptor.getDisplayName());
 		assertEquals(StaticTestCaseLevel2.class.getName(), descriptor.getLegacyReportingName());
+	}
+
+	@Test
+	void enclosingClassesAreDerivedFromParent() {
+		ClassBasedTestDescriptor parentDescriptor = new ClassTestDescriptor(uniqueId, StaticTestCase.class,
+			configuration);
+		ClassBasedTestDescriptor nestedDescriptor = new NestedClassTestDescriptor(uniqueId, NestedTestCase.class,
+			configuration);
+		assertThat(parentDescriptor.getEnclosingTestClasses()).isEmpty();
+		assertThat(nestedDescriptor.getEnclosingTestClasses()).isEmpty();
+
+		parentDescriptor.addChild(nestedDescriptor);
+		assertThat(parentDescriptor.getEnclosingTestClasses()).isEmpty();
+		assertThat(nestedDescriptor.getEnclosingTestClasses()).containsExactly(StaticTestCase.class);
 	}
 
 	// -------------------------------------------------------------------------

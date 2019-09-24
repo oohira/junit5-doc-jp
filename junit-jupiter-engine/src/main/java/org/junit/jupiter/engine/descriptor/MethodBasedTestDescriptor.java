@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.descriptor;
@@ -47,7 +47,8 @@ public abstract class MethodBasedTestDescriptor extends JupiterTestDescriptor {
 
 	MethodBasedTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method testMethod,
 			JupiterConfiguration configuration) {
-		this(uniqueId, determineDisplayNameForMethod(testClass, testMethod), testClass, testMethod, configuration);
+		this(uniqueId, determineDisplayNameForMethod(testClass, testMethod, configuration), testClass, testMethod,
+			configuration);
 	}
 
 	MethodBasedTestDescriptor(UniqueId uniqueId, String displayName, Class<?> testClass, Method testMethod,

@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.descriptor;
@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,12 +30,14 @@ import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.descriptor.ClasspathResourceSource;
 import org.junit.platform.engine.support.descriptor.DirectorySource;
 import org.junit.platform.engine.support.descriptor.FilePosition;
 import org.junit.platform.engine.support.descriptor.FileSource;
+import org.junit.platform.engine.support.descriptor.MethodSource;
 import org.junit.platform.engine.support.descriptor.UriSource;
 import org.junit.platform.engine.support.hierarchical.Node;
 import org.junit.platform.engine.support.hierarchical.OpenTest4JAwareThrowableCollector;
@@ -97,7 +100,7 @@ class TestFactoryTestDescriptorTests {
 			File file = new File("src/test/resources");
 			assertThat(file).isDirectory();
 
-			URI uri = URI.create("http://example.com?foo=bar&line=42");
+			URI uri = URI.create("https://example.com?foo=bar&line=42");
 			TestSource testSource = TestFactoryTestDescriptor.fromUri(uri);
 
 			assertThat(testSource).isInstanceOf(UriSource.class);
@@ -106,6 +109,18 @@ class TestFactoryTestDescriptorTests {
 			assertThat(source.getUri()).isEqualTo(uri);
 		}
 
+		@Test
+		void methodSourceFromUri() {
+			URI uri = URI.create("method:org.junit.Foo#bar(java.lang.String,%20java.lang.String[])");
+			TestSource testSource = TestFactoryTestDescriptor.fromUri(uri);
+
+			assertThat(testSource).isInstanceOf(MethodSource.class);
+			assertThat(testSource.getClass().getSimpleName()).isEqualTo("MethodSource");
+			MethodSource source = (MethodSource) testSource;
+			assertThat(source.getClassName()).isEqualTo("org.junit.Foo");
+			assertThat(source.getMethodName()).isEqualTo("bar");
+			assertThat(source.getMethodParameterTypes()).isEqualTo("java.lang.String, java.lang.String[]");
+		}
 	}
 
 	@Nested
@@ -115,18 +130,26 @@ class TestFactoryTestDescriptorTests {
 		private ExtensionContext extensionContext;
 		private TestFactoryTestDescriptor descriptor;
 		private boolean isClosed;
+		private JupiterConfiguration jupiterConfiguration;
 
 		@BeforeEach
 		void before() throws Exception {
+			jupiterConfiguration = mock(JupiterConfiguration.class);
+			when(jupiterConfiguration.getDefaultDisplayNameGenerator()).thenReturn(new DisplayNameGenerator.Standard());
+
 			extensionContext = mock(ExtensionContext.class);
 			isClosed = false;
 
-			context = new JupiterEngineExecutionContext(null, null).extend().withThrowableCollector(
-				new OpenTest4JAwareThrowableCollector()).withExtensionContext(extensionContext).build();
+			context = new JupiterEngineExecutionContext(null, null) //
+					.extend() //
+					.withThrowableCollector(new OpenTest4JAwareThrowableCollector()) //
+					.withExtensionContext(extensionContext) //
+					.withExtensionRegistry(mock(MutableExtensionRegistry.class)) //
+					.build();
 
 			Method testMethod = CustomStreamTestCase.class.getDeclaredMethod("customStream");
 			descriptor = new TestFactoryTestDescriptor(UniqueId.forEngine("engine"), CustomStreamTestCase.class,
-				testMethod, mock(JupiterConfiguration.class));
+				testMethod, jupiterConfiguration);
 			when(extensionContext.getTestMethod()).thenReturn(Optional.of(testMethod));
 		}
 

@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.params.provider;
@@ -67,7 +67,7 @@ import org.junit.jupiter.params.ParameterizedTest;
  * <p>The following table displays compatible method signatures for parameterized
  * test methods and their corresponding factory methods.
  *
- * <table border="1">
+ * <table class="plain">
  * <tr><th>{@code @ParameterizedTest} method</th><th>Factory method</th></tr>
  * <tr><td>{@code void test(int)}</td><td>{@code static int[] factory()}</td></tr>
  * <tr><td>{@code void test(int)}</td><td>{@code static IntStream factory()}</td></tr>

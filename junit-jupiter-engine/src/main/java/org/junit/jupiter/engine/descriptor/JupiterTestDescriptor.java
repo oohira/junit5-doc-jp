@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.descriptor;
@@ -21,6 +21,7 @@ import static org.junit.platform.commons.util.AnnotationUtils.findRepeatableAnno
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -28,16 +29,18 @@ import java.util.function.Supplier;
 import org.apiguardian.api.API;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
-import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ResourceAccessMode;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
 import org.junit.jupiter.engine.execution.ConditionEvaluator;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
+import org.junit.jupiter.engine.extension.ExtensionRegistry;
 import org.junit.platform.commons.JUnitException;
 import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
+import org.junit.platform.commons.util.BlacklistedExceptions;
 import org.junit.platform.commons.util.ExceptionUtils;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.TestSource;
@@ -59,7 +62,7 @@ public abstract class JupiterTestDescriptor extends AbstractTestDescriptor
 
 	private static final ConditionEvaluator conditionEvaluator = new ConditionEvaluator();
 
-	protected final JupiterConfiguration configuration;
+	final JupiterConfiguration configuration;
 
 	JupiterTestDescriptor(UniqueId uniqueId, AnnotatedElement element, Supplier<String> displayNameSupplier,
 			TestSource source, JupiterConfiguration configuration) {
@@ -74,7 +77,7 @@ public abstract class JupiterTestDescriptor extends AbstractTestDescriptor
 
 	// --- TestDescriptor ------------------------------------------------------
 
-	protected static Set<TestTag> getTags(AnnotatedElement element) {
+	static Set<TestTag> getTags(AnnotatedElement element) {
 		// @formatter:off
 		return findRepeatableAnnotations(element, Tag.class).stream()
 				.map(Tag::value)
@@ -97,10 +100,38 @@ public abstract class JupiterTestDescriptor extends AbstractTestDescriptor
 		// @formatter:on
 	}
 
+	/**
+	 * Invoke exception handlers for the supplied {@code Throwable} one-by-one
+	 * until none are left or the throwable to handle has been swallowed.
+	 */
+	<E extends Extension> void invokeExecutionExceptionHandlers(Class<E> handlerType, ExtensionRegistry registry,
+			Throwable throwable, ExceptionHandlerInvoker<E> handlerInvoker) {
+
+		invokeExecutionExceptionHandlers(registry.getReversedExtensions(handlerType), throwable, handlerInvoker);
+	}
+
+	private <E extends Extension> void invokeExecutionExceptionHandlers(List<E> exceptionHandlers, Throwable throwable,
+			ExceptionHandlerInvoker<E> handlerInvoker) {
+
+		// No handlers left?
+		if (exceptionHandlers.isEmpty()) {
+			ExceptionUtils.throwAsUncheckedException(throwable);
+		}
+
+		try {
+			// Invoke next available handler
+			handlerInvoker.invoke(exceptionHandlers.remove(0), throwable);
+		}
+		catch (Throwable handledThrowable) {
+			BlacklistedExceptions.rethrowIfBlacklisted(handledThrowable);
+			invokeExecutionExceptionHandlers(exceptionHandlers, handledThrowable, handlerInvoker);
+		}
+	}
+
 	// --- Node ----------------------------------------------------------------
 
 	@Override
-	public final ExecutionMode getExecutionMode() {
+	public ExecutionMode getExecutionMode() {
 		Optional<ExecutionMode> executionMode = getExplicitExecutionMode();
 		if (executionMode.isPresent()) {
 			return executionMode.get();
@@ -121,15 +152,15 @@ public abstract class JupiterTestDescriptor extends AbstractTestDescriptor
 		return toExecutionMode(configuration.getDefaultExecutionMode());
 	}
 
-	protected Optional<ExecutionMode> getExplicitExecutionMode() {
+	Optional<ExecutionMode> getExplicitExecutionMode() {
 		return Optional.empty();
 	}
 
-	protected Optional<ExecutionMode> getDefaultChildExecutionMode() {
+	Optional<ExecutionMode> getDefaultChildExecutionMode() {
 		return Optional.empty();
 	}
 
-	protected Optional<ExecutionMode> getExecutionModeFromAnnotation(AnnotatedElement element) {
+	Optional<ExecutionMode> getExecutionModeFromAnnotation(AnnotatedElement element) {
 		// @formatter:off
 		return findAnnotation(element, Execution.class)
 				.map(Execution::value)
@@ -147,7 +178,7 @@ public abstract class JupiterTestDescriptor extends AbstractTestDescriptor
 		throw new JUnitException("Unknown ExecutionMode: " + mode);
 	}
 
-	protected Set<ExclusiveResource> getExclusiveResourcesFromAnnotation(AnnotatedElement element) {
+	Set<ExclusiveResource> getExclusiveResourcesFromAnnotation(AnnotatedElement element) {
 		// @formatter:off
 		return findRepeatableAnnotations(element, ResourceLock.class).stream()
 				.map(resource -> new ExclusiveResource(resource.value(), toLockMode(resource.mode())))
@@ -192,20 +223,16 @@ public abstract class JupiterTestDescriptor extends AbstractTestDescriptor
 	}
 
 	/**
-	 * Execute the supplied {@link Executable} and
-	 * {@linkplain ExceptionUtils#throwAsUncheckedException mask} any
-	 * exception thrown as an unchecked exception.
-	 *
-	 * @param executable the {@code Executable} to execute
-	 * @see ExceptionUtils#throwAsUncheckedException(Throwable)
+	 * @since 5.5
 	 */
-	protected void executeAndMaskThrowable(Executable executable) {
-		try {
-			executable.execute();
-		}
-		catch (Throwable throwable) {
-			ExceptionUtils.throwAsUncheckedException(throwable);
-		}
+	@FunctionalInterface
+	interface ExceptionHandlerInvoker<E extends Extension> {
+
+		/**
+		 * Invoke the supplied {@code exceptionHandler} with the supplied {@code throwable}.
+		 */
+		void invoke(E exceptionHandler, Throwable throwable) throws Throwable;
+
 	}
 
 }

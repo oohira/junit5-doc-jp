@@ -29,9 +29,9 @@ include the corresponding versions of the `junit-platform-launcher`,
 [subs=attributes+]
 ----
 // Only needed to run tests in a version of IntelliJ IDEA that bundles older versions
-testRuntime("org.junit.platform:junit-platform-launcher:{platform-version}")
-testRuntime("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
-testRuntime("org.junit.vintage:junit-vintage-engine:{vintage-version}")
+testRuntimeOnly("org.junit.platform:junit-platform-launcher:{platform-version}")
+testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
+testRuntimeOnly("org.junit.vintage:junit-vintage-engine:{vintage-version}")
 ----
 
 .Additional Maven Dependencies
@@ -175,29 +175,29 @@ test {
 
 In order to run any tests at all, a `TestEngine` implementation must be on the classpath.
 
-To configure support for JUnit Jupiter based tests, configure a `testCompile` dependency
-on the JUnit Jupiter API and a `testRuntime` dependency on the JUnit Jupiter `TestEngine`
+To configure support for JUnit Jupiter based tests, configure a `testImplementation` dependency
+on the JUnit Jupiter API and a `testRuntimeOnly` dependency on the JUnit Jupiter `TestEngine`
 implementation similar to the following.
 
 [source,java,indent=0]
 [subs=attributes+]
 ----
 dependencies {
-	testCompile("org.junit.jupiter:junit-jupiter-api:{jupiter-version}")
-	testRuntime("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
+	testImplementation("org.junit.jupiter:junit-jupiter-api:{jupiter-version}")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
 }
 ----
 
-The JUnit Platform can run JUnit 4 based tests as long as you configure a `testCompile`
-dependency on JUnit 4 and a `testRuntime` dependency on the JUnit Vintage `TestEngine`
+The JUnit Platform can run JUnit 4 based tests as long as you configure a `testImplementation`
+dependency on JUnit 4 and a `testRuntimeOnly` dependency on the JUnit Vintage `TestEngine`
 implementation similar to the following.
 
 [source,java,indent=0]
 [subs=attributes+]
 ----
 dependencies {
-	testCompile("junit:junit:{junit4-version}")
-	testRuntime("org.junit.vintage:junit-vintage-engine:{vintage-version}")
+	testImplementation("junit:junit:{junit4-version}")
+	testRuntimeOnly("org.junit.vintage:junit-vintage-engine:{vintage-version}")
 }
 ----
 
@@ -241,7 +241,7 @@ native support instead.
 
 Starting with https://issues.apache.org/jira/browse/SUREFIRE-1330[version 2.22.0], Maven
 Surefire and Maven Failsafe provide
-http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html[native support]
+https://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html[native support]
 for executing tests on the JUnit Platform. The `pom.xml` file in the
 `{junit5-jupiter-starter-maven}` project demonstrates how to use the Maven Surefire plugin
 and can serve as a starting point for configuring your Maven build.
@@ -449,13 +449,11 @@ link:https://ant.apache.org/manual/Types/resources.html#collection[resource coll
 for allowing users to select the tests that they want executed by test engines. This
 gives the task a consistent and natural feel when compared to many other core Ant tasks.
 
-NOTE: The version of the `junitlauncher` task shipped in Ant 1.10.3 provides basic,
-minimal support for launching the JUnit Platform. Additional enhancements (including
-support for forking the tests in a separate JVM) will be available in subsequent releases
-of Ant.
+Starting with version `1.10.6` of Ant, the `junitlauncher` task supports
+link:https://ant.apache.org/manual/Tasks/junitlauncher.html#fork[forking the tests in a separate JVM].
 
 The `build.xml` file in the `{junit5-jupiter-starter-ant}` project demonstrates how to use
-it and can serve as a starting point.
+the task and can serve as a starting point.
 
 ===== Basic Usage
 
@@ -706,6 +704,7 @@ parameters_ for the following use cases.
 - <<writing-tests-test-instance-lifecycle-changing-default>>
 - <<extensions-registration-automatic-enabling>>
 - <<extensions-conditions-deactivation>>
+- <<writing-tests-display-name-generator-default>>
 
 _Configuration Parameters_ are text-based key-value pairs that can be supplied to test
 engines running on the JUnit Platform via one of the following mechanisms.

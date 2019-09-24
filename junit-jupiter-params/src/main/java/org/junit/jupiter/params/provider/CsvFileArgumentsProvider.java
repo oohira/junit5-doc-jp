@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.params.provider;
@@ -28,7 +28,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.support.AnnotationConsumer;
-import org.junit.platform.commons.util.PreconditionViolationException;
+import org.junit.platform.commons.PreconditionViolationException;
 import org.junit.platform.commons.util.Preconditions;
 
 /**
@@ -72,7 +72,7 @@ class CsvFileArgumentsProvider implements ArgumentsProvider, AnnotationConsumer<
 		settings.getFormat().setLineSeparator(annotation.lineSeparator());
 		settings.getFormat().setQuote('"');
 		settings.getFormat().setQuoteEscape('"');
-		settings.setEmptyValue("");
+		settings.setEmptyValue(annotation.emptyValue());
 		settings.setAutoConfigurationEnabled(false);
 	}
 

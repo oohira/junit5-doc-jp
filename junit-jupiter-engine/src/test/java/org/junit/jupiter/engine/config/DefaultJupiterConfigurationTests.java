@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.config;
@@ -21,9 +21,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.platform.commons.util.PreconditionViolationException;
+import org.junit.jupiter.engine.Constants;
+import org.junit.jupiter.engine.descriptor.CustomDisplayNameGenerator;
+import org.junit.platform.commons.PreconditionViolationException;
 import org.junit.platform.engine.ConfigurationParameters;
 
 class DefaultJupiterConfigurationTests {
@@ -57,6 +60,30 @@ class DefaultJupiterConfigurationTests {
 			() -> assertDefaultConfigParam(PER_CLASS.name().toLowerCase(), PER_CLASS), //
 			() -> assertDefaultConfigParam("  " + PER_CLASS.name() + "  ", Lifecycle.PER_CLASS) //
 		);
+	}
+
+	@Test
+	void shouldGetDefaultDisplayNameGeneratorWithConfigParamSet() {
+		ConfigurationParameters parameters = mock(ConfigurationParameters.class);
+		String key = Constants.DEFAULT_DISPLAY_NAME_GENERATOR_PROPERTY_NAME;
+		when(parameters.get(key)).thenReturn(Optional.of(CustomDisplayNameGenerator.class.getName()));
+		JupiterConfiguration configuration = new DefaultJupiterConfiguration(parameters);
+
+		DisplayNameGenerator defaultDisplayNameGenerator = configuration.getDefaultDisplayNameGenerator();
+
+		assertThat(defaultDisplayNameGenerator).isInstanceOf(CustomDisplayNameGenerator.class);
+	}
+
+	@Test
+	void shouldGetStandardAsDefaultDisplayNameGeneratorWithoutConfigParamSet() {
+		ConfigurationParameters parameters = mock(ConfigurationParameters.class);
+		String key = Constants.DEFAULT_DISPLAY_NAME_GENERATOR_PROPERTY_NAME;
+		when(parameters.get(key)).thenReturn(Optional.empty());
+		JupiterConfiguration configuration = new DefaultJupiterConfiguration(parameters);
+
+		DisplayNameGenerator defaultDisplayNameGenerator = configuration.getDefaultDisplayNameGenerator();
+
+		assertThat(defaultDisplayNameGenerator).isInstanceOf(DisplayNameGenerator.Standard.class);
 	}
 
 	private void assertDefaultConfigParam(String configValue, Lifecycle expected) {

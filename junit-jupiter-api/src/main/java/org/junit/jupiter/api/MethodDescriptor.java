@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.api;
@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.apiguardian.api.API;
 
 /**
- * {@link MethodDescriptor} encapsulates functionality for a given {@link Method}.
+ * {@code MethodDescriptor} encapsulates functionality for a given {@link Method}.
  *
  * @since 5.4
  * @see MethodOrdererContext

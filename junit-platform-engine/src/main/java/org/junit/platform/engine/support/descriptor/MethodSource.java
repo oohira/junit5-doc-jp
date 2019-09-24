@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.platform.engine.support.descriptor;
@@ -52,10 +52,26 @@ public class MethodSource implements TestSource {
 	 *
 	 * @param className the class name; must not be {@code null} or blank
 	 * @param methodName the method name; must not be {@code null} or blank
-	 * @param methodParameterTypes the method parameter types as a string
+	 * @param methodParameterTypes a comma-separated list of fully qualified
+	 * class names representing the method parameter types
 	 */
 	public static MethodSource from(String className, String methodName, String methodParameterTypes) {
 		return new MethodSource(className, methodName, methodParameterTypes);
+	}
+
+	/**
+	 * Create a new {@code MethodSource} using the supplied class name, method
+	 * name, and method parameter types.
+	 *
+	 * @param className the class name; must not be {@code null} or blank
+	 * @param methodName the method name; must not be {@code null} or blank
+	 * @param methodParameterTypes a varargs array of classes representing the
+	 * method parameter types
+	 * @since 1.5
+	 */
+	@API(status = STABLE, since = "1.5")
+	public static MethodSource from(String className, String methodName, Class<?>... methodParameterTypes) {
+		return new MethodSource(className, methodName, nullSafeToString(methodParameterTypes));
 	}
 
 	/**
