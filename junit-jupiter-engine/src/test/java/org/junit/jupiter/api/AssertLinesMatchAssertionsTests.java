@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.api;
@@ -26,8 +26,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import org.junit.platform.commons.util.PreconditionViolationException;
+import org.junit.platform.commons.PreconditionViolationException;
 import org.opentest4j.AssertionFailedError;
 
 /**
@@ -114,10 +117,14 @@ class AssertLinesMatchAssertionsTests {
 		List<String> actual = Arrays.asList("first line", "third line");
 		Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual));
 		List<String> expectedErrorMessageLines = Arrays.asList( //
-			"expected 3 lines, but only got 2 ==> expected: <first line", //
+			"expected 3 lines, but only got 2 ==> expected: <", //
+			"first line", //
 			"second line", //
-			"third line> but was: <first line", //
-			"third line>");
+			"third line", //
+			"> but was: <", //
+			"first line", //
+			"third line", //
+			">");
 		assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
 	}
 
@@ -127,11 +134,15 @@ class AssertLinesMatchAssertionsTests {
 		List<String> actual = Arrays.asList("first line", "sec0nd line", "third line");
 		Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual));
 		List<String> expectedErrorMessageLines = Arrays.asList( //
-			"expected line #2:`second line` doesn't match ==> expected: <first line", //
+			"expected line #2:`second line` doesn't match ==> expected: <", //
+			"first line", //
 			"second line", //
-			"third line> but was: <first line", //
+			"third line", //
+			"> but was: <", //
+			"first line", //
 			"sec0nd line", //
-			"third line>");
+			"third line", //
+			">");
 		assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
 	}
 
@@ -141,11 +152,15 @@ class AssertLinesMatchAssertionsTests {
 		List<String> actual = Arrays.asList("first line", "second line", "third line", "last line");
 		Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual));
 		List<String> expectedErrorMessageLines = Arrays.asList( //
-			"more actual lines than expected: 1 ==> expected: <first line", //
+			"more actual lines than expected: 1 ==> expected: <", //
+			"first line", //
 			"second line", //
-			"third line> but was: <first line", //
+			"third line", "> but was: <", //
+			"first line", //
 			"second line", //
-			"third line", "last line>");
+			"third line", //
+			"last line", //
+			">");
 		assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
 	}
 
@@ -155,10 +170,14 @@ class AssertLinesMatchAssertionsTests {
 		List<String> actual = Arrays.asList("first line", "skipped", "last line");
 		Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual));
 		List<String> expectedErrorMessageLines = Arrays.asList( //
-			"terminal fast-forward(1) error: fast-forward(2) expected ==> expected: <first line", //
-			">> 1 >>> but was: <first line", //
+			"terminal fast-forward(1) error: fast-forward(2) expected ==> expected: <", //
+			"first line", //
+			">> 1 >>", //
+			"> but was: <", //
+			"first line", //
 			"skipped", //
-			"last line>");
+			"last line", //
+			">");
 		assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
 	}
 
@@ -168,10 +187,12 @@ class AssertLinesMatchAssertionsTests {
 		List<String> actual = Arrays.asList("first line", "skipped", "last line");
 		Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual));
 		List<String> expectedErrorMessageLines = Arrays.asList( //
-			"terminal fast-forward(100) error: fast-forward(2) expected ==> expected: <first line", //
-			">> 100 >>> but was: <first line", //
+			"terminal fast-forward(100) error: fast-forward(2) expected ==> expected: <", //
+			"first line", //
+			">> 100 >>", "> but was: <", "first line", //
 			"skipped", //
-			"last line>");
+			"last line", //
+			">");
 		assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
 	}
 
@@ -181,11 +202,15 @@ class AssertLinesMatchAssertionsTests {
 		List<String> actual = Arrays.asList("first line", "skipped", "last line");
 		Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual));
 		List<String> expectedErrorMessageLines = Arrays.asList( //
-			"fast-forward(∞) didn't find: `not present` ==> expected: <first line", //
+			"fast-forward(∞) didn't find: `not present` ==> expected: <", //
+			"first line", //
 			">> fails, because next line is >>", //
-			"not present> but was: <first line", //
+			"not present", //
+			"> but was: <", //
+			"first line", //
 			"skipped", //
-			"last line>");
+			"last line", //
+			">");
 		assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
 	}
 
@@ -196,13 +221,17 @@ class AssertLinesMatchAssertionsTests {
 		List<String> actual = Arrays.asList("first line", "first skipped", "second skipped", "last line");
 		Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual));
 		List<String> expectedErrorMessageLines = Arrays.asList( //
-			"expected line #4:`not present` not found - actual lines depleted ==> expected: <first line", //
+			"expected line #4:`not present` not found - actual lines depleted ==> expected: <", //
+			"first line", //
 			">> fails, because final line is missing >>", //
 			"last line", //
-			"not present> but was: <first line", //
+			"not present", //
+			"> but was: <", //
+			"first line", //
 			"first skipped", //
 			"second skipped", //
-			"last line>");
+			"last line", //
+			">");
 		assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
 	}
 
@@ -248,5 +277,71 @@ class AssertLinesMatchAssertionsTests {
 			() -> assertFalse(AssertLinesMatch.matches("12", "123")),
 			() -> assertFalse(AssertLinesMatch.matches("..+", "1")),
 			() -> assertFalse(AssertLinesMatch.matches("\\d\\d+", "1")));
+	}
+
+	@Test
+	void largeListsThatDoNotMatchAreTruncated() {
+		var expectedLines = IntStream.range(1, 999).boxed().map(Object::toString).collect(Collectors.toList());
+		var actualLines = IntStream.range(0, 1000).boxed().map(Object::toString).collect(Collectors.toList());
+		var exception = assertThrows(AssertionError.class,
+			() -> assertLinesMatch(expectedLines, actualLines, "custom message"));
+		assertLinesMatch(List.of("custom message ==> expected line #1:`1` doesn't match ==> expected: <", //
+			"1", "2", "3", //
+			">> MANY EXPECTED INTEGERS >>", //
+			"40", "41", "42", //
+			"[omitted 956 line(s)]", //
+			"> but was: <", //
+			"0", "1", "2", //
+			">> MANY ACTUAL INTEGERS >>", //
+			"39", "40", "41", //
+			"[omitted 958 line(s)]", //
+			">"), //
+			exception.getMessage().lines().collect(Collectors.toList()));
+	}
+
+	/**
+	 * @since 5.5
+	 */
+	@Nested
+	class WithCustomFailureMessage {
+		@Test
+		void simpleStringMessage() {
+			String message = "XXX";
+			List<String> expected = Arrays.asList("a", "b", "c");
+			List<String> actual = Arrays.asList("a", "d", "c");
+			Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual, message));
+			List<String> expectedErrorMessageLines = Arrays.asList( //
+				message + " ==> " + "expected line #2:`b` doesn't match ==> expected: <", //
+				"a", //
+				"b", //
+				"c", //
+				"> but was: <", //
+				"a", //
+				"d", //
+				"c", //
+				">");
+			assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
+		}
+
+		@Test
+		void stringSupplierWithMultiLineMessage() {
+			String message = "XXX\nYYY";
+			Supplier<String> supplier = () -> message;
+			List<String> expected = Arrays.asList("a", "b", "c");
+			List<String> actual = Arrays.asList("a", "d", "c");
+			Error error = assertThrows(AssertionFailedError.class, () -> assertLinesMatch(expected, actual, supplier));
+			List<String> expectedErrorMessageLines = Arrays.asList( //
+				"XXX", //
+				"YYY ==> " + "expected line #2:`b` doesn't match ==> expected: <", //
+				"a", //
+				"b", //
+				"c", //
+				"> but was: <", //
+				"a", //
+				"d", //
+				"c", //
+				">");
+			assertLinesMatch(expectedErrorMessageLines, Arrays.asList(error.getMessage().split("\\R")));
+		}
 	}
 }

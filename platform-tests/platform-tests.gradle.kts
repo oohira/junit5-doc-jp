@@ -1,4 +1,5 @@
 plugins {
+	`java-library-conventions`
 	id("me.champeau.gradle.jmh")
 }
 
@@ -24,7 +25,7 @@ dependencies {
 	}
 	testRuntimeOnly(localGroovy()) // because `ReflectionUtilsTests.findNestedClassesWithInvalidNestedClassFile` needs it
 
-	// --- http://openjdk.java.net/projects/code-tools/jmh/ -----------------------
+	// --- https://openjdk.java.net/projects/code-tools/jmh/ -----------------------
 	jmh("org.openjdk.jmh:jmh-core:${Versions.jmh}") {
 		exclude(module = "jopt-simple")
 	}

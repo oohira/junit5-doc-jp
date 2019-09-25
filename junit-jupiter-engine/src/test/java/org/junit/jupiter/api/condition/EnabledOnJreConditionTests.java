@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.api.condition;
@@ -16,12 +16,13 @@ import static org.junit.jupiter.api.condition.EnabledOnJreIntegrationTests.onJav
 import static org.junit.jupiter.api.condition.EnabledOnJreIntegrationTests.onJava11;
 import static org.junit.jupiter.api.condition.EnabledOnJreIntegrationTests.onJava12;
 import static org.junit.jupiter.api.condition.EnabledOnJreIntegrationTests.onJava13;
+import static org.junit.jupiter.api.condition.EnabledOnJreIntegrationTests.onJava14;
 import static org.junit.jupiter.api.condition.EnabledOnJreIntegrationTests.onJava8;
 import static org.junit.jupiter.api.condition.EnabledOnJreIntegrationTests.onJava9;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExecutionCondition;
-import org.junit.platform.commons.util.PreconditionViolationException;
+import org.junit.platform.commons.PreconditionViolationException;
 
 /**
  * Unit tests for {@link EnabledOnJreCondition}.
@@ -126,12 +127,22 @@ class EnabledOnJreConditionTests extends AbstractExecutionConditionTests {
 	}
 
 	/**
+	 * @see EnabledOnJreIntegrationTests#java14()
+	 */
+	@Test
+	void java14() {
+		evaluateCondition();
+		assertEnabledOnCurrentJreIf(onJava14());
+	}
+
+	/**
 	 * @see EnabledOnJreIntegrationTests#other()
 	 */
 	@Test
 	void other() {
 		evaluateCondition();
-		assertEnabledOnCurrentJreIf(!(onJava8() || onJava9() || onJava10() || onJava11() || onJava12() || onJava13()));
+		assertEnabledOnCurrentJreIf(
+			!(onJava8() || onJava9() || onJava10() || onJava11() || onJava12() || onJava13() || onJava14()));
 	}
 
 	private void assertEnabledOnCurrentJreIf(boolean condition) {

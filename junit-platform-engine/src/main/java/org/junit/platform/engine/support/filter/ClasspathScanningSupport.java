@@ -5,12 +5,12 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.platform.engine.support.filter;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 import static org.junit.platform.engine.Filter.composeFilters;
 
 import java.util.ArrayList;
@@ -28,8 +28,10 @@ import org.junit.platform.engine.discovery.PackageNameFilter;
  * Support utility methods for classpath scanning.
  *
  * @since 1.0
+ * @deprecated Please use {@link org.junit.platform.engine.support.discovery.EngineDiscoveryRequestResolver}
  */
-@API(status = INTERNAL, since = "1.0")
+@Deprecated
+@API(status = DEPRECATED, since = "1.5")
 public final class ClasspathScanningSupport {
 
 	private ClasspathScanningSupport() {
@@ -41,7 +43,9 @@ public final class ClasspathScanningSupport {
 	 * classpath scanning from an {@link EngineDiscoveryRequest}.
 	 *
 	 * @param request the request to build a predicate from
+	 * @deprecated Please use {@link org.junit.platform.engine.support.discovery.EngineDiscoveryRequestResolver}
 	 */
+	@Deprecated
 	public static Predicate<String> buildClassNamePredicate(EngineDiscoveryRequest request) {
 		List<DiscoveryFilter<String>> filters = new ArrayList<>();
 		filters.addAll(request.getFiltersByType(ClassNameFilter.class));
@@ -56,7 +60,9 @@ public final class ClasspathScanningSupport {
 	 *
 	 * @param request the request to build a name predicate from
 	 * @param classPredicate the class predicate
+	 * @deprecated Please use {@link org.junit.platform.engine.support.discovery.EngineDiscoveryRequestResolver}
 	 */
+	@Deprecated
 	public static ClassFilter buildClassFilter(EngineDiscoveryRequest request, Predicate<Class<?>> classPredicate) {
 		return ClassFilter.of(buildClassNamePredicate(request), classPredicate);
 	}

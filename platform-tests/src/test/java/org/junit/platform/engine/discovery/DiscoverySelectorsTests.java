@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.platform.engine.discovery;
@@ -43,7 +43,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.platform.commons.util.PreconditionViolationException;
+import org.junit.platform.commons.PreconditionViolationException;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 /**
@@ -59,7 +59,7 @@ class DiscoverySelectorsTests {
 		assertThrows(PreconditionViolationException.class, () -> selectUri("   "));
 		assertThrows(PreconditionViolationException.class, () -> selectUri("foo:"));
 
-		String uri = "http://junit.org";
+		String uri = "https://junit.org";
 
 		UriSelector selector = selectUri(uri);
 		assertEquals(uri, selector.getUri().toString());
@@ -70,7 +70,7 @@ class DiscoverySelectorsTests {
 		assertThrows(PreconditionViolationException.class, () -> selectUri((URI) null));
 		assertThrows(PreconditionViolationException.class, () -> selectUri("   "));
 
-		URI uri = new URI("http://junit.org");
+		URI uri = new URI("https://junit.org");
 
 		UriSelector selector = selectUri(uri);
 		assertEquals(uri, selector.getUri());

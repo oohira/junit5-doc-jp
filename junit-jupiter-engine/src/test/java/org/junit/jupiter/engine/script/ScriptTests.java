@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.script;
@@ -30,6 +30,7 @@ import org.junit.platform.commons.JUnitException;
  *
  * @since 5.1
  */
+@Deprecated
 class ScriptTests {
 
 	@Test

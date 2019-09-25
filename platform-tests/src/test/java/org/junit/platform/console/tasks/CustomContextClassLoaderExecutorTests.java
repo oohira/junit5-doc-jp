@@ -5,17 +5,20 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.platform.console.tasks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Test;
 
@@ -52,5 +55,23 @@ class CustomContextClassLoaderExecutorTests {
 
 		assertEquals(23, result);
 		assertSame(originalClassLoader, Thread.currentThread().getContextClassLoader());
+	}
+
+	@Test
+	void invokeWithCustomClassLoaderAndEnsureItIsClosedAfterUsage() throws Exception {
+		AtomicBoolean closed = new AtomicBoolean(false);
+		ClassLoader localClassLoader = new URLClassLoader(new URL[0]) {
+			@Override
+			public void close() throws IOException {
+				closed.set(true);
+				super.close();
+			}
+		};
+		CustomContextClassLoaderExecutor executor = new CustomContextClassLoaderExecutor(Optional.of(localClassLoader));
+
+		int result = executor.invoke(() -> 4711);
+
+		assertEquals(4711, result);
+		assertTrue(closed.get());
 	}
 }

@@ -1,6 +1,12 @@
+plugins {
+	`java-library-conventions`
+}
+
 apply(from = "$rootDir/gradle/testing.gradle.kts")
 
-extra["mainJavaVersion"] = JavaVersion.VERSION_11
+javaLibrary {
+	mainJavaVersion = JavaVersion.VERSION_11
+}
 
 dependencies {
 	implementation("de.sormuras:bartholdy:${Versions.bartholdy}") {
@@ -16,6 +22,10 @@ dependencies {
 	testImplementation("com.tngtech.archunit:archunit-junit5-api:${Versions.archunit}") {
 		because("checking the architecture of JUnit 5")
 	}
+	testImplementation("org.codehaus.groovy:groovy-all:${Versions.groovy}") {
+		because("it provides convenience methods to handle process output")
+		exclude(group = "org.junit.platform", module = "junit-platform-launcher")
+	}
 	testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:${Versions.archunit}") {
 		because("contains the ArchUnit TestEngine implementation")
 	}
@@ -25,6 +35,8 @@ dependencies {
 }
 
 tasks.test {
+	inputs.dir("projects")
+
 	// Opt-in via system property: '-Dplatform.tooling.support.tests.enabled=true'
 	enabled = System.getProperty("platform.tooling.support.tests.enabled")?.toBoolean() ?: false
 
@@ -43,10 +55,16 @@ tasks.test {
 			val home = project.properties["java.home.$N"]
 			if (home != null) systemProperty("java.home.$N", home)
 		}
-		// TODO Enabling parallel execution fails due to Gradle"s listener not being thread-safe:
+		// TODO Enabling parallel execution fails due to Gradle's listener not being thread-safe:
 		//   Received a completed event for test with unknown id "10.5".
 		//   Registered test ids: "[:platform-tooling-support-tests:test, 10.1]"
 		// systemProperty("junit.jupiter.execution.parallel.enabled", "true")
+
+		// Pass version constants (declared in Versions.kt) to tests as system properties
+		systemProperty("Versions.apiGuardian", Versions.apiGuardian)
+		systemProperty("Versions.assertJ", Versions.assertJ)
+		systemProperty("Versions.junit4", Versions.junit4)
+		systemProperty("Versions.ota4j", Versions.ota4j)
 	}
 
 	filter {

@@ -436,16 +436,64 @@ INFO: Method [sleep50ms] took 53 ms.
 [[extensions-exception-handling]]
 === 例外ハンドリング
 
-`{TestExecutionExceptionHandler}` は、テスト実行中に投げられた例外を扱うための
-`Extension` API を定めています。
+Exceptions thrown during the test execution may be intercepted and handled accordingly
+before propagating further, so that certain actions like error logging or resource releasing
+may be defined in specialized `Extensions`. JUnit Jupiter offers API for `Extensions` that
+wish to handle exceptions thrown during `@Test` methods via `{TestExecutionExceptionHandler}`
+and for those thrown during one of test lifecycle methods (`@BeforeAll`, `@BeforeEach`,
+`@AfterEach` and `@AfterAll`) via `{LifecycleMethodExecutionExceptionHandler}`.
 
 次の例は、`IOException` のすべてのインスタンスをもみ消し、
 それ以外の例外は再スローするような拡張機能を示しています。
 
 [source,java,indent=0]
-.例外をハンドリングする拡張機能
+.テスト実行中の IOException 例外をハンドリングする拡張機能
 ----
 include::{testDir}/example/exception/IgnoreIOExceptionExtension.java[tags=user_guide]
+----
+
+Another example shows how to record the state of an application under test exactly at
+the point of unexpected exception being thrown during setup and cleanup. Note that unlike
+relying on lifecycle callbacks, which may or may not be executed depending on the test
+status, this solution guarantees execution immediately after failing `@BeforeAll`,
+`@BeforeEach`, `@AfterEach` or `@AfterAll`.
+
+[source,java,indent=0]
+.An exception handling extension that records application state on error
+----
+include::{testDir}/example/exception/RecordStateOnErrorExtension.java[tags=user_guide]
+----
+
+Multiple execution exception handlers may be invoked for the same lifecycle method in
+order of declaration. If one of the handlers swallows the handled exception, subsequent
+ones will not be executed, and no failure will be propagated to JUnit engine, as if the
+exception was never thrown. Handlers may also choose to rethrow the exception or throw
+a different one, potentially wrapping the original.
+
+Extensions implementing `{LifecycleMethodExecutionExceptionHandler}` that wish to handle
+exceptions thrown during `@BeforeAll` or `@AfterAll` need to be registered on a class level,
+while handlers for `BeforeEach` and `AfterEach` may be also registered for individual
+test methods.
+
+[source,java,indent=0]
+.Registering multiple exception handling extensions
+----
+include::{testDir}/example/exception/MultipleHandlersTestCase.java[tags=user_guide]
+----
+
+[[extensions-intercepting-invocations]]
+=== Intercepting Invocations
+
+`{InvocationInterceptor}` defines the API for `Extensions` that wish to intercept calls to
+test code.
+
+The following example shows an extension that executes all test methods in Swing's Event
+Dispatch Thread.
+
+[source,java,indent=0]
+.An extension that executes tests in a user-defined thread
+----
+include::{testDir}/example/interceptor/SwingEdtInterceptor.java[tags=user_guide]
 ----
 
 [[extensions-test-templates]]
@@ -574,7 +622,7 @@ test method and will be repeated for every test method in the test class.
 [#extensions-execution-order-diagram,reftext='{figure-caption}']
 image::extensions_lifecycle.png[caption='',title='{figure-caption}']
 
-次の表は、<<extensions-execution-order-diagram>> の図の12ステップをさらに説明しています。
+次の表は、<<extensions-execution-order-diagram>> の図の 16 ステップをさらに説明しています。
 
 [cols="5,15,80"]
 |===
@@ -589,51 +637,74 @@ image::extensions_lifecycle.png[caption='',title='{figure-caption}']
 | コンテナのすべてのテストが実行される前に実行されるユーザーコード
 
 | 3
+| interface `org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler
+#handleBeforeAllMethodExecutionException`
+| extension code for handling exceptions thrown from `@BeforeAll` methods
+
+| 4
 | `org.junit.jupiter.api.extension.BeforeEachCallback` インターフェース
 | 各テストが実行される前に実行される拡張機能のコード
 
-| 4
+| 5
 | `org.junit.jupiter.api.BeforeEach` アノテーション
 | 各テストが実行される前に実行されるユーザーコード
 
-| 5
+| 6
+| interface `org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler
+#handleBeforeEachMethodExecutionException`
+| extension code for handling exceptions thrown from `@BeforeEach` methods
+
+| 7
 | `org.junit.jupiter.api.extension.BeforeTestExecutionCallback` インターフェース
 | テストが実行される直前に実行される拡張機能のコード
 
-| 6
+| 8
 | `org.junit.jupiter.api.Test` アノテーション
 | 実際のテストメソッドとなるユーザーコード
 
-| 7
+| 9
 | `org.junit.jupiter.api.extension.TestExecutionExceptionHandler` インターフェース
 | テストの間に投げられた例外をハンドリングするための拡張機能のコード
 
-| 8
+| 10
 | `org.junit.jupiter.api.extension.AfterTestExecutionCallback` インターフェース
 | テストが実行され、その例外ハンドラが処理された直後に実行される拡張機能のコード
 
-| 9
+| 11
 | `org.junit.jupiter.api.AfterEach` アノテーション
 | 各テストが実行された後に実行されるユーザーコード
 
-| 10
+| 12
+| interface `org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler
+#handleAfterEachMethodExecutionException`
+| extension code for handling exceptions thrown from `@AfterEach` methods
+
+| 13
 | `org.junit.jupiter.api.extension.AfterEachCallback` インターフェース
 | 各テストが実行された後に実行される拡張機能のコード
 
-| 11
+| 14
 | `org.junit.jupiter.api.AfterAll` アノテーション
 | コンテナのすべてのテストが実行された後に実行されるユーザーコード
 
-| 12
+| 15
+| interface `org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler
+#handleAfterAllMethodExecutionException`
+| extension code for handling exceptions thrown from `@AfterAll` methods
+
+| 16
 | `org.junit.jupiter.api.extension.AfterAllCallback` インターフェース
 | コンテナのすべてのテストが実行された後に実行される拡張機能のコード
 
 |===
 
-最も単純な場合は、実際のテストメソッドだけが実行されます (ステップ 6)。
+最も単純な場合は、実際のテストメソッドだけが実行されます (ステップ 8)。
 ほかのすべてのステップは、ライフサイクルコールバックに対するユーザーコードや拡張機能コードの
 有無によって省略可能です。様々なライフサイクルコールバックに関する詳細については、
 各アノテーションや拡張機能に対する Javadoc を参照してください。
+
+All invocations of user code methods in the above table can additionally be intercepted
+by implementing <<extensions-intercepting-invocations, `InvocationInterceptor`>>.
 
 [[extensions-execution-order-wrapping-behavior]]
 ==== Wrapping Behavior of Callbacks

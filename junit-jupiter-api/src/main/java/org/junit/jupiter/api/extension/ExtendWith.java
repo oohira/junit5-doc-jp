@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.api.extension;
@@ -30,6 +30,7 @@ import org.apiguardian.api.API;
  * <h3>Supported Extension APIs</h3>
  * <ul>
  * <li>{@link ExecutionCondition}</li>
+ * <li>{@link InvocationInterceptor}</li>
  * <li>{@link BeforeAllCallback}</li>
  * <li>{@link AfterAllCallback}</li>
  * <li>{@link BeforeEachCallback}</li>

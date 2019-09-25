@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.platform.engine.discovery;
@@ -25,9 +25,9 @@ class UriSelectorTests extends AbstractEqualsAndHashCodeTests {
 
 	@Test
 	void equalsAndHashCode() throws Exception {
-		var selector1 = new UriSelector(new URI("http://junit.org"));
-		var selector2 = new UriSelector(new URI("http://junit.org"));
-		var selector3 = new UriSelector(new URI("http://example.org"));
+		var selector1 = new UriSelector(new URI("https://junit.org"));
+		var selector2 = new UriSelector(new URI("https://junit.org"));
+		var selector3 = new UriSelector(new URI("https://example.org"));
 
 		assertEqualsAndHashCode(selector1, selector2, selector3);
 	}

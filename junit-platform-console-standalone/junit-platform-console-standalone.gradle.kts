@@ -1,4 +1,5 @@
 plugins {
+	`java-library-conventions`
 	id("com.github.johnrengelman.shadow")
 }
 
@@ -19,20 +20,11 @@ tasks {
 	jar {
 		enabled = false
 		manifest {
-			// Note: do not add `"Automatic-Module-Name": ...` because this artifact is not
-			// meant to be used on the Java 9 module path.
-			// See https://github.com/junit-team/junit5/issues/866#issuecomment-306017162
 			attributes("Main-Class" to "org.junit.platform.console.ConsoleLauncher")
 		}
 		dependsOn(shadowJar)
 	}
 	shadowJar {
-		// Generate shadow jar only if the underlying manifest was regenerated.
-		// See https://github.com/junit-team/junit5/issues/631
-		onlyIf {
-			(rootProject.extra["generateManifest"] as Boolean || !archivePath.exists())
-		}
-
 		classifier = ""
 		configurations = listOf(project.configurations["shadowed"])
 
@@ -59,9 +51,9 @@ tasks {
 					"Engine-Version-junit-jupiter" to jupiterVersion,
 					"Engine-Version-junit-vintage" to vintageVersion,
 					// Version-aware binaries are already included - set Multi-Release flag here.
-					// See http://openjdk.java.net/jeps/238 for details
+					// See https://openjdk.java.net/jeps/238 for details
 					// Note: the "jar --update ... --release X" command does not work with the
-					// shadowed JAR as it contains nested classes that do comply multi-release jars.
+					// shadowed JAR as it contains nested classes that do not comply with multi-release jars.
 					"Multi-Release" to true
 			))
 		}

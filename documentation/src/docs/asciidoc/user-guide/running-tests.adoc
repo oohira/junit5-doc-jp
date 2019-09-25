@@ -30,9 +30,9 @@ JUnit 5の異なるバージョン (例えば、 {jupiter-version}) を使うに
 [subs=attributes+]
 ----
 // Only needed to run tests in a version of IntelliJ IDEA that bundles older versions
-testRuntime("org.junit.platform:junit-platform-launcher:{platform-version}")
-testRuntime("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
-testRuntime("org.junit.vintage:junit-vintage-engine:{vintage-version}")
+testRuntimeOnly("org.junit.platform:junit-platform-launcher:{platform-version}")
+testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
+testRuntimeOnly("org.junit.vintage:junit-vintage-engine:{vintage-version}")
 ----
 
 .Mavenの追加の依存関係
@@ -177,28 +177,28 @@ test {
 テストを実行させるためには、`TestEngine` の実装がクラスパスに存在しなければなりません。
 
 JUnit Jupiterベースのテストをサポートするためには、JUnit Jupiter API
-に対する `testCompile` 依存と、JUnit Jupiter `TestEngine`
-実装に対する `testRuntime` 依存を次のように指定する必要があります。
+に対する `testImplementation` 依存と、JUnit Jupiter `TestEngine`
+実装に対する `testRuntimeOnly` 依存を次のように指定する必要があります。
 
 [source,java,indent=0]
 [subs=attributes+]
 ----
 dependencies {
-	testCompile("org.junit.jupiter:junit-jupiter-api:{jupiter-version}")
-	testRuntime("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
+	testImplementation("org.junit.jupiter:junit-jupiter-api:{jupiter-version}")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:{jupiter-version}")
 }
 ----
 
 JUnit Platformは、JUnit 4ベースのテストも実行することができます。
-そのためには、JUnit 4に対する `testCompile` 依存と、JUnit Vintage
-`TestEngine` 実装に対する `testRuntime` 依存が必要です。
+そのためには、JUnit 4に対する `testImplementation` 依存と、JUnit Vintage
+`TestEngine` 実装に対する `testRuntimeOnly` 依存が必要です。
 
 [source,java,indent=0]
 [subs=attributes+]
 ----
 dependencies {
-	testCompile("junit:junit:{junit4-version}")
-	testRuntime("org.junit.vintage:junit-vintage-engine:{vintage-version}")
+	testImplementation("junit:junit:{junit4-version}")
+	testRuntimeOnly("org.junit.vintage:junit-vintage-engine:{vintage-version}")
 }
 ----
 
@@ -241,7 +241,7 @@ JUnit Platform 1.3で非推奨となり、JUnit Platform 1.4で廃止されま�
 
 https://issues.apache.org/jira/browse/SUREFIRE-1330[バージョン 2.22.0] から、
 Maven SurefireとMaven Failsafeは、JUnit Platform上でテストを実行するための
-http://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html[ネイティブサポート]
+https://maven.apache.org/surefire/maven-surefire-plugin/examples/junit-platform.html[ネイティブサポート]
 を提供しています。 `{junit5-jupiter-starter-maven}` プロジェクトの `pom.xml`
 ファイルがMaven Surefireプラグインの使い方を示すとともに、Mavenビルドを設定するための出発点となるでしょう。
 
@@ -447,13 +447,11 @@ link:https://ant.apache.org/manual/Types/resources.html#collection[リソース�
 のように、Antの既存機能と可能な限り一貫性を保とうとしています。
 これにより、Antの他のコアタスクと比べても、一貫性があり直感的なものになっています。
 
-NOTE: Ant 1.10.3 でリリースされた `junitlauncher` タスクは、
-JUnit Platformを起動する基本的かつ最低限のサポートだけを提供します。
-追加の機能強化 (異なるJVMにforkしてのテスト実行サポートを含む) は、
-今後のAntリリースで利用可能になる予定です。
+Ant のバージョン `1.10.6` から、`junitlauncher` タスクは
+link:https://ant.apache.org/manual/Tasks/junitlauncher.html#fork[異なる JVM に fork してのテスト実行] をサポートしています。
 
 `{junit5-jupiter-starter-ant}` プロジェクトの `build.xml`
-ファイルが使い方を示しています。
+ファイルがタスクの使い方を示しています。
 
 ===== 基本的な使い方
 
@@ -707,6 +705,7 @@ infrastructure.
 - <<writing-tests-test-instance-lifecycle-changing-default>>
 - <<extensions-registration-automatic-enabling>>
 - <<extensions-conditions-deactivation>>
+- <<writing-tests-display-name-generator-default>>
 
 _設定パラメーター_ は、テキストベースのキーと値のペアで、JUnit Platform
 で動作するテストエンジンに次のいずれかの方法で渡されます。

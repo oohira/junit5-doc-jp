@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.platform.commons.util;
@@ -215,51 +215,97 @@ public final class ReflectionUtils {
 	}
 
 	public static boolean isPublic(Class<?> clazz) {
+		Preconditions.notNull(clazz, "Class must not be null");
 		return Modifier.isPublic(clazz.getModifiers());
 	}
 
 	public static boolean isPublic(Member member) {
+		Preconditions.notNull(member, "Member must not be null");
 		return Modifier.isPublic(member.getModifiers());
 	}
 
 	public static boolean isPrivate(Class<?> clazz) {
+		Preconditions.notNull(clazz, "Class must not be null");
 		return Modifier.isPrivate(clazz.getModifiers());
 	}
 
 	public static boolean isPrivate(Member member) {
+		Preconditions.notNull(member, "Member must not be null");
 		return Modifier.isPrivate(member.getModifiers());
 	}
 
+	@API(status = INTERNAL, since = "1.4")
 	public static boolean isNotPrivate(Class<?> clazz) {
 		return !isPrivate(clazz);
 	}
 
+	@API(status = INTERNAL, since = "1.1")
 	public static boolean isNotPrivate(Member member) {
 		return !isPrivate(member);
 	}
 
 	public static boolean isAbstract(Class<?> clazz) {
+		Preconditions.notNull(clazz, "Class must not be null");
 		return Modifier.isAbstract(clazz.getModifiers());
 	}
 
 	public static boolean isAbstract(Member member) {
+		Preconditions.notNull(member, "Member must not be null");
 		return Modifier.isAbstract(member.getModifiers());
 	}
 
 	public static boolean isStatic(Class<?> clazz) {
+		Preconditions.notNull(clazz, "Class must not be null");
 		return Modifier.isStatic(clazz.getModifiers());
 	}
 
+	@API(status = INTERNAL, since = "1.4")
 	public static boolean isNotStatic(Class<?> clazz) {
 		return !isStatic(clazz);
 	}
 
 	public static boolean isStatic(Member member) {
+		Preconditions.notNull(member, "Member must not be null");
 		return Modifier.isStatic(member.getModifiers());
 	}
 
+	@API(status = INTERNAL, since = "1.1")
 	public static boolean isNotStatic(Member member) {
 		return !isStatic(member);
+	}
+
+	/**
+	 * @since 1.5
+	 */
+	@API(status = INTERNAL, since = "1.5")
+	public static boolean isFinal(Class<?> clazz) {
+		Preconditions.notNull(clazz, "Class must not be null");
+		return Modifier.isFinal(clazz.getModifiers());
+	}
+
+	/**
+	 * @since 1.5
+	 */
+	@API(status = INTERNAL, since = "1.5")
+	public static boolean isNotFinal(Class<?> clazz) {
+		return !isFinal(clazz);
+	}
+
+	/**
+	 * @since 1.5
+	 */
+	@API(status = INTERNAL, since = "1.5")
+	public static boolean isFinal(Member member) {
+		Preconditions.notNull(member, "Member must not be null");
+		return Modifier.isFinal(member.getModifiers());
+	}
+
+	/**
+	 * @since 1.5
+	 */
+	@API(status = INTERNAL, since = "1.5")
+	public static boolean isNotFinal(Member member) {
+		return !isFinal(member);
 	}
 
 	/**
@@ -275,6 +321,7 @@ public final class ReflectionUtils {
 	 * @return {@code true} if the class is an <em>inner class</em>
 	 */
 	public static boolean isInnerClass(Class<?> clazz) {
+		Preconditions.notNull(clazz, "Class must not be null");
 		return !isStatic(clazz) && clazz.isMemberClass();
 	}
 
@@ -973,7 +1020,7 @@ public final class ReflectionUtils {
 	/**
 	 * Get the sole declared {@link Constructor} for the supplied class.
 	 *
-	 * <p>Throws a {@link PreconditionViolationException} if the supplied
+	 * <p>Throws a {@link org.junit.platform.commons.PreconditionViolationException} if the supplied
 	 * class declares more than one constructor.
 	 *
 	 * @param clazz the class to get the constructor for

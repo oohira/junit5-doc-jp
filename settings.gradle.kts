@@ -1,4 +1,7 @@
 pluginManagement {
+	repositories {
+		gradlePluginPortal()
+	}
 	resolutionStrategy {
 		eachPlugin {
 			when (requested.id.id) {
@@ -12,6 +15,7 @@ pluginManagement {
 				"org.asciidoctor.convert" -> useVersion(Versions.asciidoctorPlugin)
 				"me.champeau.gradle.jmh" -> useVersion(Versions.jmhPlugin)
 				"de.marcphilipp.nexus-publish" -> useVersion(Versions.nexusPublishPlugin)
+				"io.spring.nohttp" -> useVersion(Versions.noHttpPlugin)
 			}
 		}
 	}
@@ -32,7 +36,6 @@ include("junit-jupiter-engine")
 include("junit-jupiter-migrationsupport")
 include("junit-jupiter-params")
 include("junit-platform-commons")
-include("junit-platform-commons-java-9")
 include("junit-platform-console")
 include("junit-platform-console-standalone")
 include("junit-platform-engine")

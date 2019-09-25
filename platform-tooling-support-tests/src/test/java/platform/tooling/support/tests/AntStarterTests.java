@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package platform.tooling.support.tests;
@@ -28,10 +28,10 @@ import platform.tooling.support.Request;
 class AntStarterTests {
 
 	@Test
-	void ant_1_10_4() {
+	void ant_1_10_6() {
 		var standalone = Paths.get("..", "junit-platform-console-standalone", "build", "libs");
 		var result = Request.builder() //
-				.setTool(Ant.install("1.10.4", Paths.get("build", "test-tools"))) //
+				.setTool(Ant.install("1.10.6", Paths.get("build", "test-tools"))) //
 				.setProject("ant-starter") //
 				.addArguments("-verbose", "-lib", standalone.toAbsolutePath()) //
 				.build() //

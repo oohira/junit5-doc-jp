@@ -5,7 +5,7 @@
  * made available under the terms of the Eclipse Public License v2.0 which
  * accompanies this distribution and is available at
  *
- * http://www.eclipse.org/legal/epl-v20.html
+ * https://www.eclipse.org/legal/epl-v20.html
  */
 
 package org.junit.jupiter.engine.descriptor;
@@ -17,10 +17,12 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 import org.apiguardian.api.API;
+import org.junit.jupiter.api.extension.InvocationInterceptor;
 import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
+import org.junit.jupiter.engine.execution.ExecutableInvoker.ReflectiveInterceptorCall;
 import org.junit.jupiter.engine.execution.JupiterEngineExecutionContext;
-import org.junit.jupiter.engine.extension.ExtensionRegistry;
+import org.junit.jupiter.engine.extension.MutableExtensionRegistry;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.UniqueId;
 import org.junit.platform.engine.support.hierarchical.ExclusiveResource;
@@ -35,13 +37,16 @@ import org.junit.platform.engine.support.hierarchical.ExclusiveResource;
 public class TestTemplateInvocationTestDescriptor extends TestMethodTestDescriptor {
 
 	public static final String SEGMENT_TYPE = "test-template-invocation";
+	private static final ReflectiveInterceptorCall<Method, Void> interceptorCall = ReflectiveInterceptorCall.ofVoidMethod(
+		InvocationInterceptor::interceptTestTemplateMethod);
 
 	private TestTemplateInvocationContext invocationContext;
 	private final int index;
 
 	TestTemplateInvocationTestDescriptor(UniqueId uniqueId, Class<?> testClass, Method templateMethod,
 			TestTemplateInvocationContext invocationContext, int index, JupiterConfiguration configuration) {
-		super(uniqueId, invocationContext.getDisplayName(index), testClass, templateMethod, configuration);
+		super(uniqueId, invocationContext.getDisplayName(index), testClass, templateMethod, configuration,
+			interceptorCall);
 		this.invocationContext = invocationContext;
 		this.index = index;
 	}
@@ -58,8 +63,8 @@ public class TestTemplateInvocationTestDescriptor extends TestMethodTestDescript
 	}
 
 	@Override
-	protected ExtensionRegistry populateNewExtensionRegistry(JupiterEngineExecutionContext context) {
-		ExtensionRegistry registry = super.populateNewExtensionRegistry(context);
+	protected MutableExtensionRegistry populateNewExtensionRegistry(JupiterEngineExecutionContext context) {
+		MutableExtensionRegistry registry = super.populateNewExtensionRegistry(context);
 		invocationContext.getAdditionalExtensions().forEach(
 			extension -> registry.registerExtension(extension, invocationContext));
 		return registry;
